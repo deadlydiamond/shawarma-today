@@ -7,12 +7,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Section } from "@/components/ui/Section"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { Beef, UtensilsCrossed, Salad, Heart, MapPin, Phone, Clock, Star, Percent, Tag, ArrowRight } from "lucide-react"
+import { Beef, UtensilsCrossed, Salad, Heart, MapPin, Phone, Clock, Star, Percent, Tag, ArrowRight, Users, Award, Flame } from "lucide-react"
 import Reviews from "@/components/ui/Reviews"
 import contentData from "@/src/content/content.json"
 import PopularTimes from "@/components/ui/PopularTimes"
 import { DynamicMenu } from "@/components/ui/DynamicMenu"
 import { useMenu } from "@/contexts/MenuContext"
+import { AnimatedSection, AnimatedCounter } from "@/components/ui/AnimatedSection"
 
 export default function Home() {
   const { promotions, banners, getTodaySpecials } = useMenu()
@@ -47,32 +48,88 @@ export default function Home() {
           {/* Black 85% opacity overlay */}
           <div className="absolute inset-0 bg-black/85" />
         </div>
+
+        {/* Floating Decorative Food Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Floating spice particles */}
+          <div className="absolute top-20 left-[10%] w-3 h-3 bg-shawarma/60 rounded-full animate-float-slow" style={{ animationDelay: '0s' }} />
+          <div className="absolute top-40 right-[15%] w-2 h-2 bg-yellow-500/50 rounded-full animate-float-medium" style={{ animationDelay: '1s' }} />
+          <div className="absolute bottom-40 left-[20%] w-4 h-4 bg-shawarma/40 rounded-full animate-float-fast" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute top-60 right-[25%] w-2 h-2 bg-orange-400/50 rounded-full animate-float-slow" style={{ animationDelay: '2s' }} />
+          <div className="absolute bottom-60 right-[10%] w-3 h-3 bg-red-500/40 rounded-full animate-float-medium" style={{ animationDelay: '1.5s' }} />
+          
+          {/* Large decorative blurs */}
+          <div className="absolute top-1/4 left-0 w-72 h-72 bg-shawarma/10 rounded-full blur-3xl animate-pulse-slow" />
+          <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }} />
+        </div>
         
         {/* Content */}
         <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 text-center">
-          <div className="animate-fade-in">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading tracking-wide mb-8 text-white text-balance drop-shadow-2xl uppercase">
-              <span className="text-shawarma drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">Authentic Shawarma</span>
+          <div className="space-y-8">
+            {/* Trust Badge */}
+            <div className="animate-slide-up flex justify-center" style={{ animationDelay: '0.2s' }}>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white/90 text-sm">
+                <div className="flex -space-x-2">
+                  <div className="w-6 h-6 rounded-full bg-shawarma flex items-center justify-center text-xs">⭐</div>
+                  <div className="w-6 h-6 rounded-full bg-shawarma-600 flex items-center justify-center text-xs">⭐</div>
+                  <div className="w-6 h-6 rounded-full bg-shawarma-700 flex items-center justify-center text-xs">⭐</div>
+                </div>
+                <span className="font-medium">Loved by 500+ customers</span>
+              </div>
+            </div>
+
+            {/* Main Heading with Staggered Animation */}
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading tracking-wide text-white text-balance drop-shadow-2xl uppercase">
+              <span className="inline-block animate-slide-up text-shawarma drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]" style={{ animationDelay: '0.3s' }}>
+                Authentic Shawarma
+              </span>
               <br />
-              <span className="text-white font-heading">made fresh daily</span>
-          </h1>
-            <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+              <span className="inline-block animate-slide-up text-white font-heading" style={{ animationDelay: '0.5s' }}>
+                made fresh daily
+              </span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto leading-relaxed drop-shadow-md animate-slide-up" style={{ animationDelay: '0.7s' }}>
               Traditional Middle Eastern flavours, served fast and fresh
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a href="#menu" className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-shawarma-50 text-shawarma-800 hover:bg-shawarma-100 border-2 border-shawarma-100 min-w-[160px] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
-                <UtensilsCrossed className="h-5 w-5" /> View Menu
+            
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-slide-up" style={{ animationDelay: '0.9s' }}>
+              <a href="#menu" className="group inline-flex items-center justify-center gap-3 px-8 py-3 bg-shawarma-50 text-shawarma-800 hover:bg-shawarma-100 border-2 border-shawarma-100 min-w-[160px] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg press-effect">
+                <UtensilsCrossed className="h-5 w-5 group-hover:rotate-12 transition-transform" /> View Menu
               </a>
-              <a href="#contact" className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-shawarma border-2 border-shawarma text-white hover:bg-[#d95a1e] min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
-                <MapPin className="h-5 w-5" /> Visit Us
+              <a href="#contact" className="group inline-flex items-center justify-center gap-3 px-8 py-3 bg-shawarma border-2 border-shawarma text-white hover:bg-[#d95a1e] min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg press-effect ripple">
+                <MapPin className="h-5 w-5 group-hover:bounce transition-transform" /> Visit Us
               </a>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="flex flex-wrap justify-center gap-8 pt-8 animate-slide-up" style={{ animationDelay: '1.1s' }}>
+              <div className="flex items-center gap-2 text-white/80">
+                <Flame className="h-5 w-5 text-shawarma" />
+                <span className="text-sm font-medium">Fresh Daily</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/80">
+                <Award className="h-5 w-5 text-yellow-500" />
+                <span className="text-sm font-medium">100% Halal</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/80">
+                <Users className="h-5 w-5 text-green-400" />
+                <span className="text-sm font-medium">Family Owned</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Decorative Elements */}
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-2">
+            <div className="w-1.5 h-3 bg-white/50 rounded-full animate-pulse" />
+          </div>
+        </div>
       </section>
 
       {/* Hero Position Banners */}
@@ -108,84 +165,86 @@ export default function Home() {
         {/* Liquid background effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/90 via-white/80 to-white/90" />
         <div className="relative z-10">
-          <div className="text-center mb-20 animate-slide-up">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 pb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Our Offerings
-          </h2>
+          <AnimatedSection animation="fade-up" className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 pb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+              Our Offerings
+            </h2>
             <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed font-light">
-            Discover our authentic Middle Eastern cuisine
-          </p>
-        </div>
+              Discover our authentic Middle Eastern cuisine
+            </p>
+          </AnimatedSection>
 
-        {/* Horizontal scroll on mobile, grid on desktop */}
-        <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 -mx-6 px-6 md:mx-0 md:px-0 md:overflow-visible scrollbar-hide snap-x snap-mandatory">
-          {[
-            {
-              icon: UtensilsCrossed,
-              title: "10\" Pizzas",
-              description: "Fresh baked pizzas from £4.99",
-              image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=75",
-              filter: "pizzas",
-            },
-            {
-              icon: Beef,
-              title: "Shawarma & Wraps",
-              description: "Lamb & chicken wraps from £4.50",
-              image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=600&q=75",
-              filter: "wraps",
-            },
-            {
-              icon: Beef,
-              title: "Grill & Platters",
-              description: "Kebabs, tikka & mix platters",
-              image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=75",
-              filter: "grill",
-            },
-          ].map((feature, index) => (
-            <button
-              key={feature.title}
-              onClick={() => {
-                // Scroll to menu section first
-                const menuSection = document.getElementById('menu')
-                if (menuSection) {
-                  menuSection.scrollIntoView({ behavior: 'smooth' })
-                }
-                // Set hash after a small delay to ensure scroll completes
-                setTimeout(() => {
-                  window.location.hash = `menu-${feature.filter}`
-                }, 100)
-              }}
-              className="block flex-shrink-0 w-[280px] md:w-auto snap-start text-left"
-            >
-              <Card
-                className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer h-full"
-              >
-                <div className="relative h-40 md:h-48 overflow-hidden rounded-t-xl bg-gray-100">
-                  <Image
-                    src={feature.image}
-                    alt={feature.title}
-                    fill
-                    className="object-cover transition-transform duration-200 group-hover:scale-105"
-                    loading="lazy"
-                    sizes="(max-width: 768px) 280px, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <div className="flex items-center gap-2 mb-1">
-                      <feature.icon className="h-4 w-4 text-white" strokeWidth={2} />
-                      <span className="text-white font-semibold text-base drop-shadow-md">{feature.title}</span>
+          {/* Horizontal scroll on mobile, grid on desktop */}
+          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 -mx-6 px-6 md:mx-0 md:px-0 md:overflow-visible scrollbar-hide snap-x snap-mandatory">
+            {[
+              {
+                icon: UtensilsCrossed,
+                title: "10\" Pizzas",
+                description: "Fresh baked pizzas from £4.99",
+                image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=75",
+                filter: "pizzas",
+              },
+              {
+                icon: Beef,
+                title: "Shawarma & Wraps",
+                description: "Lamb & chicken wraps from £4.50",
+                image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=600&q=75",
+                filter: "wraps",
+              },
+              {
+                icon: Beef,
+                title: "Grill & Platters",
+                description: "Kebabs, tikka & mix platters",
+                image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=75",
+                filter: "grill",
+              },
+            ].map((feature, index) => (
+              <AnimatedSection key={feature.title} animation="zoom" delay={index * 150}>
+                <button
+                  onClick={() => {
+                    // Scroll to menu section first
+                    const menuSection = document.getElementById('menu')
+                    if (menuSection) {
+                      menuSection.scrollIntoView({ behavior: 'smooth' })
+                    }
+                    // Set hash after a small delay to ensure scroll completes
+                    setTimeout(() => {
+                      window.location.hash = `menu-${feature.filter}`
+                    }, 100)
+                  }}
+                  className="block flex-shrink-0 w-[280px] md:w-auto snap-start text-left"
+                >
+                  <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer h-full hover-lift">
+                    <div className="relative h-40 md:h-48 overflow-hidden rounded-t-xl bg-gray-100">
+                      <Image
+                        src={feature.image}
+                        alt={feature.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                        sizes="(max-width: 768px) 280px, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/70 transition-all" />
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="p-1.5 rounded-lg bg-shawarma/80 backdrop-blur-sm group-hover:bg-shawarma transition-colors">
+                            <feature.icon className="h-4 w-4 text-white" strokeWidth={2} />
+                          </div>
+                          <span className="text-white font-semibold text-base drop-shadow-md">{feature.title}</span>
+                        </div>
+                        <p className="text-white/80 text-xs line-clamp-1">{feature.description}</p>
+                      </div>
                     </div>
-                    <p className="text-white/80 text-xs line-clamp-1">{feature.description}</p>
-                  </div>
-                </div>
-                <CardContent className="p-3">
-                  <span className="text-xs font-medium text-gray-500 group-hover:text-gray-900 transition-colors flex items-center gap-2">
-                    <UtensilsCrossed className="h-3 w-3" /> View Menu
-                  </span>
-                </CardContent>
-              </Card>
-            </button>
-          ))}
+                    <CardContent className="p-3">
+                      <span className="text-xs font-medium text-gray-500 group-hover:text-shawarma transition-colors flex items-center gap-2">
+                        <UtensilsCrossed className="h-3 w-3 group-hover:rotate-12 transition-transform" /> View Menu
+                        <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                      </span>
+                    </CardContent>
+                  </Card>
+                </button>
+              </AnimatedSection>
+            ))}
           </div>
         </div>
       </Section>
@@ -195,14 +254,14 @@ export default function Home() {
         {/* Liquid background effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-gray-50/60 to-white/80 backdrop-blur-3xl" />
         <div className="relative z-10">
-          <div className="text-center mb-12 md:mb-16">
+          <AnimatedSection animation="fade-up" className="text-center mb-12 md:mb-16">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-4 md:mb-6 pb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Our Menu
-          </h2>
-          <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-            A selection of our most popular items
-          </p>
-        </div>
+              Our Menu
+            </h2>
+            <p className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed">
+              A selection of our most popular items
+            </p>
+          </AnimatedSection>
 
         {/* Active Promotions Banner */}
         {activePromotions.length > 0 && (
@@ -301,9 +360,9 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-50/95 via-white/85 to-gray-100/95" />
         <div className="relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-            <div className="animate-slide-up space-y-6">
+            <AnimatedSection animation="slide-left" className="space-y-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-lg bg-shawarma shadow-sm">
+                <div className="p-2 rounded-lg bg-shawarma shadow-sm animate-pulse-slow">
                   <Heart className="h-5 w-5 text-white" strokeWidth={2} />
                 </div>
                 <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
@@ -319,16 +378,48 @@ export default function Home() {
               <p className="text-lg md:text-xl text-foreground/70 leading-relaxed">
                 Every wrap is made fresh to order with premium halal meat, house-made sauces, and crisp vegetables. Experience the real taste of shawarma, just like it&apos;s meant to be.
               </p>
-            </div>
-            <div className="relative h-[600px] rounded-3xl overflow-hidden shadow-2xl animate-scale-in ring-1 ring-border/50">
+              
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-4 pt-6">
+                <div className="text-center p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-gray-100 hover-scale">
+                  <div className="text-3xl font-bold text-shawarma">10+</div>
+                  <div className="text-sm text-gray-600">Years Experience</div>
+                </div>
+                <div className="text-center p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-gray-100 hover-scale">
+                  <div className="text-3xl font-bold text-shawarma">500+</div>
+                  <div className="text-sm text-gray-600">Happy Customers</div>
+                </div>
+                <div className="text-center p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-gray-100 hover-scale">
+                  <div className="text-3xl font-bold text-shawarma">40+</div>
+                  <div className="text-sm text-gray-600">Menu Items</div>
+                </div>
+              </div>
+            </AnimatedSection>
+            
+            <AnimatedSection animation="slide-right" className="relative h-[600px] rounded-3xl overflow-hidden shadow-2xl ring-1 ring-border/50 group">
               <Image
                 src="https://images.unsplash.com/photo-1561651823-34feb02250e4?w=800&q=75"
                 alt="Fresh shawarma"
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+              
+              {/* Floating badge on image */}
+              <div className="absolute bottom-6 left-6 right-6">
+                <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-yellow-500 animate-badge-bounce">
+                      <Star className="h-5 w-5 text-white fill-white" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-gray-900">5.0 Rating</div>
+                      <div className="text-sm text-gray-600">Based on Google Reviews</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AnimatedSection>
           </div>
         </div>
       </Section>
@@ -345,8 +436,8 @@ export default function Home() {
       <Section id="contact" className="relative py-16 bg-gray-50">
         <div className="relative z-10 max-w-7xl mx-auto">
           {/* Section Header */}
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 bg-shawarma/10 text-shawarma font-semibold text-sm rounded-full mb-4">
+          <AnimatedSection animation="fade-up" className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 bg-shawarma/10 text-shawarma font-semibold text-sm rounded-full mb-4 animate-badge-bounce">
               📍 Find Us
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
@@ -355,7 +446,7 @@ export default function Home() {
             <p className="text-gray-600 max-w-lg mx-auto">
               Fresh shawarma, warm hospitality, and the best Middle Eastern flavors in Edinburgh
             </p>
-          </div>
+          </AnimatedSection>
 
           {/* Main Content - Bento Grid Style */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

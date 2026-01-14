@@ -200,13 +200,39 @@ export default function MyOrdersPage() {
             <p className="text-gray-500">Track your orders in real-time</p>
           </div>
 
-          {/* Loading State */}
+          {/* Loading State with Brand Skeleton */}
           {loading && (
-            <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                <UtensilsCrossed className="h-8 w-8 text-gray-300" />
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 animate-fade-in">
+              <div className="flex flex-col items-center mb-8">
+                <div className="relative w-20 h-20 mb-4">
+                  <div className="absolute inset-0 bg-shawarma/20 rounded-full animate-ping" />
+                  <div className="relative w-full h-full bg-shawarma/10 rounded-full flex items-center justify-center">
+                    <UtensilsCrossed className="h-8 w-8 text-shawarma animate-pulse" />
+                  </div>
+                </div>
+                <p className="text-gray-500 font-medium">Finding your orders...</p>
               </div>
-              <p className="text-gray-500">Loading your orders...</p>
+              
+              {/* Skeleton cards */}
+              <div className="space-y-4">
+                {[1, 2].map((i) => (
+                  <div key={i} className="border border-gray-100 rounded-2xl p-5" style={{ animationDelay: `${i * 150}ms` }}>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 skeleton-brand rounded-xl" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 skeleton-brand rounded w-32" />
+                        <div className="h-3 skeleton-brand rounded w-24" />
+                      </div>
+                      <div className="h-8 w-24 skeleton-brand rounded-full" />
+                    </div>
+                    <div className="flex gap-3">
+                      {[1, 2, 3].map((j) => (
+                        <div key={j} className="w-12 h-12 skeleton-brand rounded-lg" />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -372,23 +398,57 @@ export default function MyOrdersPage() {
             </div>
           )}
 
-          {/* No Orders Found */}
+          {/* No Orders Found - Engaging Empty State */}
           {!loading && orders.length === 0 && (
-            <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-gray-100">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Receipt className="h-8 w-8 text-gray-300" />
+            <div className="bg-white rounded-3xl p-10 text-center shadow-lg border border-gray-100 animate-fade-in">
+              {/* Animated illustration */}
+              <div className="relative w-32 h-32 mx-auto mb-8">
+                {/* Background circles */}
+                <div className="absolute inset-0 bg-shawarma/10 rounded-full animate-pulse-slow" />
+                <div className="absolute inset-4 bg-shawarma/20 rounded-full animate-pulse-slow" style={{ animationDelay: '0.5s' }} />
+                
+                {/* Main icon */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-shawarma to-shawarma-600 rounded-full flex items-center justify-center shadow-xl animate-empty-bounce">
+                    <Receipt className="h-10 w-10 text-white" />
+                  </div>
+                </div>
+                
+                {/* Floating particles */}
+                <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-float-slow" />
+                <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-shawarma-300 rounded-full animate-float-medium" style={{ animationDelay: '1s' }} />
+                <div className="absolute top-1/2 -right-4 w-2 h-2 bg-orange-300 rounded-full animate-float-fast" style={{ animationDelay: '0.5s' }} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No orders yet</h3>
-              <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-                Your orders will appear here once you place your first order
+              
+              <h3 className="text-2xl font-bold text-gray-900 mb-3 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                No orders yet
+              </h3>
+              <p className="text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed animate-slide-up" style={{ animationDelay: '0.3s' }}>
+                Ready to taste authentic Middle Eastern flavours? Your orders will appear here once you place your first order.
               </p>
+              
+              {/* CTA Button with animation */}
               <Link 
                 href="/#menu"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-shawarma hover:bg-shawarma-600 text-white font-semibold rounded-2xl transition-all hover:scale-105"
+                className="group inline-flex items-center gap-2 px-8 py-4 bg-shawarma hover:bg-shawarma-600 text-white font-bold rounded-2xl transition-all hover:scale-105 shadow-lg hover:shadow-xl press-effect animate-slide-up"
+                style={{ animationDelay: '0.4s' }}
               >
-                <Sparkles className="h-5 w-5" />
+                <Sparkles className="h-5 w-5 group-hover:rotate-12 transition-transform" />
                 Browse Menu
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
+              
+              {/* Trust indicators */}
+              <div className="flex justify-center gap-6 mt-8 pt-6 border-t border-gray-100 animate-slide-up" style={{ animationDelay: '0.5s' }}>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Clock className="h-4 w-4 text-shawarma" />
+                  <span>15-20 min prep</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <span>Fresh daily</span>
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -139,26 +139,31 @@ function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isC
   if (isCompact) {
     // Compact card for grid view
     return (
-      <div className="group relative bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+      <div className={cn(
+        "group relative bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1",
+        item.isPopular ? "border-shawarma/30 ring-2 ring-shawarma/10" : "border-gray-100"
+      )}>
         {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+            <div className="absolute inset-0 skeleton-brand" />
           )}
           <Image
             src={item.image}
             alt={item.name}
             fill
-            className={cn("object-cover transition-transform duration-300 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
+            className={cn("object-cover transition-transform duration-500 group-hover:scale-110", imageLoaded ? "opacity-100" : "opacity-0")}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             onLoad={() => setImageLoaded(true)}
           />
-          {/* Popular badge */}
+          {/* Popular badge with glow */}
           {item.isPopular && (
-            <div className="absolute top-2 left-2 bg-shawarma text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md">
+            <div className="absolute top-2 left-2 bg-shawarma text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md animate-glow-pulse">
               🔥 Popular
             </div>
           )}
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Content */}
@@ -217,27 +222,32 @@ function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isC
 
   // Large featured card
   return (
-    <div className="group relative bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+    <div className={cn(
+      "group relative bg-white rounded-3xl border overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1",
+      item.isPopular ? "border-shawarma/30 ring-2 ring-shawarma/10" : "border-gray-100"
+    )}>
       <div className="flex flex-col sm:flex-row">
         {/* Image */}
         <div className="relative w-full sm:w-48 h-48 sm:h-auto overflow-hidden bg-gray-100 flex-shrink-0">
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+            <div className="absolute inset-0 skeleton-brand" />
           )}
           <Image
             src={item.image}
             alt={item.name}
             fill
-            className={cn("object-cover transition-transform duration-300 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
+            className={cn("object-cover transition-transform duration-500 group-hover:scale-110", imageLoaded ? "opacity-100" : "opacity-0")}
             sizes="(max-width: 640px) 100vw, 200px"
             onLoad={() => setImageLoaded(true)}
           />
-          {/* Popular badge */}
+          {/* Popular badge with glow */}
           {item.isPopular && (
-            <div className="absolute top-3 left-3 bg-shawarma text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+            <div className="absolute top-3 left-3 bg-shawarma text-white text-xs font-bold px-3 py-1 rounded-full shadow-md animate-glow-pulse">
               🔥 Popular
             </div>
           )}
+          {/* Hover overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
 
         {/* Content */}
@@ -394,22 +404,36 @@ export function DynamicMenu({
 
   if (loading) {
     return (
-      <div className="space-y-8">
-        {/* Skeleton tabs */}
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="flex-shrink-0 w-24 h-12 bg-gray-100 rounded-full animate-pulse" />
+      <div className="space-y-8 animate-fade-in">
+        {/* Skeleton tabs with staggered animation */}
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide md:justify-center">
+          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <div 
+              key={i} 
+              className="flex-shrink-0 flex flex-col items-center gap-2"
+              style={{ animationDelay: `${i * 100}ms` }}
+            >
+              <div className="w-14 h-14 skeleton-brand rounded-2xl" />
+              <div className="w-10 h-3 skeleton-brand rounded" />
+            </div>
           ))}
         </div>
-        {/* Skeleton grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-            <div key={i} className="bg-gray-100 rounded-2xl animate-pulse">
-              <div className="aspect-[4/3]" />
-              <div className="p-3 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
-                <div className="h-8 bg-gray-200 rounded w-full" />
+        {/* Skeleton grid with staggered animation */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+            <div 
+              key={i} 
+              className="bg-white rounded-2xl overflow-hidden border border-gray-100"
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              <div className="aspect-[4/3] skeleton-brand" />
+              <div className="p-3 space-y-2.5">
+                <div className="h-4 skeleton-brand rounded w-4/5" />
+                <div className="h-3 skeleton-brand rounded w-3/5" />
+                <div className="flex items-center justify-between pt-2">
+                  <div className="h-5 skeleton-brand rounded w-16" />
+                  <div className="h-9 w-20 skeleton-brand rounded-full" />
+                </div>
               </div>
             </div>
           ))}
@@ -423,10 +447,10 @@ export function DynamicMenu({
       {/* Category Pills - Sticky */}
       <div 
         ref={tabsRef}
-        className="sticky top-20 z-40 bg-white/95 backdrop-blur-lg py-4 -mx-6 px-6 border-b border-gray-100"
+        className="sticky top-20 z-40 bg-white/95 backdrop-blur-lg py-4 -mx-6 px-6 border-b border-gray-100 shadow-sm"
       >
         <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide md:justify-center">
-          {categoryConfig.map((cat) => {
+          {categoryConfig.map((cat, index) => {
             const isActive = activeCategory === cat.id
             const itemCount = cat.id === "all" 
               ? allItems.length 
@@ -439,30 +463,42 @@ export function DynamicMenu({
                 key={cat.id}
                 onClick={() => scrollToCategory(cat.id)}
                 className={cn(
-                  "flex-shrink-0 flex flex-col items-center gap-1.5 transition-all duration-200",
+                  "flex-shrink-0 flex flex-col items-center gap-1.5 transition-all duration-300 group press-effect",
                 )}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                {/* Icon Circle */}
+                {/* Icon Circle with animation */}
                 <div className={cn(
-                  "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-200",
+                  "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden",
                   isActive
-                    ? "bg-shawarma text-white shadow-lg shadow-shawarma/30 scale-105"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    ? "bg-shawarma text-white shadow-lg shadow-shawarma/30 scale-110"
+                    : "bg-gray-100 text-gray-600 hover:bg-shawarma/10 hover:text-shawarma group-hover:scale-105"
                 )}>
-                  {cat.icon}
+                  {/* Animated background for active state */}
+                  {isActive && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-shawarma to-shawarma-600 animate-pulse-slow" />
+                  )}
+                  <span className="relative z-10">{cat.icon}</span>
                 </div>
-                {/* Label */}
-                <span className={cn(
-                  "text-xs font-medium transition-colors",
-                  isActive ? "text-shawarma" : "text-gray-600"
-                )}>
-                  {cat.label}
-                </span>
+                {/* Label with underline animation */}
+                <div className="relative">
+                  <span className={cn(
+                    "text-xs font-medium transition-colors duration-200",
+                    isActive ? "text-shawarma font-semibold" : "text-gray-600 group-hover:text-shawarma"
+                  )}>
+                    {cat.label}
+                  </span>
+                  {/* Animated underline */}
+                  <div className={cn(
+                    "absolute -bottom-0.5 left-0 h-0.5 bg-shawarma rounded-full transition-all duration-300",
+                    isActive ? "w-full" : "w-0 group-hover:w-full"
+                  )} />
+                </div>
                 {/* Count badge */}
                 {itemCount > 0 && (
                   <span className={cn(
-                    "text-[10px] font-medium -mt-1",
-                    isActive ? "text-shawarma" : "text-gray-400"
+                    "text-[10px] font-medium -mt-1 transition-all duration-200",
+                    isActive ? "text-shawarma scale-110" : "text-gray-400 group-hover:text-shawarma"
                   )}>
                     {itemCount}
                   </span>

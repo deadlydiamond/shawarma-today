@@ -85,18 +85,36 @@ export default function Cart() {
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {cartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center px-6">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                <ShoppingBag className="h-10 w-10 text-gray-300" strokeWidth={1.5} />
+            <div className="flex flex-col items-center justify-center h-full text-center px-6 animate-fade-in">
+              {/* Animated empty cart illustration */}
+              <div className="relative w-32 h-32 mb-6">
+                {/* Background rings */}
+                <div className="absolute inset-0 bg-shawarma/5 rounded-full animate-pulse-slow" />
+                <div className="absolute inset-4 bg-shawarma/10 rounded-full animate-pulse-slow" style={{ animationDelay: '0.3s' }} />
+                
+                {/* Main icon */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center shadow-inner animate-empty-bounce">
+                    <ShoppingBag className="h-10 w-10 text-gray-400" strokeWidth={1.5} />
+                  </div>
+                </div>
+                
+                {/* Floating food elements */}
+                <div className="absolute -top-1 right-2 text-2xl animate-float-slow">🍕</div>
+                <div className="absolute bottom-2 -left-1 text-xl animate-float-medium" style={{ animationDelay: '0.5s' }}>🥙</div>
+                <div className="absolute top-1/2 -right-2 text-lg animate-float-fast" style={{ animationDelay: '1s' }}>🔥</div>
               </div>
+              
               <h3 className="text-xl font-bold text-gray-900 mb-2">Your cart is empty</h3>
-              <p className="text-gray-500 mb-8 max-w-[250px]">Looks like you haven&apos;t added anything to your cart yet</p>
+              <p className="text-gray-500 mb-8 max-w-[250px]">
+                Craving something delicious? Browse our menu and add your favorites!
+              </p>
               <Button 
                 variant="primary" 
                 onClick={handleClose}
-                className="gap-2"
+                className="gap-2 press-effect group"
               >
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-4 w-4 group-hover:rotate-12 transition-transform" />
                 Browse Menu
               </Button>
             </div>
