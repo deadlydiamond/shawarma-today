@@ -58,7 +58,7 @@ export default function Navbar() {
               alt="Today Shawarma Logo"
               width={100}
               height={100}
-              className="h-[100px] w-[100px] object-contain"
+              className="h-[100px] w-[100px] object-contain animate-shawarma-spin"
             />
             <span className={cn(
               "font-heading text-2xl tracking-wide transition-colors uppercase -ml-2",

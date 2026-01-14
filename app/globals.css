@@ -432,3 +432,18 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #F7451B #310E05;
 }
+
+/* 3D Shawarma spit rotation animation */
+@keyframes shawarma-spin {
+  0% {
+    transform: perspective(500px) rotateY(0deg);
+  }
+  100% {
+    transform: perspective(500px) rotateY(360deg);
+  }
+}
+
+.animate-shawarma-spin {
+  animation: shawarma-spin 4s linear infinite;
+  transform-style: preserve-3d;
+}
