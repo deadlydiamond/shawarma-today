@@ -239,7 +239,7 @@ export function DynamicMenu({
       const hash = window.location.hash.replace("#", "")
       if (hash.startsWith("menu-")) {
         const category = hash.replace("menu-", "") as CategoryFilter
-        if (["wraps", "plates", "sides", "drinks", "desserts"].includes(category)) {
+        if (["pizzas", "fatayer", "wraps", "meals", "grill", "sides", "drinks"].includes(category)) {
           setActiveCategory(category)
         }
       } else if (hash === "menu") {
