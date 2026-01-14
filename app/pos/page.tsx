@@ -24,6 +24,7 @@ import {
   Receipt,
   CreditCard,
   Banknote,
+  RefreshCw,
   AlertCircle,
   DollarSign,
 } from "lucide-react"
@@ -563,10 +564,10 @@ export default function POSPage() {
 
       {/* Receipt Modal */}
       {showReceipt && lastReceipt && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
-          <div className="bg-white rounded-2xl max-w-md w-full overflow-hidden">
-            {/* Receipt Content */}
-            <div ref={receiptRef} className="p-6">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Scrollable Receipt Content */}
+            <div ref={receiptRef} className="p-6 overflow-y-auto flex-1">
               <div className="header text-center border-b-2 border-dashed border-gray-300 pb-4 mb-4">
                 <div className="logo text-2xl font-bold">TODAY SHAWARMA</div>
                 <p className="text-gray-500 text-sm">203 Dalry Road, Edinburgh</p>
@@ -636,8 +637,8 @@ export default function POSPage() {
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="p-4 bg-gray-50 space-y-3">
+            {/* Actions - Fixed at bottom */}
+            <div className="p-4 bg-gray-50 space-y-3 border-t border-gray-200 flex-shrink-0">
               {/* Collect Payment section - only if not paid */}
               {!lastReceipt.isPaid && !showReceiptPaymentOptions && (
                 <button
@@ -693,11 +694,12 @@ export default function POSPage() {
                     onClick={() => setShowReceiptPaymentOptions(false)}
                     className="w-full py-2 text-gray-500 hover:text-gray-700 text-sm font-medium"
                   >
-                    Cancel
+                    Back
                   </button>
                 </div>
               )}
               
+              {/* Main action buttons */}
               <div className="flex gap-3">
                 <button
                   onClick={handlePrintReceipt}
@@ -715,6 +717,49 @@ export default function POSPage() {
                 >
                   <CheckCircle className="h-5 w-5" />
                   Done
+                </button>
+              </div>
+
+              {/* Modify / Cancel buttons */}
+              <div className="flex gap-3 pt-2 border-t border-gray-200">
+                <button
+                  onClick={() => {
+                    // Re-add items to cart for modification
+                    setCart(lastReceipt.items)
+                    setCustomerName(lastReceipt.customer)
+                    setTableNumber(lastReceipt.tableNumber)
+                    // Cancel the existing order
+                    const order = orders.find(o => 
+                      o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
+                    )
+                    if (order) {
+                      updateOrderStatus(order.id, "cancelled")
+                    }
+                    setShowReceipt(false)
+                    setShowReceiptPaymentOptions(false)
+                  }}
+                  className="flex-1 py-2 border-2 border-amber-400 text-amber-600 hover:bg-amber-50 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Modify Order
+                </button>
+                <button
+                  onClick={async () => {
+                    if (confirm("Are you sure you want to cancel this order?")) {
+                      const order = orders.find(o => 
+                        o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
+                      )
+                      if (order) {
+                        await updateOrderStatus(order.id, "cancelled")
+                      }
+                      setShowReceipt(false)
+                      setShowReceiptPaymentOptions(false)
+                    }
+                  }}
+                  className="flex-1 py-2 border-2 border-red-300 text-red-600 hover:bg-red-50 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                  Cancel Order
                 </button>
               </div>
             </div>
