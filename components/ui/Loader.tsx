@@ -8,8 +8,8 @@ export default function Loader() {
   const [animationData, setAnimationData] = useState<any>(null)
 
   useEffect(() => {
-    // Load animation from public folder
-    fetch("/coffee-cup.json")
+    // Load Akram Pizza animation from public folder
+    fetch("/akram-pizza.json")
       .then((response) => response.json())
       .then((data) => {
         setAnimationData(data)
@@ -29,7 +29,7 @@ export default function Loader() {
   if (!loading) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0E0E0E]">
       <div className="flex flex-col items-center gap-6">
         {/* Lottie Animation */}
         {animationData ? (
@@ -43,7 +43,7 @@ export default function Loader() {
           </div>
         ) : (
           <div className="w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
-            <div className="w-16 h-16 border-4 border-foreground/20 border-t-foreground rounded-full animate-spin"></div>
+            <div className="w-16 h-16 border-4 border-shawarma-orange/20 border-t-shawarma-orange rounded-full animate-spin"></div>
           </div>
         )}
         

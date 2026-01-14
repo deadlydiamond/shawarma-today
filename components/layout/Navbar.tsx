@@ -52,16 +52,16 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo - Using Anton font to match signage */}
-          <a href="/" className="flex items-center gap-2">
+          <a href="/" className="flex items-center">
             <Image
               src="/logos/shawarma-logo.png"
               alt="Today Shawarma Logo"
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain"
+              width={100}
+              height={100}
+              className="h-[100px] w-[100px] object-contain"
             />
             <span className={cn(
-              "font-heading text-2xl tracking-wide transition-colors uppercase",
+              "font-heading text-2xl tracking-wide transition-colors uppercase -ml-2",
               (scrolled || isLightBackground) 
                 ? "text-shawarma-orange" 
                 : "text-shawarma-orange drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
