@@ -129,6 +129,7 @@ export default function POSPage() {
   const [tableNumber, setTableNumber] = useState("counter")
   const [prepTime, setPrepTime] = useState(10) // default 10 minutes
   const [paidNow, setPaidNow] = useState(false) // Payment collected at order time
+  const [showPaymentConfirm, setShowPaymentConfirm] = useState(false) // Payment confirmation popup
   const [showReceipt, setShowReceipt] = useState(false)
   const [lastReceipt, setLastReceipt] = useState<OrderReceipt | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -540,27 +541,21 @@ export default function POSPage() {
             <span>£{total.toFixed(2)}</span>
           </div>
           
-          {/* Payment Toggle */}
-          <button
-            onClick={() => setPaidNow(!paidNow)}
-            className={`w-full py-3 mb-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${
-              paidNow 
-                ? "bg-green-500 text-white" 
-                : "bg-gray-700 text-gray-300 border-2 border-dashed border-gray-500"
-            }`}
-          >
-            {paidNow ? (
-              <>
-                <CheckCircle className="h-5 w-5" />
-                Payment Collected ✓
-              </>
-            ) : (
-              <>
-                <CreditCard className="h-5 w-5" />
-                Tap if Payment Collected
-              </>
-            )}
-          </button>
+          {/* Payment Status */}
+          {paidNow ? (
+            <div className="w-full py-3 mb-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-green-500 text-white">
+              <CheckCircle className="h-5 w-5" />
+              Payment Collected ✓
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowPaymentConfirm(true)}
+              className="w-full py-3 mb-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-gray-700 text-gray-300 border-2 border-dashed border-gray-500 hover:bg-gray-600 transition-all"
+            >
+              <CreditCard className="h-5 w-5" />
+              Tap to Collect Payment
+            </button>
+          )}
           
           <button
             onClick={handlePlaceOrder}
@@ -815,6 +810,69 @@ export default function POSPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Confirmation Popup */}
+      {showPaymentConfirm && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-white rounded-2xl max-w-sm w-full overflow-hidden">
+            {/* Header */}
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="h-8 w-8 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Collect Payment</h2>
+              <p className="text-4xl font-bold text-green-600 mb-2">£{total.toFixed(2)}</p>
+              <p className="text-gray-500">Confirm payment has been received</p>
+            </div>
+
+            {/* Payment Methods */}
+            <div className="px-6 pb-4">
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    setPaidNow(true)
+                    setShowPaymentConfirm(false)
+                  }}
+                  className="p-4 bg-gray-100 hover:bg-gray-200 rounded-xl text-center transition-colors"
+                >
+                  <span className="text-2xl mb-1 block">💵</span>
+                  <span className="font-semibold text-gray-700">Cash</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setPaidNow(true)
+                    setShowPaymentConfirm(false)
+                  }}
+                  className="p-4 bg-gray-100 hover:bg-gray-200 rounded-xl text-center transition-colors"
+                >
+                  <span className="text-2xl mb-1 block">💳</span>
+                  <span className="font-semibold text-gray-700">Card</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="p-4 bg-gray-50 flex gap-3">
+              <button
+                onClick={() => setShowPaymentConfirm(false)}
+                className="flex-1 py-3 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setPaidNow(true)
+                  setShowPaymentConfirm(false)
+                }}
+                className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+              >
+                <CheckCircle className="h-5 w-5" />
+                Confirm
+              </button>
             </div>
           </div>
         </div>
