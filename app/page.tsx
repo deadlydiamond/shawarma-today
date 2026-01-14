@@ -160,92 +160,219 @@ export default function Home() {
         </section>
       )}
 
-      {/* Features Section */}
-      <Section className="relative">
-        {/* Liquid background effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/90 via-white/80 to-white/90" />
-        <div className="relative z-10">
-          <AnimatedSection animation="fade-up" className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 pb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+      {/* Features Section - Trendy Bento Grid */}
+      <Section className="relative py-16 md:py-24 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-50" />
+        
+        <div className="relative z-10 max-w-7xl mx-auto">
+          {/* Header */}
+          <AnimatedSection animation="fade-up" className="text-center mb-12 md:mb-16">
+            <span className="inline-block px-4 py-1.5 bg-shawarma/10 text-shawarma font-semibold text-sm rounded-full mb-4">
+              🔥 What We Serve
+            </span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 text-gray-900">
               Our Offerings
             </h2>
-            <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed font-light">
-              Discover our authentic Middle Eastern cuisine
+            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+              Authentic Middle Eastern flavors, crafted fresh daily
             </p>
           </AnimatedSection>
 
-          {/* Horizontal scroll on mobile, grid on desktop */}
-          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 -mx-6 px-6 md:mx-0 md:px-0 md:overflow-visible scrollbar-hide snap-x snap-mandatory">
-            {[
-              {
-                icon: UtensilsCrossed,
-                title: "10\" Pizzas",
-                description: "Fresh baked pizzas from £4.99",
-                image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=75",
-                filter: "pizzas",
-              },
-              {
-                icon: Beef,
-                title: "Shawarma & Wraps",
-                description: "Lamb & chicken wraps from £4.50",
-                image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=600&q=75",
-                filter: "wraps",
-              },
-              {
-                icon: Beef,
-                title: "Grill & Platters",
-                description: "Kebabs, tikka & mix platters",
-                image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=75",
-                filter: "grill",
-              },
-            ].map((feature, index) => (
-              <AnimatedSection key={feature.title} animation="zoom" delay={index * 150}>
-                <button
-                  onClick={() => {
-                    // Scroll to menu section first
-                    const menuSection = document.getElementById('menu')
-                    if (menuSection) {
-                      menuSection.scrollIntoView({ behavior: 'smooth' })
-                    }
-                    // Set hash after a small delay to ensure scroll completes
-                    setTimeout(() => {
-                      window.location.hash = `menu-${feature.filter}`
-                    }, 100)
-                  }}
-                  className="block flex-shrink-0 w-[280px] md:w-auto snap-start text-left"
-                >
-                  <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer h-full hover-lift">
-                    <div className="relative h-40 md:h-48 overflow-hidden rounded-t-xl bg-gray-100">
-                      <Image
-                        src={feature.image}
-                        alt={feature.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        loading="lazy"
-                        sizes="(max-width: 768px) 280px, 33vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/70 transition-all" />
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="p-1.5 rounded-lg bg-shawarma/80 backdrop-blur-sm group-hover:bg-shawarma transition-colors">
-                            <feature.icon className="h-4 w-4 text-white" strokeWidth={2} />
-                          </div>
-                          <span className="text-white font-semibold text-base drop-shadow-md">{feature.title}</span>
-                        </div>
-                        <p className="text-white/80 text-xs line-clamp-1">{feature.description}</p>
-                      </div>
-                    </div>
-                    <CardContent className="p-3">
-                      <span className="text-xs font-semibold text-white flex items-center gap-2 bg-shawarma px-3 py-2 rounded-lg group-hover:bg-shawarma-600 transition-colors">
-                        <UtensilsCrossed className="h-3 w-3 group-hover:rotate-12 transition-transform" /> View Menu
-                        <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
+          {/* Bento Grid Layout */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {/* Large Featured Card - Shawarma */}
+            <AnimatedSection animation="slide-left" className="col-span-2 row-span-2">
+              <button
+                onClick={() => {
+                  const menuSection = document.getElementById('menu')
+                  if (menuSection) menuSection.scrollIntoView({ behavior: 'smooth' })
+                  setTimeout(() => { window.location.hash = 'menu-wraps' }, 100)
+                }}
+                className="relative w-full h-full min-h-[400px] md:min-h-[500px] rounded-3xl overflow-hidden group cursor-pointer"
+              >
+                <Image
+                  src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=800&q=80"
+                  alt="Shawarma & Wraps"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                
+                {/* Content */}
+                <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end">
+                  <div className="transform transition-transform duration-300 group-hover:-translate-y-2">
+                    <span className="inline-block px-3 py-1 bg-shawarma text-white text-xs font-bold rounded-full mb-3 animate-glow-pulse">
+                      ⭐ BESTSELLER
+                    </span>
+                    <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">Shawarma & Wraps</h3>
+                    <p className="text-white/80 text-sm md:text-base mb-4 max-w-sm">
+                      Tender lamb & chicken, marinated for 24 hours in our secret spice blend
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl font-bold text-shawarma">From £4.50</span>
+                      <span className="flex items-center gap-2 text-white/90 text-sm bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full group-hover:bg-shawarma transition-colors">
+                        Order Now <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </span>
-                    </CardContent>
-                  </Card>
-                </button>
-              </AnimatedSection>
-            ))}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </AnimatedSection>
+
+            {/* Pizza Card */}
+            <AnimatedSection animation="zoom" delay={100} className="col-span-1 row-span-1">
+              <button
+                onClick={() => {
+                  const menuSection = document.getElementById('menu')
+                  if (menuSection) menuSection.scrollIntoView({ behavior: 'smooth' })
+                  setTimeout(() => { window.location.hash = 'menu-pizzas' }, 100)
+                }}
+                className="relative w-full h-full min-h-[190px] md:min-h-[240px] rounded-3xl overflow-hidden group cursor-pointer"
+              >
+                <Image
+                  src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=75"
+                  alt="10 inch Pizzas"
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                
+                <div className="absolute inset-0 p-4 md:p-5 flex flex-col justify-end">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-xl bg-shawarma flex items-center justify-center">
+                      <UtensilsCrossed className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold text-white">10&quot; Pizzas</h3>
+                  <p className="text-white/70 text-xs md:text-sm">From £4.99</p>
+                </div>
+                
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-shawarma/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span className="text-white font-bold flex items-center gap-2">
+                    View Menu <ArrowRight className="h-5 w-5" />
+                  </span>
+                </div>
+              </button>
+            </AnimatedSection>
+
+            {/* Grill Card */}
+            <AnimatedSection animation="zoom" delay={200} className="col-span-1 row-span-1">
+              <button
+                onClick={() => {
+                  const menuSection = document.getElementById('menu')
+                  if (menuSection) menuSection.scrollIntoView({ behavior: 'smooth' })
+                  setTimeout(() => { window.location.hash = 'menu-grill' }, 100)
+                }}
+                className="relative w-full h-full min-h-[190px] md:min-h-[240px] rounded-3xl overflow-hidden group cursor-pointer"
+              >
+                <Image
+                  src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=75"
+                  alt="Grill & Platters"
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                
+                <div className="absolute inset-0 p-4 md:p-5 flex flex-col justify-end">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-xl bg-shawarma flex items-center justify-center">
+                      <Beef className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold text-white">Grill & Platters</h3>
+                  <p className="text-white/70 text-xs md:text-sm">Kebabs & Tikka</p>
+                </div>
+                
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-shawarma/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span className="text-white font-bold flex items-center gap-2">
+                    View Menu <ArrowRight className="h-5 w-5" />
+                  </span>
+                </div>
+              </button>
+            </AnimatedSection>
+
+            {/* Fatayer Card */}
+            <AnimatedSection animation="zoom" delay={300} className="col-span-1 row-span-1">
+              <button
+                onClick={() => {
+                  const menuSection = document.getElementById('menu')
+                  if (menuSection) menuSection.scrollIntoView({ behavior: 'smooth' })
+                  setTimeout(() => { window.location.hash = 'menu-fatayer' }, 100)
+                }}
+                className="relative w-full h-full min-h-[190px] md:min-h-[240px] rounded-3xl overflow-hidden group cursor-pointer"
+              >
+                <Image
+                  src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=600&q=75"
+                  alt="Fatayer"
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                
+                <div className="absolute inset-0 p-4 md:p-5 flex flex-col justify-end">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-xl bg-shawarma flex items-center justify-center">
+                      <Salad className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold text-white">Fatayer</h3>
+                  <p className="text-white/70 text-xs md:text-sm">10&quot; Flatbreads</p>
+                </div>
+                
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-shawarma/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <span className="text-white font-bold flex items-center gap-2">
+                    View Menu <ArrowRight className="h-5 w-5" />
+                  </span>
+                </div>
+              </button>
+            </AnimatedSection>
+
+            {/* Meals Card - Wide */}
+            <AnimatedSection animation="slide-right" delay={400} className="col-span-1 row-span-1">
+              <button
+                onClick={() => {
+                  const menuSection = document.getElementById('menu')
+                  if (menuSection) menuSection.scrollIntoView({ behavior: 'smooth' })
+                  setTimeout(() => { window.location.hash = 'menu-meals' }, 100)
+                }}
+                className="relative w-full h-full min-h-[190px] md:min-h-[240px] rounded-3xl overflow-hidden group cursor-pointer bg-gradient-to-br from-gray-900 to-gray-800"
+              >
+                <div className="absolute inset-0 p-5 flex flex-col justify-between">
+                  <div className="w-10 h-10 rounded-2xl bg-shawarma flex items-center justify-center">
+                    <UtensilsCrossed className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-1">Full Meals</h3>
+                    <p className="text-white/60 text-sm mb-3">With chips & salad</p>
+                    <span className="inline-flex items-center gap-2 text-shawarma font-semibold text-sm group-hover:gap-3 transition-all">
+                      From £5.99 <ArrowRight className="h-4 w-4" />
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Decorative elements */}
+                <div className="absolute top-4 right-4 w-20 h-20 bg-shawarma/20 rounded-full blur-2xl" />
+                <div className="absolute bottom-10 right-10 w-16 h-16 bg-shawarma/10 rounded-full blur-xl" />
+              </button>
+            </AnimatedSection>
           </div>
+
+          {/* View Full Menu CTA */}
+          <AnimatedSection animation="fade-up" delay={500} className="text-center mt-10 md:mt-14">
+            <a
+              href="#menu"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-2xl transition-all hover:scale-105 shadow-xl hover:shadow-2xl press-effect group"
+            >
+              <span>View Full Menu</span>
+              <div className="w-8 h-8 rounded-full bg-shawarma flex items-center justify-center group-hover:rotate-12 transition-transform">
+                <ArrowRight className="h-4 w-4" />
+              </div>
+            </a>
+          </AnimatedSection>
         </div>
       </Section>
 
