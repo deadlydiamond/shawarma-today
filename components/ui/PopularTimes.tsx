@@ -145,58 +145,66 @@ function getBusynessHeight(busyness: number): string {
 export default function PopularTimes() {
   const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" })
   const currentHour = new Date().getHours()
-  // Restaurant hours: 11am - 10pm (11-22), map to index 0-11
-  const currentTimeSlot = currentHour >= 11 && currentHour < 22 ? currentHour - 11 : null
+  
+  // Get today's data
+  const todayData = popularTimesData.find((d) => d.day === currentDay) || popularTimesData[0]
+  
+  // Find current time slot index
+  const currentTimeIndex = todayData.times.findIndex((slot) => {
+    const slotHour = parseInt(slot.hour.replace(/[ap]m/, ""))
+    const isPM = slot.hour.includes("pm")
+    const hour24 = isPM && slotHour !== 12 ? slotHour + 12 : slotHour === 12 && !isPM ? 0 : slotHour
+    return hour24 === currentHour
+  })
 
   return (
-    <Card className="p-10">
+    <Card className="p-6">
       <CardContent className="p-0">
-        <div className="flex items-center justify-center gap-4 mb-8">
-          <div className="p-3 rounded-xl bg-shawarma">
-            <TrendingUp className="h-6 w-6 text-white" strokeWidth={2} />
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-shawarma">
+            <TrendingUp className="h-5 w-5 text-white" strokeWidth={2} />
           </div>
-          <h3 className="text-xl font-semibold">Popular Times</h3>
+          <div className="text-center">
+            <h3 className="text-lg font-semibold">Popular Times</h3>
+            <p className="text-sm text-gray-500">{currentDay}</p>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          {popularTimesData.map((dayData) => {
-            const isToday = dayData.day === currentDay
+        <div className="flex items-end gap-1 h-20">
+          {todayData.times.map((timeSlot, index) => {
+            const isCurrentTime = currentTimeIndex === index
             return (
-              <div key={dayData.day} className={isToday ? "border-l-2 border-gray-900 pl-4" : ""}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className={`text-sm font-medium ${isToday ? "text-gray-900" : "text-gray-600"}`}>
-                    {dayData.day}
-                    {isToday && <span className="ml-2 text-xs text-gray-500">(Today)</span>}
-                  </span>
+              <div key={index} className="flex-1 flex flex-col items-center">
+                <div className="relative w-full h-16 flex items-end">
+                  <div
+                    className={`w-full rounded-t transition-all duration-300 ${getBusynessColor(
+                      timeSlot.busyness
+                    )} ${isCurrentTime ? "ring-2 ring-shawarma ring-offset-1" : ""}`}
+                    style={{ height: getBusynessHeight(timeSlot.busyness) }}
+                    title={`${timeSlot.hour}: ${timeSlot.label}`}
+                  />
                 </div>
-                <div className="flex items-end gap-1 h-12">
-                  {dayData.times.map((timeSlot, index) => {
-                    const isCurrentTime = isToday && currentTimeSlot !== null && index === currentTimeSlot
-                    return (
-                      <div key={index} className="flex-1 flex flex-col items-center">
-                        <div className="relative w-full h-10 flex items-end">
-                          <div
-                            className={`w-full rounded-t transition-all duration-300 ${getBusynessColor(
-                              timeSlot.busyness
-                            )} ${isCurrentTime ? "ring-2 ring-gray-900 ring-offset-1" : ""}`}
-                            style={{ height: getBusynessHeight(timeSlot.busyness) }}
-                            title={`${timeSlot.hour}: ${timeSlot.label}`}
-                          />
-                        </div>
-                        <span className="text-xs text-gray-400 mt-1">{timeSlot.hour}</span>
-                      </div>
-                    )
-                  })}
-                </div>
+                <span className={`text-xs mt-1 ${isCurrentTime ? "text-shawarma font-semibold" : "text-gray-400"}`}>
+                  {timeSlot.hour.replace("am", "").replace("pm", "")}
+                </span>
               </div>
             )
           })}
         </div>
 
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="flex items-center gap-2 text-xs text-gray-500">
+        {currentTimeIndex >= 0 && (
+          <div className="mt-4 text-center">
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-shawarma/10 rounded-full text-sm text-shawarma font-medium">
+              <span className="w-2 h-2 bg-shawarma rounded-full animate-pulse" />
+              {todayData.times[currentTimeIndex].label} right now
+            </span>
+          </div>
+        )}
+
+        <div className="mt-4 pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
             <Clock className="h-3 w-3" strokeWidth={2} />
-            <span>Based on typical restaurant patterns. Actual times may vary.</span>
+            <span>Typical busy times</span>
           </div>
         </div>
       </CardContent>
