@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { useOrders, Order } from "@/contexts/OrderContext"
 import { useAuth } from "@/contexts/AuthContext"
 import { Button } from "@/components/ui/button"
@@ -30,9 +29,6 @@ import {
   Save,
   X,
   Settings,
-  ExternalLink,
-  BarChart3,
-  UtensilsCrossed,
 } from "lucide-react"
 
 const statusColors: Record<Order["status"], string> = {
@@ -167,18 +163,8 @@ export default function AdminDashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center gap-4">
-        <div className="w-20 h-20 bg-white rounded-2xl p-2 shadow-2xl">
-          <Image
-            src="/logos/shawarma-logo.png"
-            alt="Today Shawarma"
-            width={80}
-            height={80}
-            className="w-full h-full object-contain animate-pulse"
-          />
-        </div>
-        <RefreshCw className="h-6 w-6 animate-spin text-shawarma" />
-        <p className="text-gray-400 text-sm">Loading dashboard...</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <RefreshCw className="h-8 w-8 animate-spin text-gray-400" />
       </div>
     )
   }
@@ -188,170 +174,141 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header - Industry Standard Modern Design */}
-      <header className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 sticky top-0 z-40 shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-3">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Logo & Brand */}
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="w-14 h-14 bg-white rounded-2xl p-1.5 shadow-lg ring-2 ring-shawarma/20">
-                  <Image
-                    src="/logos/shawarma-logo.png"
-                    alt="Today Shawarma"
-                    width={56}
-                    height={56}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                {/* Online indicator */}
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 animate-pulse" />
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-shawarma rounded-xl">
+                <Coffee className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white tracking-tight">TODAY SHAWARMA</h1>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-shawarma font-medium">{staff?.name || "Admin"}</span>
-                  <span className="text-gray-500">•</span>
-                  <span className="text-gray-400 capitalize">{staff?.role || "admin"}</span>
-                </div>
+                <h1 className="text-xl font-semibold text-gray-900">Today Shawarma</h1>
+                <p className="text-sm text-gray-500">
+                  {staff?.name || "Admin"} • <span className="capitalize">{staff?.role || "admin"}</span>
+                </p>
               </div>
             </div>
-
-            {/* Navigation */}
-            <nav className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Link 
                 href="/admin/menu" 
-                className="flex items-center gap-2 px-4 py-2.5 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all font-medium backdrop-blur-sm border border-white/10"
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
               >
-                <UtensilsCrossed className="h-4 w-4" />
-                <span className="hidden sm:inline">Menu</span>
+                <Coffee className="h-4 w-4" />
+                Menu
               </Link>
               <Link 
                 href="/admin/reports" 
-                className="flex items-center gap-2 px-4 py-2.5 bg-shawarma text-white rounded-xl hover:bg-shawarma-600 transition-all font-medium shadow-lg shadow-shawarma/25"
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
               >
-                <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Reports</span>
+                <DollarSign className="h-4 w-4" />
+                Reports
               </Link>
               <Link 
                 href="/admin/settings" 
-                className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Settings"
               >
                 <Settings className="h-5 w-5" />
               </Link>
-              <div className="w-px h-8 bg-gray-700 mx-1" />
-              <Link 
-                href="/" 
-                className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-400 hover:text-white transition-colors"
-                target="_blank"
-              >
-                <ExternalLink className="h-4 w-4" />
-                <span className="hidden sm:inline">View Site</span>
+              <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
+                View Site
               </Link>
               <button 
                 onClick={handleLogout} 
-                className="flex items-center gap-2 px-4 py-2 text-sm rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all border border-red-500/20"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border transition-colors"
+                style={{ borderColor: '#e5e7eb', color: '#374151', backgroundColor: 'white' }}
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Logout</span>
+                Logout
               </button>
-            </nav>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        {/* Stats - Modern Dashboard Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {/* Awaiting Payment */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-5 text-white shadow-lg shadow-orange-500/20">
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                  <Banknote className="h-5 w-5" />
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-yellow-100 rounded-xl">
+                  <Banknote className="h-6 w-6 text-yellow-600" />
                 </div>
-                <span className="text-sm font-medium text-white/80">Awaiting Payment</span>
+                <div>
+                  <p className="text-sm text-gray-500">Awaiting Payment</p>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {orders.filter((o) => o.status === "pending").length}
+                  </p>
+                </div>
               </div>
-              <p className="text-4xl font-bold">
-                {orders.filter((o) => o.status === "pending").length}
-              </p>
-            </div>
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* In Kitchen */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-5 text-white shadow-lg shadow-purple-500/20">
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                  <ChefHat className="h-5 w-5" />
+          <Card className="bg-white">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-shawarma rounded-xl">
+                  <ChefHat className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-sm font-medium text-white/80">In Kitchen</span>
+                <div>
+                  <p className="text-sm text-gray-500">In Kitchen</p>
+                  <p className="text-2xl font-semibold text-gray-900">
+                    {orders.filter((o) => ["paid", "preparing"].includes(o.status)).length}
+                  </p>
+                </div>
               </div>
-              <p className="text-4xl font-bold">
-                {orders.filter((o) => ["paid", "preparing"].includes(o.status)).length}
-              </p>
-            </div>
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Today's Orders */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-shawarma to-red-600 rounded-2xl p-5 text-white shadow-lg shadow-shawarma/20">
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                  <ShoppingBag className="h-5 w-5" />
+          <Card className="bg-white">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-shawarma rounded-xl">
+                  <ShoppingBag className="h-6 w-6 text-white" />
                 </div>
-                <span className="text-sm font-medium text-white/80">Today&apos;s Orders</span>
+                <div>
+                  <p className="text-sm text-gray-500">Today&apos;s Orders</p>
+                  <p className="text-2xl font-semibold text-gray-900">{getTodayOrders().length}</p>
+                </div>
               </div>
-              <p className="text-4xl font-bold">{getTodayOrders().length}</p>
-            </div>
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Today's Revenue */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/20">
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                  <DollarSign className="h-5 w-5" />
+          <Card className="bg-white">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-emerald-100 rounded-xl">
+                  <DollarSign className="h-6 w-6 text-emerald-600" />
                 </div>
-                <span className="text-sm font-medium text-white/80">Today&apos;s Revenue</span>
+                <div>
+                  <p className="text-sm text-gray-500">Today&apos;s Revenue</p>
+                  <p className="text-2xl font-semibold text-gray-900">{formatPrice(getTodayRevenue())}</p>
+                </div>
               </div>
-              <p className="text-4xl font-bold">{formatPrice(getTodayRevenue())}</p>
-            </div>
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Kitchen Queue - Orders ready for preparation */}
         {orders.filter(o => o.status === "paid" || o.status === "preparing").length > 0 && (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
-            {/* Kitchen Queue Header */}
-            <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4">
-              <div className="flex items-center justify-between">
+          <Card className="bg-gradient-to-r from-orange-50 to-amber-50 border-orange-200 mb-8">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-shawarma rounded-xl shadow-lg">
+                  <div className="p-2 bg-orange-500 rounded-xl">
                     <ChefHat className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-white">Kitchen Queue</h2>
-                    <p className="text-sm text-gray-400">
+                    <h2 className="text-lg font-semibold text-gray-900">Kitchen Queue</h2>
+                    <p className="text-sm text-gray-500">
                       {orders.filter(o => o.status === "paid" || o.status === "preparing").length} orders to prepare
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="px-3 py-1.5 bg-shawarma/20 text-shawarma rounded-full text-sm font-semibold">
-                    🔥 Live
-                  </span>
-                </div>
               </div>
-            </div>
-            {/* Kitchen Queue Content */}
-            <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {orders
                   .filter(o => o.status === "paid" || o.status === "preparing")
@@ -448,42 +405,34 @@ export default function AdminDashboard() {
                   })
                 }
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Orders List */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-              {/* Orders Header */}
-              <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
-                      <ShoppingBag className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-white">Orders</h2>
-                      <p className="text-sm text-gray-400">
-                        {filteredOrders.length} order{filteredOrders.length !== 1 ? "s" : ""} found
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleRefresh}
-                    disabled={isRefreshing}
-                    className="p-2.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
-                    title="Refresh orders"
-                  >
-                    <RefreshCw className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`} />
-                  </button>
-                </div>
-              </div>
-              {/* Orders Content */}
-              <div className="p-6">
+            <Card className="bg-white">
+              <CardContent className="p-6">
                 <div className="space-y-4 mb-6">
+                  {/* Header row */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-lg font-semibold text-gray-900">Orders</h2>
+                      <button
+                        onClick={handleRefresh}
+                        disabled={isRefreshing}
+                        className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Refresh orders"
+                      >
+                        <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                      </button>
+                      {ordersLoading && <span className="text-sm text-gray-500">Loading...</span>}
+                      <span className="text-sm text-gray-400">
+                        {filteredOrders.length} order{filteredOrders.length !== 1 ? "s" : ""}
+                      </span>
+                    </div>
                     {/* Quick filters */}
                     <div className="flex gap-2">
                       {(["active", "all", "completed"] as const).map((f) => (
@@ -719,27 +668,18 @@ export default function AdminDashboard() {
                     )})}
                   </div>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Order Details */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden sticky top-24">
-              {/* Order Details Header */}
-              <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
-                    <Package className="h-5 w-5 text-white" />
-                  </div>
-                  <h2 className="text-lg font-bold text-white">Order Details</h2>
-                </div>
-              </div>
-              {/* Order Details Content */}
-              <div className="p-6">
+            <Card className="bg-white sticky top-24">
+              <CardContent className="p-6">
                 {selectedOrder ? (
                   <>
                     <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-lg font-semibold text-gray-900">Order Details</h2>
                       <span
                         className={`px-3 py-1 text-xs font-medium rounded-full border ${
                           statusColors[selectedOrder.status]
@@ -989,8 +929,8 @@ export default function AdminDashboard() {
                     <p className="text-sm text-gray-400 mt-1">Click on an order to view details</p>
                   </div>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
