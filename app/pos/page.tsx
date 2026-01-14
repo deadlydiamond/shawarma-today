@@ -128,6 +128,7 @@ export default function POSPage() {
   const [customerName, setCustomerName] = useState("")
   const [tableNumber, setTableNumber] = useState("counter")
   const [prepTime, setPrepTime] = useState(10) // default 10 minutes
+  const [paidNow, setPaidNow] = useState(false) // Payment collected at order time
   const [showReceipt, setShowReceipt] = useState(false)
   const [lastReceipt, setLastReceipt] = useState<OrderReceipt | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -239,14 +240,16 @@ export default function POSPage() {
         description: "",
       }))
 
+      const paymentStatus = paidNow ? "✅ PAID" : "💰 UNPAID"
+      
       const orderId = await addOrder({
         items: orderItems,
         customer: { name: displayName, phone: "" },
         subtotal,
         total,
         tableNumber,
-        specialInstructions: `#${orderCode} | Ready ${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} | 💰 UNPAID`,
-        status: "preparing", // Start preparing immediately, payment collected later
+        specialInstructions: `#${orderCode} | Ready ${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} | ${paymentStatus}`,
+        status: "preparing", // Start preparing immediately
       })
 
       // Create receipt
@@ -269,6 +272,7 @@ export default function POSPage() {
       setCustomerName("")
       setTableNumber("counter")
       setPrepTime(10) // Reset to default
+      setPaidNow(false) // Reset payment toggle
     } catch (error) {
       console.error("Failed to place order:", error)
     } finally {
@@ -531,10 +535,33 @@ export default function POSPage() {
             <span>Subtotal</span>
             <span>£{subtotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-white text-xl font-bold mb-4">
+          <div className="flex justify-between text-white text-xl font-bold mb-3">
             <span>Total</span>
             <span>£{total.toFixed(2)}</span>
           </div>
+          
+          {/* Payment Toggle */}
+          <button
+            onClick={() => setPaidNow(!paidNow)}
+            className={`w-full py-3 mb-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${
+              paidNow 
+                ? "bg-green-500 text-white" 
+                : "bg-gray-700 text-gray-300 border-2 border-dashed border-gray-500"
+            }`}
+          >
+            {paidNow ? (
+              <>
+                <CheckCircle className="h-5 w-5" />
+                Payment Collected ✓
+              </>
+            ) : (
+              <>
+                <CreditCard className="h-5 w-5" />
+                Tap if Payment Collected
+              </>
+            )}
+          </button>
+          
           <button
             onClick={handlePlaceOrder}
             disabled={cart.length === 0 || isProcessing}
