@@ -3,7 +3,6 @@
 import { MapPin, Phone, Clock, Heart } from "lucide-react"
 import contentData from "@/src/content/content.json"
 import Link from "next/link"
-import Image from "next/image"
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -16,18 +15,7 @@ export default function Footer() {
           
           {/* Brand */}
           <div className="lg:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="bg-white rounded-xl p-0.5">
-                <Image
-                  src="/logos/shawarma-logo.png"
-                  alt="Today Shawarma"
-                  width={48}
-                  height={48}
-                  className="rounded-lg"
-                />
-              </div>
-              <span className="text-xl font-bold">Today Shawarma</span>
-            </div>
+            <h3 className="text-xl font-bold mb-4">Today Shawarma</h3>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               {contentData.tagline}
             </p>
