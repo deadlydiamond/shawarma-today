@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useCart } from "@/contexts/CartContext"
 import { useOrders } from "@/contexts/OrderContext"
@@ -10,14 +10,30 @@ import { ArrowLeft, Loader2, User, MapPin, MessageSquare, Clock, Minus, Plus, Tr
 import Link from "next/link"
 import Image from "next/image"
 
+// Generate or get session ID for order tracking
+const getSessionId = () => {
+  if (typeof window === "undefined") return ""
+  let sessionId = localStorage.getItem("order_session_id")
+  if (!sessionId) {
+    sessionId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    localStorage.setItem("order_session_id", sessionId)
+  }
+  return sessionId
+}
+
 export default function Checkout() {
   const router = useRouter()
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, clearCart } = useCart()
   const { addOrder, orders } = useOrders()
+  const [sessionId, setSessionId] = useState("")
+  
+  useEffect(() => {
+    setSessionId(getSessionId())
+  }, [])
   
   const getEstimatedWaitTime = () => {
     const activeOrders = orders.filter(o => 
-      o.status === "paid" || o.status === "preparing"
+      o.status === "preparing"
     ).length
     const baseMin = 10 + (activeOrders * 3)
     const baseMax = 15 + (activeOrders * 3)
@@ -30,12 +46,11 @@ export default function Checkout() {
   const [orderType, setOrderType] = useState<"dine-in" | "takeaway">("dine-in")
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
     tableNumber: "",
     pickupTime: "",
     specialInstructions: "",
   })
-  const [errors, setErrors] = useState<{ name?: string; phone?: string; tableNumber?: string; pickupTime?: string }>({})
+  const [errors, setErrors] = useState<{ name?: string; tableNumber?: string; pickupTime?: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const formatPrice = (price: number) => `£${price.toFixed(2)}`
@@ -54,7 +69,7 @@ export default function Checkout() {
     const options: { value: string; label: string }[] = []
     const now = new Date()
     const minutes = now.getMinutes()
-    const roundedMinutes = Math.ceil((minutes + 10) / 15) * 15
+    const roundedMinutes = Math.ceil((minutes + 15) / 15) * 15
     now.setMinutes(roundedMinutes, 0, 0)
     
     options.push({ value: "asap", label: "🚀 ASAP (as soon as ready)" })
@@ -72,7 +87,7 @@ export default function Checkout() {
   }
 
   const validateForm = () => {
-    const newErrors: { name?: string; phone?: string; tableNumber?: string; pickupTime?: string } = {}
+    const newErrors: { name?: string; tableNumber?: string; pickupTime?: string } = {}
     
     if (!formData.name.trim()) {
       newErrors.name = "Name is required"
@@ -80,17 +95,12 @@ export default function Checkout() {
       newErrors.name = "Name must be at least 2 characters"
     }
     
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Phone number is required"
-    } else if (!/^[\d\s+()-]{10,}$/.test(formData.phone.trim())) {
-      newErrors.phone = "Please enter a valid phone number"
-    }
-    
     if (orderType === "dine-in" && !formData.tableNumber.trim()) {
       newErrors.tableNumber = "Please select your table"
     }
     
-    if (!formData.pickupTime) {
+    // Pickup time only required for takeaway
+    if (orderType === "takeaway" && !formData.pickupTime) {
       newErrors.pickupTime = "Please select a pickup time"
     }
     
@@ -118,17 +128,18 @@ export default function Checkout() {
       items: orderItems,
       customer: {
         name: formData.name,
-        phone: formData.phone,
+        sessionId: sessionId,
       },
       tableNumber: orderType === "takeaway" ? "takeaway" : formData.tableNumber,
-      pickupTime: formData.pickupTime,
+      pickupTime: orderType === "takeaway" ? formData.pickupTime : undefined,
       specialInstructions: formData.specialInstructions,
       subtotal: getTotalPrice(),
       total: getTotalPrice(),
     })
 
     if (newOrderId) {
-      localStorage.setItem("customer_phone", formData.phone)
+      // Save session for order lookup
+      localStorage.setItem("order_session_id", sessionId)
       clearCart()
       router.push(`/order/${newOrderId}`)
     } else {
@@ -144,7 +155,7 @@ export default function Checkout() {
     })
   }
 
-  const isFormValid = formData.name.trim() && formData.phone.trim() && formData.pickupTime && (orderType === "takeaway" || formData.tableNumber)
+  const isFormValid = formData.name.trim() && (orderType === "takeaway" ? formData.pickupTime : formData.tableNumber)
 
   // Empty Cart State
   if (cartItems.length === 0) {
@@ -190,7 +201,7 @@ export default function Checkout() {
             </Link>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <Shield className="h-4 w-4 text-green-500" />
-              Secure Checkout
+              Secure Order
             </div>
           </div>
 
@@ -264,14 +275,14 @@ export default function Checkout() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-gray-900">Your Details</h2>
-                    <p className="text-sm text-gray-500">For order identification</p>
+                    <p className="text-sm text-gray-500">We&apos;ll call your name when ready</p>
                   </div>
                 </div>
                 
                 <form className="space-y-4">
                   {/* Name */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Name *</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Your Name *</label>
                     <input
                       type="text"
                       name="name"
@@ -280,35 +291,15 @@ export default function Checkout() {
                         handleChange(e)
                         if (errors.name) setErrors({ ...errors, name: undefined })
                       }}
-                      placeholder="Your name"
-                      className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all ${
+                      placeholder="e.g. John"
+                      className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all text-lg ${
                         errors.name 
                           ? "border-red-300 focus:border-red-500" 
                           : "border-gray-100 focus:border-shawarma"
                       }`}
                     />
                     {errors.name && <p className="mt-1.5 text-sm text-red-500">{errors.name}</p>}
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={(e) => {
-                        handleChange(e)
-                        if (errors.phone) setErrors({ ...errors, phone: undefined })
-                      }}
-                      placeholder="07123 456789"
-                      className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all ${
-                        errors.phone 
-                          ? "border-red-300 focus:border-red-500" 
-                          : "border-gray-100 focus:border-shawarma"
-                      }`}
-                    />
-                    {errors.phone && <p className="mt-1.5 text-sm text-red-500">{errors.phone}</p>}
+                    <p className="mt-1.5 text-xs text-gray-400">This is how we&apos;ll call you when your order is ready</p>
                   </div>
 
                   {/* Table Number - Dine In Only */}
@@ -324,7 +315,7 @@ export default function Checkout() {
                           handleChange(e)
                           if (errors.tableNumber) setErrors({ ...errors, tableNumber: undefined })
                         }}
-                        className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all appearance-none ${
+                        className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all appearance-none text-lg ${
                           errors.tableNumber 
                             ? "border-red-300 focus:border-red-500" 
                             : "border-gray-100 focus:border-shawarma"
@@ -341,32 +332,34 @@ export default function Checkout() {
                     </div>
                   )}
 
-                  {/* Pickup Time */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-shawarma" />
-                      {orderType === "dine-in" ? "When would you like it served?" : "Pickup Time"} *
-                    </label>
-                    <select
-                      name="pickupTime"
-                      value={formData.pickupTime}
-                      onChange={(e) => {
-                        handleChange(e)
-                        if (errors.pickupTime) setErrors({ ...errors, pickupTime: undefined })
-                      }}
-                      className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all appearance-none ${
-                        errors.pickupTime 
-                          ? "border-red-300 focus:border-red-500" 
-                          : "border-gray-100 focus:border-shawarma"
-                      }`}
-                    >
-                      <option value="">Select a time</option>
-                      {getPickupTimeOptions().map((option) => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
-                      ))}
-                    </select>
-                    {errors.pickupTime && <p className="mt-1.5 text-sm text-red-500">{errors.pickupTime}</p>}
-                  </div>
+                  {/* Pickup Time - Takeaway Only */}
+                  {orderType === "takeaway" && (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-shawarma" />
+                        Pickup Time *
+                      </label>
+                      <select
+                        name="pickupTime"
+                        value={formData.pickupTime}
+                        onChange={(e) => {
+                          handleChange(e)
+                          if (errors.pickupTime) setErrors({ ...errors, pickupTime: undefined })
+                        }}
+                        className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all appearance-none text-lg ${
+                          errors.pickupTime 
+                            ? "border-red-300 focus:border-red-500" 
+                            : "border-gray-100 focus:border-shawarma"
+                        }`}
+                      >
+                        <option value="">Select pickup time</option>
+                        {getPickupTimeOptions().map((option) => (
+                          <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                      </select>
+                      {errors.pickupTime && <p className="mt-1.5 text-sm text-red-500">{errors.pickupTime}</p>}
+                    </div>
+                  )}
 
                   {/* Special Instructions */}
                   <div>

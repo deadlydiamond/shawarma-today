@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
-import { Button } from "@/components/ui/button"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { Phone, Clock, CheckCircle, ChefHat, Package, XCircle, Search, ArrowRight, MapPin, Sparkles, Receipt, RefreshCw, UtensilsCrossed } from "lucide-react"
+import { Clock, CheckCircle, ChefHat, Package, XCircle, ArrowRight, MapPin, Sparkles, Receipt, UtensilsCrossed } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -21,7 +20,7 @@ interface OrderItem {
 interface Order {
   id: string
   customer_name: string
-  customer_phone: string
+  session_id?: string
   table_number: string
   special_instructions?: string
   items: OrderItem[]
@@ -81,23 +80,22 @@ const progressSteps = [
 ]
 
 export default function MyOrdersPage() {
-  const [phone, setPhone] = useState("")
   const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(false)
-  const [searched, setSearched] = useState(false)
-  const [savedPhone, setSavedPhone] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [sessionId, setSessionId] = useState("")
 
   useEffect(() => {
-    const saved = localStorage.getItem("customer_phone")
-    if (saved) {
-      setPhone(saved)
-      setSavedPhone(saved)
-      searchOrders(saved)
+    const savedSession = localStorage.getItem("order_session_id")
+    if (savedSession) {
+      setSessionId(savedSession)
+      fetchOrders(savedSession)
+    } else {
+      setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    if (!savedPhone) return
+    if (!sessionId) return
 
     const channel = supabase
       .channel("my-orders")
@@ -111,7 +109,7 @@ export default function MyOrdersPage() {
         (payload) => {
           if (payload.eventType === "INSERT") {
             const newOrder = payload.new as Order
-            if (newOrder.customer_phone === savedPhone) {
+            if (newOrder.session_id === sessionId) {
               setOrders((prev) => [newOrder, ...prev])
             }
           } else if (payload.eventType === "UPDATE") {
@@ -127,48 +125,37 @@ export default function MyOrdersPage() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [savedPhone])
+  }, [sessionId])
 
-  const searchOrders = async (phoneNumber: string) => {
-    const cleanPhone = phoneNumber.trim()
-    if (!cleanPhone) return
-
+  const fetchOrders = async (session: string) => {
     setLoading(true)
-    setSearched(true)
 
     try {
       const { data, error } = await supabase
         .from("orders")
         .select("*")
-        .eq("customer_phone", cleanPhone)
+        .eq("session_id", session)
         .order("created_at", { ascending: false })
 
       if (error) {
         console.error("Error fetching orders:", error)
+        // Fallback to localStorage
         const storedOrders = localStorage.getItem("cafe_orders")
         if (storedOrders) {
           const allOrders = JSON.parse(storedOrders)
           const filtered = allOrders.filter((o: any) => 
-            (o.customer?.phone || o.customer_phone) === cleanPhone
+            o.session_id === session || o.sessionId === session
           )
           setOrders(filtered)
         }
       } else {
         setOrders(data || [])
       }
-
-      localStorage.setItem("customer_phone", cleanPhone)
-      setSavedPhone(cleanPhone)
     } catch (err) {
       console.error("Error:", err)
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    searchOrders(phone)
   }
 
   const formatPrice = (price: number) => `£${price.toFixed(2)}`
@@ -213,41 +200,18 @@ export default function MyOrdersPage() {
             <p className="text-gray-500">Track your orders in real-time</p>
           </div>
 
-          {/* Phone Search Card */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-8 border border-gray-100">
-            <form onSubmit={handleSubmit} className="flex gap-3">
-              <div className="relative flex-1">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter your phone number"
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-shawarma/20 focus:border-shawarma transition-all text-gray-900 placeholder:text-gray-400"
-                />
+          {/* Loading State */}
+          {loading && (
+            <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-gray-100">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <UtensilsCrossed className="h-8 w-8 text-gray-300" />
               </div>
-              <button 
-                type="submit" 
-                disabled={loading || !phone.trim()}
-                className="px-6 py-4 bg-shawarma hover:bg-shawarma-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold rounded-2xl transition-all hover:scale-105 active:scale-95 disabled:hover:scale-100"
-              >
-                {loading ? (
-                  <RefreshCw className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Search className="h-5 w-5" />
-                )}
-              </button>
-            </form>
-            {savedPhone && (
-              <p className="text-sm text-gray-500 mt-4 text-center flex items-center justify-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                Live updates for {savedPhone}
-              </p>
-            )}
-          </div>
+              <p className="text-gray-500">Loading your orders...</p>
+            </div>
+          )}
 
           {/* Active Orders */}
-          {activeOrders.length > 0 && (
+          {!loading && activeOrders.length > 0 && (
             <div className="mb-10">
               <div className="flex items-center gap-3 mb-5">
                 <span className="flex h-3 w-3 relative">
@@ -298,7 +262,7 @@ export default function MyOrdersPage() {
                           </div>
                           {/* Progress line */}
                           <div className="flex gap-1 px-5 -mt-[52px] mb-8">
-                            {[1, 2, 3].map((i) => (
+                            {[1, 2].map((i) => (
                               <div 
                                 key={i} 
                                 className={`flex-1 h-1 rounded-full transition-colors ${i < currentProgress ? 'bg-green-500' : 'bg-gray-200'}`} 
@@ -375,7 +339,7 @@ export default function MyOrdersPage() {
           )}
 
           {/* Past Orders */}
-          {pastOrders.length > 0 && (
+          {!loading && pastOrders.length > 0 && (
             <div>
               <h2 className="text-lg font-bold text-gray-400 mb-4">Past Orders</h2>
               <div className="space-y-3">
@@ -409,14 +373,14 @@ export default function MyOrdersPage() {
           )}
 
           {/* No Orders Found */}
-          {searched && orders.length === 0 && !loading && (
+          {!loading && orders.length === 0 && (
             <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-gray-100">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Receipt className="h-8 w-8 text-gray-300" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No orders found</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">No orders yet</h3>
               <p className="text-gray-500 mb-8 max-w-sm mx-auto">
-                We couldn&apos;t find any orders with this phone number. Ready to place your first order?
+                Your orders will appear here once you place your first order
               </p>
               <Link 
                 href="/#menu"
@@ -425,19 +389,6 @@ export default function MyOrdersPage() {
                 <Sparkles className="h-5 w-5" />
                 Browse Menu
               </Link>
-            </div>
-          )}
-
-          {/* Not Searched Yet */}
-          {!searched && (
-            <div className="bg-white rounded-3xl p-10 text-center shadow-sm border border-gray-100">
-              <div className="w-20 h-20 bg-shawarma/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Phone className="h-8 w-8 text-shawarma" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Track Your Order</h3>
-              <p className="text-gray-500 max-w-sm mx-auto">
-                Enter the phone number you used when placing your order to see real-time updates
-              </p>
             </div>
           )}
         </div>

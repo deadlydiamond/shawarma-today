@@ -10,14 +10,14 @@ export interface Order {
   items: OrderItem[]
   customer: {
     name: string
-    phone: string
+    sessionId?: string
   }
   tableNumber: string
   pickupTime?: string
   specialInstructions?: string
   subtotal: number
   total: number
-  status: "pending" | "paid" | "preparing" | "ready" | "completed" | "cancelled"
+  status: "pending" | "preparing" | "ready" | "completed" | "cancelled"
   createdAt: string
   updatedAt: string
 }
@@ -43,14 +43,14 @@ const dbToOrder = (row: DbOrder): Order => ({
   items: row.items,
   customer: {
     name: row.customer_name,
-    phone: row.customer_phone,
+    sessionId: row.session_id || "",
   },
   tableNumber: row.table_number || "",
   pickupTime: row.pickup_time || "",
   specialInstructions: row.special_instructions || "",
   subtotal: row.subtotal,
   total: row.total,
-  status: row.status,
+  status: row.status as Order["status"],
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 })
@@ -193,7 +193,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase.from("orders").insert({
         id: orderId,
         customer_name: orderData.customer.name,
-        customer_phone: orderData.customer.phone,
+        session_id: orderData.customer.sessionId || "",
         table_number: orderData.tableNumber,
         pickup_time: orderData.pickupTime || "",
         special_instructions: orderData.specialInstructions || "",
@@ -278,7 +278,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
 
   const getPendingOrders = () => {
     return orders.filter((order) =>
-      order.status === "paid" || order.status === "preparing"
+      order.status === "pending" || order.status === "preparing"
     )
   }
 

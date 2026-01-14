@@ -12,14 +12,14 @@ export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
 export interface DbOrder {
   id: string
   customer_name: string
-  customer_phone: string
+  session_id?: string
   table_number: string
   pickup_time?: string
   special_instructions?: string
   items: OrderItem[]
   subtotal: number
   total: number
-  status: 'pending' | 'paid' | 'preparing' | 'ready' | 'completed' | 'cancelled'
+  status: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled'
   created_at: string
   updated_at: string
 }
