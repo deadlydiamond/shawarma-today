@@ -46,6 +46,7 @@ interface OrderReceipt {
   timestamp: Date
   prepTime: number // minutes until ready
   readyTime: Date // calculated ready time
+  isPaid: boolean // payment status
 }
 
 // Generate a random 4-digit order code
@@ -142,14 +143,17 @@ export default function POSPage() {
   
   // Search for order by code
   const searchOrderByCode = () => {
-    const code = paymentSearchCode.trim()
+    const code = paymentSearchCode.trim().replace("#", "")
     if (!code) return
     
-    // Search in special instructions for the order code
+    // Search in special instructions, customer name, or order ID
     const order = orders.find(o => 
       o.specialInstructions?.includes(`#${code}`) || 
+      o.specialInstructions?.includes(code) ||
       o.customer.name.includes(`#${code}`) ||
-      o.id.includes(code)
+      o.customer.name.includes(code) ||
+      o.id.toLowerCase().includes(code.toLowerCase()) ||
+      o.id.slice(-4) === code
     )
     setFoundOrder(order || null)
   }
@@ -265,6 +269,7 @@ export default function POSPage() {
         timestamp: now,
         prepTime,
         readyTime,
+        isPaid: paidNow,
       }
 
       setLastReceipt(receipt)
@@ -634,28 +639,60 @@ export default function POSPage() {
                 <span>£{lastReceipt.total.toFixed(2)}</span>
               </div>
 
-              <div className="footer text-center mt-6 text-sm text-gray-500">
+              {/* Payment Status on Receipt */}
+              <div className={`mt-4 p-3 rounded-xl text-center font-bold ${
+                lastReceipt.isPaid 
+                  ? "bg-green-100 text-green-700 border-2 border-green-300" 
+                  : "bg-red-100 text-red-700 border-2 border-red-300"
+              }`}>
+                {lastReceipt.isPaid ? "✅ PAYMENT COLLECTED" : "💰 PAYMENT PENDING"}
+              </div>
+
+              <div className="footer text-center mt-4 text-sm text-gray-500">
                 <p>Thank you for your order!</p>
                 <p>100% Halal • Fresh Daily</p>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="p-4 bg-gray-50 flex gap-3">
-              <button
-                onClick={handlePrintReceipt}
-                className="flex-1 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
-              >
-                <Printer className="h-5 w-5" />
-                Print Receipt
-              </button>
-              <button
-                onClick={() => setShowReceipt(false)}
-                className="flex-1 py-3 bg-shawarma hover:bg-shawarma-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
-              >
-                <CheckCircle className="h-5 w-5" />
-                Done
-              </button>
+            <div className="p-4 bg-gray-50 space-y-3">
+              {/* Mark as Paid button - only if not paid */}
+              {!lastReceipt.isPaid && (
+                <button
+                  onClick={async () => {
+                    // Find and update the order
+                    const order = orders.find(o => 
+                      o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
+                    )
+                    if (order) {
+                      const newInstructions = order.specialInstructions?.replace("💰 UNPAID", "✅ PAID") || "✅ PAID"
+                      await updateOrderNotes(order.id, newInstructions)
+                    }
+                    setLastReceipt({ ...lastReceipt, isPaid: true })
+                  }}
+                  className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+                >
+                  <CreditCard className="h-6 w-6" />
+                  Collect Payment • £{lastReceipt.total.toFixed(2)}
+                </button>
+              )}
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={handlePrintReceipt}
+                  className="flex-1 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
+                >
+                  <Printer className="h-5 w-5" />
+                  Print
+                </button>
+                <button
+                  onClick={() => setShowReceipt(false)}
+                  className="flex-1 py-3 bg-shawarma hover:bg-shawarma-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
+                >
+                  <CheckCircle className="h-5 w-5" />
+                  Done
+                </button>
+              </div>
             </div>
           </div>
         </div>
