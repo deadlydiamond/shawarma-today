@@ -9,7 +9,7 @@ export default function About() {
         <div className="absolute inset-0 opacity-5">
           <Image
             src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=1920&q=80"
-            alt="Leaf & Bean Café"
+            alt="Today Shawarma Café"
             fill
             className="object-cover"
           />
@@ -29,7 +29,7 @@ export default function About() {
         <div className="mx-auto max-w-3xl">
           <div className="space-y-8 text-coffee-dark/80">
             <p className="text-base font-body leading-relaxed">
-                  Leaf & Bean Café is an independent neighbourhood café located in the heart of Morningside, Edinburgh. 
+                  Today Shawarma Café is an independent neighbourhood café located in the heart of Morningside, Edinburgh. 
                   We are a family-run business dedicated to serving quality coffee, fresh food, and warm hospitality to our community.
                 </p>
             <p className="text-base font-body leading-relaxed">
@@ -43,7 +43,7 @@ export default function About() {
                   make your visit enjoyable.
                 </p>
             <p className="text-base font-body leading-relaxed text-coffee-dark">
-                  We look forward to welcoming you to Leaf & Bean Café.
+                  We look forward to welcoming you to Today Shawarma Café.
                 </p>
               </div>
         </div>

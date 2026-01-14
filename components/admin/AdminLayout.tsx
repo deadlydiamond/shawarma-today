@@ -79,7 +79,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="p-2 bg-gray-900 rounded-lg">
               <Coffee className="h-5 w-5 text-white" />
             </div>
-            <span className="font-semibold text-gray-900">Leaf & Bean</span>
+            <span className="font-semibold text-gray-900">Today Shawarma</span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}

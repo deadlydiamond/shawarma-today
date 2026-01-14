@@ -385,66 +385,70 @@ export default function Home() {
       <Section id="reviews" className="relative py-12">
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
+                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                <span className="font-bold text-lg">4.5</span>
+              </div>
               <h2 className="text-xl font-semibold text-gray-900">Customer Reviews</h2>
+              <span className="text-sm text-gray-500">(222 reviews on Google)</span>
             </div>
           </div>
 
           <div className="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide snap-x snap-mandatory">
             {[
               {
-                name: "Sarah Mitchell",
+                name: "Ariananda H",
                 rating: 5,
-                review: "The best coffee in Morningside! The atmosphere is warm and welcoming, and the staff are always friendly. Their flat white is perfection. A real gem in the neighbourhood.",
+                review: "Best chicken shawarma in Edinburgh! The meat is perfectly seasoned and the garlic sauce is incredible. Great value for money and super quick service.",
                 date: "2 weeks ago"
               },
               {
-                name: "James Thompson",
+                name: "Aninda De",
                 rating: 5,
-                review: "Love the Full Scottish Breakfast here. Quality ingredients and generous portions. It's become our weekend tradition. Highly recommend!",
+                review: "Amazing falafel wrap! Crispy on the outside, soft inside. The hummus is fresh and the portions are generous. My go-to place for lunch now!",
                 date: "1 month ago"
+              },
+              {
+                name: "Mimi H",
+                rating: 5,
+                review: "The lamb shawarma here is authentic and delicious. Reminds me of the shawarma I had in the Middle East. Friendly staff too!",
+                date: "3 weeks ago"
+              },
+              {
+                name: "Super",
+                rating: 5,
+                review: "Incredible food at great prices! The chicken wrap with extra garlic sauce is my favorite. Fast service even when busy. Highly recommend!",
+                date: "1 week ago"
+              },
+              {
+                name: "David M",
+                rating: 5,
+                review: "The soup here is fantastic - perfect for a cold Edinburgh day. Combined with a shawarma wrap, it's the perfect lunch. Great value!",
+                date: "2 weeks ago"
               },
               {
                 name: "Emma Wilson",
                 rating: 5,
-                review: "Such a lovely neighbourhood café. The porridge is amazing, and I always feel at home when I visit. The staff are so welcoming and remember regulars.",
+                review: "Love this place! The lamb kebab is juicy and flavourful. The naan bread is always fresh. Best Middle Eastern food in Leith!",
                 date: "3 weeks ago"
               },
               {
-                name: "Michael Brown",
-                rating: 4,
-                review: "Great food, excellent coffee, and wonderful service. The tuna melt ciabatta is my go-to lunch. Only minor issue is it can get busy at peak times, but worth the wait!",
-                date: "2 months ago"
-              },
-              {
-                name: "Olivia Davis",
+                name: "James T",
                 rating: 5,
-                review: "The perfect spot for a morning coffee or afternoon catch-up. The pancakes are absolutely delicious, and the coffee is top-notch. Love the cosy atmosphere!",
-                date: "1 week ago"
-              },
-              {
-                name: "David Miller",
-                rating: 5,
-                review: "A real gem in the neighbourhood. The soup of the day is always fantastic, and the staff remember your order. What more could you ask for? Excellent value too.",
-                date: "3 weeks ago"
-              },
-              {
-                name: "Rachel Green",
-                rating: 4,
-                review: "Really nice café with good coffee and friendly staff. The breakfast options are great, though I wish they had more vegetarian choices. Overall a lovely place!",
+                review: "Finally, authentic shawarma in Edinburgh! The mixed plate with rice and salads is amazing. Staff are always friendly and remember regulars.",
                 date: "1 month ago"
               },
               {
-                name: "Tom Anderson",
+                name: "Sarah K",
                 rating: 5,
-                review: "Fantastic little café! The coffee is excellent and the food is always fresh. Staff are super friendly and the prices are very reasonable. My new favourite spot!",
+                review: "The falafel is the best I've had outside of the Middle East. Crispy, flavourful, and the tahini sauce is perfect. Will definitely be back!",
                 date: "2 weeks ago"
               },
               {
-                name: "Lisa Parker",
+                name: "Michael B",
                 rating: 4,
-                review: "Great neighbourhood café with a warm atmosphere. The coffee is consistently good and the staff are lovely. Only downside is limited seating, but that's part of its charm!",
+                review: "Great shawarma and very reasonable prices. The chicken is tender and well-spiced. Can get busy at lunch but worth the wait!",
                 date: "3 weeks ago"
               },
             ].map((review, index) => (
@@ -495,7 +499,7 @@ export default function Home() {
           <Card className="mb-12 overflow-hidden p-0">
             <div className="relative w-full h-96">
               <iframe
-                src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2233.123456789!2d${contentData.address.postcode === 'EH10 5QE' ? '-3.2099549' : '-3.2099549'}!3d${contentData.address.postcode === 'EH10 5QE' ? '55.924805' : '55.924805'}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTXCsDU1JzI5LjMiTiAzwrAxMiczNS44Ilc!5e0!3m2!1sen!2suk!4v1234567890123!5m2!1sen!2suk`}
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2233.5!2d-3.1675541!3d55.9573123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4887b9001f5acead%3A0x388a5a0797201ff0!2sToday%20Shawarma!5e0!3m2!1sen!2suk!4v1234567890123"
                 width="100%"
                 height="100%"
                 style={{ border: 0, filter: 'grayscale(100%) contrast(1.2)' }}

@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                 <Coffee className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Leaf & Bean</h1>
+                <h1 className="text-xl font-semibold text-gray-900">Today Shawarma</h1>
                 <p className="text-sm text-gray-500">
                   {staff?.name || "Admin"} • <span className="capitalize">{staff?.role || "admin"}</span>
                 </p>

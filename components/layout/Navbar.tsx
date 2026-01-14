@@ -55,7 +55,7 @@ export default function Navbar() {
             "text-xl font-semibold tracking-tight transition-colors",
             (scrolled || isLightBackground) ? "text-foreground" : "text-white drop-shadow-md"
           )}>
-            LEAF & BEAN
+            TODAY SHAWARMA
           </a>
 
           {/* Desktop Navigation */}

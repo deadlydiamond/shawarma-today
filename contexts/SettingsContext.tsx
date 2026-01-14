@@ -42,7 +42,7 @@ const defaultSettings: CafeSettings = {
   tableCount: 20,
   taxRate: 0,
   currency: "£",
-  cafeName: "Leaf & Bean Café",
+  cafeName: "Today Shawarma Café",
   cafeAddress: "123 Morningside Road, Edinburgh",
   cafePhone: "+44 7887 910900",
 }
@@ -94,7 +94,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
               loadedSettings.currency = row.value || "£"
               break
             case "cafe_name":
-              loadedSettings.cafeName = row.value || "Leaf & Bean Café"
+              loadedSettings.cafeName = row.value || "Today Shawarma Café"
               break
             case "cafe_address":
               loadedSettings.cafeAddress = row.value || ""
