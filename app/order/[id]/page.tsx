@@ -285,7 +285,7 @@ export default function OrderTrackingPage() {
 
           {/* Table & Time Info */}
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-gray-900 rounded-2xl p-5 text-white">
+            <div className="bg-shawarma rounded-2xl p-5 text-white">
               <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
                 <MapPin className="h-4 w-4" />
                 Your Location
