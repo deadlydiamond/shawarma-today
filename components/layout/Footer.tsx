@@ -17,13 +17,15 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <Image
-                src="/logos/shawarma-logo.png"
-                alt="Today Shawarma"
-                width={44}
-                height={44}
-                className="rounded-lg"
-              />
+              <div className="bg-white rounded-xl p-1.5">
+                <Image
+                  src="/logos/shawarma-logo.png"
+                  alt="Today Shawarma"
+                  width={40}
+                  height={40}
+                  className="rounded-lg"
+                />
+              </div>
               <span className="text-xl font-bold">Today Shawarma</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
