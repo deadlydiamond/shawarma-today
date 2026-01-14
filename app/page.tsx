@@ -38,8 +38,8 @@ export default function Home() {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=1200&q=75"
-            alt="Shawarma Today"
+            src="/hero-bg.jpg"
+            alt="Today Shawarma Restaurant"
             fill
             className="object-cover"
             priority
