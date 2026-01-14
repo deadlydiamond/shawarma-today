@@ -302,7 +302,7 @@ export default function Home() {
           <div className="mb-8 -mx-6 px-6">
             <div className="flex items-center gap-2 mb-4">
               <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-              <h3 className="text-lg font-bold text-gray-900">Today&apos;s Specials</h3>
+              <h3 className="text-lg font-bold text-shawarma">Today&apos;s Specials</h3>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
               {todaySpecials.map((item) => (
@@ -345,8 +345,10 @@ export default function Home() {
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Camera className="h-5 w-5 text-gray-600" strokeWidth={2} />
-              <h2 className="text-xl font-semibold text-gray-900">Gallery</h2>
+              <div className="p-2 rounded-lg bg-shawarma">
+                <Camera className="h-4 w-4 text-white" strokeWidth={2} />
+              </div>
+              <h2 className="text-xl font-semibold text-shawarma">Gallery</h2>
             </div>
             <span className="text-sm text-gray-500">Swipe to explore →</span>
           </div>
@@ -387,10 +389,12 @@ export default function Home() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1">
-                <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                <div className="p-2 rounded-lg bg-shawarma">
+                  <Star className="h-4 w-4 text-white fill-white" />
+                </div>
                 <span className="font-bold text-lg">4.5</span>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Customer Reviews</h2>
+              <h2 className="text-xl font-semibold text-shawarma">Customer Reviews</h2>
               <span className="text-sm text-gray-500">(222 reviews on Google)</span>
             </div>
           </div>
@@ -487,7 +491,7 @@ export default function Home() {
         <div className="relative z-10">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-2 text-gray-900">
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-2 text-shawarma">
               Visit Us
             </h2>
             <p className="text-gray-600">
@@ -502,7 +506,7 @@ export default function Home() {
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2233.5!2d-3.1675541!3d55.9573123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4887b9001f5acead%3A0x388a5a0797201ff0!2sToday%20Shawarma!5e0!3m2!1sen!2suk!4v1234567890123"
                 width="100%"
                 height="100%"
-                style={{ border: 0, filter: 'grayscale(100%) contrast(1.2)' }}
+                style={{ border: 0, filter: 'grayscale(100%) sepia(50%) saturate(200%) hue-rotate(-10deg) contrast(1.1)' }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -512,7 +516,9 @@ export default function Home() {
             <div className="p-6 glass">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-foreground/70" strokeWidth={2} />
+                  <div className="p-2 rounded-lg bg-shawarma">
+                    <MapPin className="h-4 w-4 text-white" strokeWidth={2} />
+                  </div>
                   <div className="text-foreground/80">
                     <p className="font-medium">{contentData.address.line1}</p>
                     <p className="text-sm">{contentData.address.city} {contentData.address.postcode}</p>
@@ -522,7 +528,9 @@ export default function Home() {
                 href={`tel:${contentData.phone.replace(/\s/g, "")}`}
                   className="flex items-center gap-3 text-gray-700 hover:text-gray-900 transition-colors"
               >
-                  <Phone className="h-5 w-5 text-gray-600" strokeWidth={2} />
+                  <div className="p-2 rounded-lg bg-shawarma">
+                    <Phone className="h-4 w-4 text-white" strokeWidth={2} />
+                  </div>
                   <span className="font-medium">{contentData.phone}</span>
               </a>
               </div>
@@ -532,10 +540,10 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
             <Card className="p-10">
               <div className="flex items-center justify-center gap-4 mb-8">
-                <div className="p-3 rounded-xl bg-gray-100">
-                  <Clock className="h-6 w-6 text-gray-900" strokeWidth={2} />
+                <div className="p-3 rounded-xl bg-shawarma">
+                  <Clock className="h-6 w-6 text-white" strokeWidth={2} />
                 </div>
-                <h3 className="text-xl font-semibold">Opening Hours</h3>
+                <h3 className="text-xl font-semibold text-shawarma">Opening Hours</h3>
               </div>
               <div className="space-y-3 max-w-md mx-auto">
                 {contentData.hours.items.map((item) => (
