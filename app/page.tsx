@@ -189,44 +189,6 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* About Section */}
-      <Section id="about" className="relative">
-        {/* Liquid background effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50/95 via-white/85 to-gray-100/95" />
-        <div className="relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-          <div className="animate-slide-up space-y-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 rounded-lg bg-shawarma shadow-sm">
-                <Heart className="h-5 w-5 text-white" strokeWidth={2} />
-              </div>
-              <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
-                About Us
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-8 pb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Authentic Flavours
-            </h2>
-            <p className="text-lg md:text-xl text-foreground/70 leading-relaxed">
-              Shawarma Today brings the authentic taste of Middle Eastern street food to Edinburgh. Our recipes have been passed down through generations, using traditional spices and cooking methods.
-            </p>
-            <p className="text-lg md:text-xl text-foreground/70 leading-relaxed">
-              Every wrap is made fresh to order with premium halal meat, house-made sauces, and crisp vegetables. Experience the real taste of shawarma, just like it&apos;s meant to be.
-            </p>
-          </div>
-          <div className="relative h-[600px] rounded-3xl overflow-hidden shadow-2xl animate-scale-in ring-1 ring-border/50">
-          <Image
-              src="https://images.unsplash.com/photo-1561651823-34feb02250e4?w=800&q=75"
-            alt="Fresh shawarma"
-            fill
-            className="object-cover"
-          />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-          </div>
-        </div>
-        </div>
-      </Section>
-
       {/* Menu Preview with Images */}
       <Section id="menu" className="relative">
         {/* Liquid background effect */}
@@ -333,49 +295,45 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Decorative Divider */}
-      <div className="relative h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-
-      {/* Gallery Section - Horizontal scroll */}
-      <Section id="gallery" className="relative py-12">
+      {/* About Section */}
+      <Section id="about" className="relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50/95 via-white/85 to-gray-100/95" />
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Camera className="h-5 w-5 text-gray-600" strokeWidth={2} />
-              <h2 className="text-xl font-semibold text-gray-900">Gallery</h2>
-            </div>
-            <span className="text-sm text-gray-500">Swipe to explore →</span>
-          </div>
-
-          <div className="flex gap-3 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide snap-x snap-mandatory">
-            {[
-              "/assets/menuuu/2020-06-10.jpg",
-              "/assets/menuuu/2020-06-10%20(1).jpg",
-              "/assets/menuuu/2020-10-08.png",
-              "/assets/menuuu/2020-10-30.png",
-              "/assets/menuuu/2020-12-20.jpg",
-              "/assets/menuuu/2021-02-13.jpg",
-              "/assets/menuuu/2021-03-14.jpg",
-              "/assets/menuuu/2022-12-10.jpg",
-            ].map((image, index) => (
-              <div
-                key={index}
-                className="flex-shrink-0 w-[200px] h-[150px] rounded-xl overflow-hidden snap-start"
-              >
-                <Image
-                  src={image}
-                  alt={`Café gallery ${index + 1}`}
-                  width={200}
-                  height={150}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                  loading="lazy"
-                  unoptimized
-                  />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+            <div className="animate-slide-up space-y-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 rounded-lg bg-shawarma shadow-sm">
+                  <Heart className="h-5 w-5 text-white" strokeWidth={2} />
+                </div>
+                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  About Us
+                </span>
               </div>
-            ))}
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-8 pb-1 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+                Authentic Flavours
+              </h2>
+              <p className="text-lg md:text-xl text-foreground/70 leading-relaxed">
+                Today Shawarma brings the authentic taste of Middle Eastern street food to Edinburgh. Our recipes have been passed down through generations, using traditional spices and cooking methods.
+              </p>
+              <p className="text-lg md:text-xl text-foreground/70 leading-relaxed">
+                Every wrap is made fresh to order with premium halal meat, house-made sauces, and crisp vegetables. Experience the real taste of shawarma, just like it&apos;s meant to be.
+              </p>
+            </div>
+            <div className="relative h-[600px] rounded-3xl overflow-hidden shadow-2xl animate-scale-in ring-1 ring-border/50">
+              <Image
+                src="https://images.unsplash.com/photo-1561651823-34feb02250e4?w=800&q=75"
+                alt="Fresh shawarma"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+            </div>
           </div>
         </div>
       </Section>
+
+      {/* Decorative Divider */}
+      <div className="relative h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
       {/* Reviews Section - Horizontal scroll */}
       <Section id="reviews" className="relative py-12">
@@ -487,7 +445,7 @@ export default function Home() {
               Visit Us
             </h2>
             <p className="text-gray-600">
-              We&apos;d love to see you at our café
+              We&apos;d love to see you at our restaurant
             </p>
           </div>
 

@@ -9,7 +9,7 @@ export default function About() {
         <div className="absolute inset-0 opacity-5">
           <Image
             src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=1920&q=80"
-            alt="Today Shawarma Café"
+            alt="Today Shawarma Restaurant"
             fill
             className="object-cover"
           />
@@ -29,23 +29,23 @@ export default function About() {
         <div className="mx-auto max-w-3xl">
           <div className="space-y-8 text-coffee-dark/80">
             <p className="text-base font-body leading-relaxed">
-                  Today Shawarma Café is an independent neighbourhood café located in the heart of Morningside, Edinburgh. 
-                  We are a family-run business dedicated to serving quality coffee, fresh food, and warm hospitality to our community.
-                </p>
+              Today Shawarma is an independent Middle Eastern restaurant located on Leith Walk, Edinburgh. 
+              We are a family-run business dedicated to serving authentic shawarma, fresh kebabs, and warm hospitality to our community.
+            </p>
             <p className="text-base font-body leading-relaxed">
-                  Since opening our doors, we have been committed to creating a welcoming space where neighbours can gather, 
-                  work, and enjoy delicious food and drink. Our menu features traditional breakfast favourites, freshly prepared 
-                  sandwiches, and a selection of quality coffee and teas.
-                </p>
+              Since opening our doors, we have been committed to creating a welcoming space where neighbours can gather 
+              and enjoy delicious, freshly prepared food. Our menu features traditional shawarma wraps, pizzas, fatayer, 
+              grilled meats, and a variety of Middle Eastern favourites.
+            </p>
             <p className="text-base font-body leading-relaxed">
-                  We take pride in being part of the Morningside community and look forward to serving you. Whether you&apos;re 
-                  stopping by for your morning coffee, meeting friends for brunch, or grabbing a quick lunch, we&apos;re here to 
-                  make your visit enjoyable.
-                </p>
+              We take pride in being part of the Leith community and look forward to serving you. Whether you&apos;re 
+              stopping by for a quick wrap, enjoying a platter with friends, or grabbing a family meal, we&apos;re here to 
+              make your visit memorable.
+            </p>
             <p className="text-base font-body leading-relaxed text-coffee-dark">
-                  We look forward to welcoming you to Today Shawarma Café.
-                </p>
-              </div>
+              We look forward to welcoming you to Today Shawarma.
+            </p>
+          </div>
         </div>
       </section>
     </div>

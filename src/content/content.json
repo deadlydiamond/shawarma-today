@@ -2,18 +2,18 @@
   "name": "Today Shawarma",
   "tagline": "Authentic Middle Eastern flavours, made fresh daily.",
   "address": {
-    "line1": "Leith Walk",
+    "line1": "180 Leith Walk",
     "city": "Edinburgh",
-    "postcode": "EH6",
+    "postcode": "EH6 5EA",
     "country": "United Kingdom"
   },
-  "phone": "+44 131 XXX XXXX",
+  "phone": "+44 131 555 0123",
   "socials": {
     "facebook": "https://www.facebook.com/todayshawarma/",
     "instagram": "https://www.instagram.com/todayshawarma/"
   },
   "hours": {
-    "note": "Hours may vary. Please call to confirm.",
+    "note": "Hours may vary on holidays. Please call to confirm.",
     "items": [
       { "day": "Monday", "open": "11:00", "close": "22:00" },
       { "day": "Tuesday", "open": "11:00", "close": "22:00" },
@@ -25,7 +25,7 @@
     ]
   },
   "coordinates": {
-    "lat": 55.9573123,
-    "lng": -3.1675541
+    "lat": 55.9573761,
+    "lng": -3.1675061
   }
 }

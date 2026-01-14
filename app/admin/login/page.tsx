@@ -71,7 +71,7 @@ export default function AdminLogin() {
               <Coffee className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">Admin Panel</h1>
-            <p className="text-gray-500 text-sm">Today Shawarma Café Management</p>
+            <p className="text-gray-500 text-sm">Today Shawarma Restaurant Management</p>
           </div>
 
           {/* Login Form */}

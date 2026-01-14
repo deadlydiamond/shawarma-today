@@ -14,109 +14,119 @@ interface DayData {
   times: TimeSlot[]
 }
 
-// Typical café busy times pattern
+// Today Shawarma restaurant busy times (based on typical fast food/takeaway patterns)
 const popularTimesData: DayData[] = [
   {
     day: "Monday",
     times: [
-      { hour: "8am", busyness: 40, label: "A little busy" },
-      { hour: "9am", busyness: 70, label: "Busy" },
-      { hour: "10am", busyness: 85, label: "Very busy" },
-      { hour: "11am", busyness: 75, label: "Busy" },
-      { hour: "12pm", busyness: 90, label: "Very busy" },
-      { hour: "1pm", busyness: 95, label: "Very busy" },
-      { hour: "2pm", busyness: 80, label: "Very busy" },
-      { hour: "3pm", busyness: 60, label: "Busy" },
-      { hour: "4pm", busyness: 50, label: "A little busy" },
+      { hour: "11am", busyness: 25, label: "Not busy" },
+      { hour: "12pm", busyness: 65, label: "Busy" },
+      { hour: "1pm", busyness: 85, label: "Very busy" },
+      { hour: "2pm", busyness: 60, label: "Busy" },
+      { hour: "3pm", busyness: 35, label: "A little busy" },
+      { hour: "4pm", busyness: 30, label: "A little busy" },
       { hour: "5pm", busyness: 45, label: "A little busy" },
+      { hour: "6pm", busyness: 70, label: "Busy" },
+      { hour: "7pm", busyness: 85, label: "Very busy" },
+      { hour: "8pm", busyness: 75, label: "Busy" },
+      { hour: "9pm", busyness: 50, label: "A little busy" },
     ],
   },
   {
     day: "Tuesday",
     times: [
-      { hour: "8am", busyness: 45, label: "A little busy" },
-      { hour: "9am", busyness: 75, label: "Busy" },
-      { hour: "10am", busyness: 88, label: "Very busy" },
-      { hour: "11am", busyness: 78, label: "Busy" },
-      { hour: "12pm", busyness: 92, label: "Very busy" },
-      { hour: "1pm", busyness: 96, label: "Very busy" },
-      { hour: "2pm", busyness: 82, label: "Very busy" },
-      { hour: "3pm", busyness: 65, label: "Busy" },
-      { hour: "4pm", busyness: 55, label: "A little busy" },
-      { hour: "5pm", busyness: 48, label: "A little busy" },
+      { hour: "11am", busyness: 25, label: "Not busy" },
+      { hour: "12pm", busyness: 70, label: "Busy" },
+      { hour: "1pm", busyness: 88, label: "Very busy" },
+      { hour: "2pm", busyness: 55, label: "A little busy" },
+      { hour: "3pm", busyness: 30, label: "A little busy" },
+      { hour: "4pm", busyness: 28, label: "Not busy" },
+      { hour: "5pm", busyness: 50, label: "A little busy" },
+      { hour: "6pm", busyness: 75, label: "Busy" },
+      { hour: "7pm", busyness: 90, label: "Very busy" },
+      { hour: "8pm", busyness: 78, label: "Busy" },
+      { hour: "9pm", busyness: 55, label: "A little busy" },
     ],
   },
   {
     day: "Wednesday",
     times: [
-      { hour: "8am", busyness: 42, label: "A little busy" },
-      { hour: "9am", busyness: 72, label: "Busy" },
-      { hour: "10am", busyness: 86, label: "Very busy" },
-      { hour: "11am", busyness: 76, label: "Busy" },
-      { hour: "12pm", busyness: 91, label: "Very busy" },
-      { hour: "1pm", busyness: 94, label: "Very busy" },
-      { hour: "2pm", busyness: 81, label: "Very busy" },
-      { hour: "3pm", busyness: 62, label: "Busy" },
-      { hour: "4pm", busyness: 52, label: "A little busy" },
-      { hour: "5pm", busyness: 46, label: "A little busy" },
+      { hour: "11am", busyness: 28, label: "Not busy" },
+      { hour: "12pm", busyness: 68, label: "Busy" },
+      { hour: "1pm", busyness: 85, label: "Very busy" },
+      { hour: "2pm", busyness: 52, label: "A little busy" },
+      { hour: "3pm", busyness: 32, label: "A little busy" },
+      { hour: "4pm", busyness: 30, label: "A little busy" },
+      { hour: "5pm", busyness: 48, label: "A little busy" },
+      { hour: "6pm", busyness: 72, label: "Busy" },
+      { hour: "7pm", busyness: 88, label: "Very busy" },
+      { hour: "8pm", busyness: 75, label: "Busy" },
+      { hour: "9pm", busyness: 52, label: "A little busy" },
     ],
   },
   {
     day: "Thursday",
     times: [
-      { hour: "8am", busyness: 48, label: "A little busy" },
-      { hour: "9am", busyness: 78, label: "Busy" },
-      { hour: "10am", busyness: 89, label: "Very busy" },
-      { hour: "11am", busyness: 79, label: "Busy" },
-      { hour: "12pm", busyness: 93, label: "Very busy" },
-      { hour: "1pm", busyness: 97, label: "Very busy" },
-      { hour: "2pm", busyness: 83, label: "Very busy" },
-      { hour: "3pm", busyness: 68, label: "Busy" },
-      { hour: "4pm", busyness: 58, label: "A little busy" },
-      { hour: "5pm", busyness: 50, label: "A little busy" },
+      { hour: "11am", busyness: 30, label: "A little busy" },
+      { hour: "12pm", busyness: 72, label: "Busy" },
+      { hour: "1pm", busyness: 90, label: "Very busy" },
+      { hour: "2pm", busyness: 58, label: "A little busy" },
+      { hour: "3pm", busyness: 35, label: "A little busy" },
+      { hour: "4pm", busyness: 32, label: "A little busy" },
+      { hour: "5pm", busyness: 55, label: "A little busy" },
+      { hour: "6pm", busyness: 78, label: "Busy" },
+      { hour: "7pm", busyness: 92, label: "Very busy" },
+      { hour: "8pm", busyness: 82, label: "Very busy" },
+      { hour: "9pm", busyness: 60, label: "Busy" },
     ],
   },
   {
     day: "Friday",
     times: [
-      { hour: "8am", busyness: 50, label: "A little busy" },
-      { hour: "9am", busyness: 80, label: "Very busy" },
-      { hour: "10am", busyness: 90, label: "Very busy" },
-      { hour: "11am", busyness: 82, label: "Very busy" },
-      { hour: "12pm", busyness: 95, label: "Very busy" },
-      { hour: "1pm", busyness: 98, label: "Very busy" },
-      { hour: "2pm", busyness: 85, label: "Very busy" },
-      { hour: "3pm", busyness: 70, label: "Busy" },
-      { hour: "4pm", busyness: 60, label: "Busy" },
-      { hour: "5pm", busyness: 55, label: "A little busy" },
+      { hour: "11am", busyness: 35, label: "A little busy" },
+      { hour: "12pm", busyness: 80, label: "Very busy" },
+      { hour: "1pm", busyness: 95, label: "Very busy" },
+      { hour: "2pm", busyness: 65, label: "Busy" },
+      { hour: "3pm", busyness: 40, label: "A little busy" },
+      { hour: "4pm", busyness: 38, label: "A little busy" },
+      { hour: "5pm", busyness: 60, label: "Busy" },
+      { hour: "6pm", busyness: 85, label: "Very busy" },
+      { hour: "7pm", busyness: 98, label: "Very busy" },
+      { hour: "8pm", busyness: 92, label: "Very busy" },
+      { hour: "9pm", busyness: 78, label: "Busy" },
+      { hour: "10pm", busyness: 55, label: "A little busy" },
     ],
   },
   {
     day: "Saturday",
     times: [
-      { hour: "9am", busyness: 60, label: "Busy" },
-      { hour: "10am", busyness: 75, label: "Busy" },
-      { hour: "11am", busyness: 85, label: "Very busy" },
-      { hour: "12pm", busyness: 92, label: "Very busy" },
-      { hour: "1pm", busyness: 96, label: "Very busy" },
-      { hour: "2pm", busyness: 88, label: "Very busy" },
-      { hour: "3pm", busyness: 80, label: "Very busy" },
-      { hour: "4pm", busyness: 70, label: "Busy" },
+      { hour: "11am", busyness: 45, label: "A little busy" },
+      { hour: "12pm", busyness: 82, label: "Very busy" },
+      { hour: "1pm", busyness: 95, label: "Very busy" },
+      { hour: "2pm", busyness: 75, label: "Busy" },
+      { hour: "3pm", busyness: 55, label: "A little busy" },
+      { hour: "4pm", busyness: 45, label: "A little busy" },
       { hour: "5pm", busyness: 65, label: "Busy" },
+      { hour: "6pm", busyness: 88, label: "Very busy" },
+      { hour: "7pm", busyness: 98, label: "Very busy" },
+      { hour: "8pm", busyness: 95, label: "Very busy" },
+      { hour: "9pm", busyness: 82, label: "Very busy" },
+      { hour: "10pm", busyness: 60, label: "Busy" },
     ],
   },
   {
     day: "Sunday",
     times: [
-      { hour: "9am", busyness: 55, label: "A little busy" },
-      { hour: "10am", busyness: 70, label: "Busy" },
-      { hour: "11am", busyness: 80, label: "Very busy" },
-      { hour: "12pm", busyness: 88, label: "Very busy" },
-      { hour: "1pm", busyness: 92, label: "Very busy" },
-      { hour: "2pm", busyness: 85, label: "Very busy" },
-      { hour: "3pm", busyness: 75, label: "Busy" },
-      { hour: "4pm", busyness: 65, label: "Busy" },
-      { hour: "5pm", busyness: 58, label: "A little busy" },
+      { hour: "12pm", busyness: 55, label: "A little busy" },
+      { hour: "1pm", busyness: 78, label: "Busy" },
+      { hour: "2pm", busyness: 88, label: "Very busy" },
+      { hour: "3pm", busyness: 72, label: "Busy" },
+      { hour: "4pm", busyness: 50, label: "A little busy" },
+      { hour: "5pm", busyness: 55, label: "A little busy" },
+      { hour: "6pm", busyness: 75, label: "Busy" },
+      { hour: "7pm", busyness: 90, label: "Very busy" },
+      { hour: "8pm", busyness: 80, label: "Very busy" },
+      { hour: "9pm", busyness: 55, label: "A little busy" },
     ],
   },
 ]
@@ -135,7 +145,8 @@ function getBusynessHeight(busyness: number): string {
 export default function PopularTimes() {
   const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" })
   const currentHour = new Date().getHours()
-  const currentTimeSlot = currentHour >= 8 && currentHour < 18 ? currentHour - 8 : null
+  // Restaurant hours: 11am - 10pm (11-22), map to index 0-11
+  const currentTimeSlot = currentHour >= 11 && currentHour < 22 ? currentHour - 11 : null
 
   return (
     <Card className="p-10">
@@ -185,7 +196,7 @@ export default function PopularTimes() {
         <div className="mt-6 pt-4 border-t border-gray-200">
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <Clock className="h-3 w-3" strokeWidth={2} />
-            <span>Based on typical café patterns. Actual times may vary.</span>
+            <span>Based on typical restaurant patterns. Actual times may vary.</span>
           </div>
         </div>
       </CardContent>

@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
           {/* About */}
           <div>
-            <h3 className="text-sm font-semibold mb-4">Today Shawarma Café</h3>
+            <h3 className="text-sm font-semibold mb-4">Today Shawarma</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
               {contentData.tagline}
             </p>
@@ -65,7 +65,7 @@ export default function Footer() {
 
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center">
-            © {new Date().getFullYear()} Today Shawarma Café, Edinburgh, UK. All rights reserved.
+            © {new Date().getFullYear()} Today Shawarma, Edinburgh, UK. All rights reserved.
           </p>
         </div>
       </div>
