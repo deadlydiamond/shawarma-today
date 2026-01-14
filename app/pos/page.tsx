@@ -257,9 +257,9 @@ export default function POSPage() {
   if (!isAuthenticated) return null
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
+    <div className="h-screen bg-gray-900 flex overflow-hidden">
       {/* Left Panel - Menu */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Header */}
         <header className="bg-gray-800 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -313,7 +313,7 @@ export default function POSPage() {
         </div>
 
         {/* Menu Grid */}
-        <div className="flex-1 overflow-auto px-6 pb-6">
+        <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6">
           <div className="grid grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
             {filteredItems.map(item => (
               <button
@@ -334,7 +334,7 @@ export default function POSPage() {
       </div>
 
       {/* Right Panel - Cart */}
-      <div className="w-[400px] bg-gray-800 flex flex-col border-l border-gray-700">
+      <div className="w-[400px] bg-gray-800 flex flex-col h-full border-l border-gray-700">
         {/* Cart Header */}
         <div className="p-4 border-b border-gray-700">
           <div className="flex items-center justify-between mb-4">
@@ -383,7 +383,7 @@ export default function POSPage() {
         </div>
 
         {/* Cart Items */}
-        <div className="flex-1 overflow-auto p-4">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-500">
               <ShoppingBag className="h-16 w-16 mb-4 opacity-50" />
