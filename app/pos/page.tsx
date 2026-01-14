@@ -278,15 +278,6 @@ export default function POSPage() {
     setCart(prev => prev.filter(item => item.id !== id))
   }
 
-  const clearCart = () => {
-    setCart([])
-    setCustomerName("")
-    setTableNumber("counter")
-  }
-
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-  const total = subtotal
-
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return
     
