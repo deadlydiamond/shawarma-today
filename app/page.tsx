@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -17,6 +18,23 @@ import { AnimatedSection, AnimatedCounter } from "@/components/ui/AnimatedSectio
 
 export default function Home() {
   const { promotions, banners, getTodaySpecials } = useMenu()
+  
+  // Google reviews data for About Us stats
+  const [googleStats, setGoogleStats] = useState({ rating: 4.8, totalReviews: 100 })
+  
+  useEffect(() => {
+    // Fetch Google rating and review count
+    fetch('/api/reviews')
+      .then(res => res.json())
+      .then(data => {
+        if (data.rating && data.totalReviews) {
+          setGoogleStats({ rating: data.rating, totalReviews: data.totalReviews })
+        }
+      })
+      .catch(() => {
+        // Keep default values on error
+      })
+  }, [])
   
   // Get today's specials
   const todaySpecials = getTodaySpecials()
@@ -506,15 +524,18 @@ export default function Home() {
                 Every wrap is made fresh to order with premium halal meat, house-made sauces, and crisp vegetables. Experience the real taste of shawarma, just like it&apos;s meant to be.
               </p>
               
-              {/* Stats */}
+              {/* Stats from Google */}
               <div className="grid grid-cols-3 gap-4 pt-6">
                 <div className="text-center p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-gray-100 hover-scale">
-                  <div className="text-3xl font-bold text-shawarma">10+</div>
-                  <div className="text-sm text-gray-600">Years Experience</div>
+                  <div className="text-3xl font-bold text-shawarma flex items-center justify-center gap-1">
+                    {googleStats.rating}
+                    <Star className="h-6 w-6 text-yellow-500 fill-yellow-500" />
+                  </div>
+                  <div className="text-sm text-gray-600">Google Rating</div>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-gray-100 hover-scale">
-                  <div className="text-3xl font-bold text-shawarma">500+</div>
-                  <div className="text-sm text-gray-600">Happy Customers</div>
+                  <div className="text-3xl font-bold text-shawarma">{googleStats.totalReviews}+</div>
+                  <div className="text-sm text-gray-600">Google Reviews</div>
                 </div>
                 <div className="text-center p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-gray-100 hover-scale">
                   <div className="text-3xl font-bold text-shawarma">40+</div>
