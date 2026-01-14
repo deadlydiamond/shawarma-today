@@ -2,22 +2,22 @@
 
 import { useMenu } from "@/contexts/MenuContext"
 import { MenuItem, useCart } from "@/contexts/CartContext"
-import { Plus, Minus, Flame, Leaf, Sparkles, WheatOff, Check, ShoppingBag } from "lucide-react"
+import { Plus, Minus, Flame, Leaf, Sparkles, WheatOff, Check, ShoppingBag, Pizza, Sandwich, UtensilsCrossed, Beef, Salad, CupSoda, LayoutGrid } from "lucide-react"
 import { useMemo, useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
 type CategoryFilter = "all" | "pizzas" | "fatayer" | "wraps" | "meals" | "grill" | "sides" | "drinks"
 
-const categoryConfig: { id: CategoryFilter; label: string; emoji: string }[] = [
-  { id: "all", label: "All", emoji: "🍽️" },
-  { id: "pizzas", label: "Pizzas", emoji: "🍕" },
-  { id: "fatayer", label: "Fatayer", emoji: "🫓" },
-  { id: "wraps", label: "Wraps", emoji: "🌯" },
-  { id: "meals", label: "Meals", emoji: "🍛" },
-  { id: "grill", label: "Grill", emoji: "🍢" },
-  { id: "sides", label: "Sides", emoji: "🍟" },
-  { id: "drinks", label: "Drinks", emoji: "🥤" },
+const categoryConfig: { id: CategoryFilter; label: string; icon: React.ReactNode }[] = [
+  { id: "all", label: "All", icon: <LayoutGrid className="h-5 w-5" /> },
+  { id: "pizzas", label: "Pizzas", icon: <Pizza className="h-5 w-5" /> },
+  { id: "fatayer", label: "Fatayer", icon: <Sandwich className="h-5 w-5" /> },
+  { id: "wraps", label: "Wraps", icon: <Sandwich className="h-5 w-5" /> },
+  { id: "meals", label: "Meals", icon: <UtensilsCrossed className="h-5 w-5" /> },
+  { id: "grill", label: "Grill", icon: <Beef className="h-5 w-5" /> },
+  { id: "sides", label: "Sides", icon: <Salad className="h-5 w-5" /> },
+  { id: "drinks", label: "Drinks", icon: <CupSoda className="h-5 w-5" /> },
 ]
 
 // Fallback menu items - TODAY SHAWARMA ACTUAL MENU
@@ -99,13 +99,13 @@ type ExtendedMenuItem = MenuItem & {
 
 // Modern Menu Item Card
 function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isCompact?: boolean }) {
-  const { addToCart, items, updateQuantity } = useCart()
+  const { addToCart, cartItems, updateQuantity } = useCart()
   const [imageLoaded, setImageLoaded] = useState(false)
   const [selectedSize, setSelectedSize] = useState<"regular" | "large" | "kids">("regular")
   const [justAdded, setJustAdded] = useState(false)
   
   const hasSizes = !!(item.priceLarge || item.priceKids)
-  const cartItem = items.find(i => i.id === item.id && i.size === selectedSize)
+  const cartItem = cartItems.find((i) => i.id === item.id && i.selectedSize === selectedSize)
   const quantity = cartItem?.quantity || 0
   
   const getDisplayPrice = () => {
@@ -131,7 +131,7 @@ function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isC
 
   const handleIncrement = () => {
     if (cartItem) {
-      updateQuantity(cartItem.id, cartItem.size || "regular", quantity + 1)
+      updateQuantity(cartItem.id, quantity + 1, cartItem.selectedSize || "regular")
     } else {
       handleAdd()
     }
@@ -139,7 +139,7 @@ function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isC
 
   const handleDecrement = () => {
     if (cartItem && quantity > 0) {
-      updateQuantity(cartItem.id, cartItem.size || "regular", quantity - 1)
+      updateQuantity(cartItem.id, quantity - 1, cartItem.selectedSize || "regular")
     }
   }
 
@@ -501,7 +501,7 @@ export function DynamicMenu({
         ref={tabsRef}
         className="sticky top-16 z-40 bg-white/95 backdrop-blur-lg py-4 -mx-6 px-6 border-b border-gray-100"
       >
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide md:justify-center">
           {categoryConfig.map((cat) => {
             const isActive = activeCategory === cat.id
             const itemCount = cat.id === "all" 
@@ -515,18 +515,30 @@ export function DynamicMenu({
                 key={cat.id}
                 onClick={() => scrollToCategory(cat.id)}
                 className={cn(
-                  "flex-shrink-0 px-4 py-2.5 rounded-full font-medium text-sm flex items-center gap-2 transition-all duration-200 whitespace-nowrap",
-                  isActive
-                    ? "bg-gray-900 text-white shadow-lg"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  "flex-shrink-0 flex flex-col items-center gap-1.5 transition-all duration-200",
                 )}
               >
-                <span className="text-base">{cat.emoji}</span>
-                <span>{cat.label}</span>
+                {/* Icon Circle */}
+                <div className={cn(
+                  "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-200",
+                  isActive
+                    ? "bg-shawarma text-white shadow-lg shadow-shawarma/30 scale-105"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                )}>
+                  {cat.icon}
+                </div>
+                {/* Label */}
+                <span className={cn(
+                  "text-xs font-medium transition-colors",
+                  isActive ? "text-shawarma" : "text-gray-600"
+                )}>
+                  {cat.label}
+                </span>
+                {/* Count badge */}
                 {itemCount > 0 && (
                   <span className={cn(
-                    "text-xs px-1.5 py-0.5 rounded-full",
-                    isActive ? "bg-white/20" : "bg-gray-200"
+                    "text-[10px] font-medium -mt-1",
+                    isActive ? "text-shawarma" : "text-gray-400"
                   )}>
                     {itemCount}
                   </span>
@@ -573,7 +585,9 @@ export function DynamicMenu({
                 {showCategoryHeaders && (
                   <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{categoryConf?.emoji || "🍽️"}</span>
+                      <div className="w-10 h-10 rounded-xl bg-shawarma flex items-center justify-center text-white">
+                        {categoryConf?.icon || <UtensilsCrossed className="h-5 w-5" />}
+                      </div>
                       <div>
                         <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
                         <p className="text-sm text-gray-500">{items.length} items</p>
