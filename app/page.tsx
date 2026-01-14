@@ -53,20 +53,20 @@ export default function Home() {
         {/* Content */}
         <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 text-center">
           <div className="animate-fade-in">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight mb-8 text-white text-balance drop-shadow-2xl">
-              Authentic Shawarma
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading tracking-wide mb-8 text-white text-balance drop-shadow-2xl uppercase">
+              <span className="text-shawarma-orange drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">Authentic Shawarma</span>
               <br />
-              <span className="text-white/95 font-light tracking-wide">made fresh daily</span>
+              <span className="text-white font-heading">made fresh daily</span>
           </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
               Traditional Middle Eastern flavours, served fast and fresh
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a href="#menu" className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-white text-gray-900 hover:bg-gray-100 min-w-[160px] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg group">
+              <a href="#menu" className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-white text-shawarma-black hover:bg-gray-100 min-w-[160px] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg group">
                 View Menu
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </a>
-              <a href="#contact" className="inline-flex items-center justify-center px-8 py-3 bg-yellow-500 border-2 border-yellow-600 text-white hover:bg-yellow-600 min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
+              <a href="#contact" className="inline-flex items-center justify-center px-8 py-3 bg-shawarma-orange border-2 border-shawarma-orange text-white hover:bg-[#d95a1e] min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
                 Visit Us
               </a>
             </div>

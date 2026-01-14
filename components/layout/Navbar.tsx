@@ -50,10 +50,12 @@ export default function Navbar() {
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
+          {/* Logo - Using Anton font to match signage */}
           <a href="/" className={cn(
-            "text-xl font-semibold tracking-tight transition-colors",
-            (scrolled || isLightBackground) ? "text-foreground" : "text-white drop-shadow-md"
+            "font-heading text-2xl tracking-wide transition-colors uppercase",
+            (scrolled || isLightBackground) 
+              ? "text-shawarma-orange" 
+              : "text-shawarma-orange drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
           )}>
             TODAY SHAWARMA
           </a>
@@ -126,7 +128,7 @@ export default function Navbar() {
             >
               <ShoppingBag className="h-5 w-5" />
               {getTotalItems() > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 bg-gray-900 text-white text-xs font-medium rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-5 w-5 bg-shawarma-orange text-white text-xs font-medium rounded-full flex items-center justify-center">
                   {getTotalItems()}
                 </span>
               )}
@@ -203,7 +205,7 @@ export default function Navbar() {
               <ShoppingBag className="h-5 w-5" />
               Cart
               {getTotalItems() > 0 && (
-                <span className="ml-auto px-2 py-0.5 bg-gray-900 text-white text-xs font-medium rounded-full">
+                <span className="ml-auto px-2 py-0.5 bg-shawarma-orange text-white text-xs font-medium rounded-full">
                   {getTotalItems()}
                 </span>
               )}

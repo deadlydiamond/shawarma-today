@@ -19,35 +19,50 @@ const config = {
     },
     extend: {
       colors: {
-        // Coffee color palette
+        // Shawarma brand colors (extracted from signage)
+        shawarma: {
+          orange: "#F26522",      // Primary brand - appetite, heat, speed
+          black: "#0E0E0E",       // Deep black background
+          yellow: "#FFC845",      // Flame accent
+          white: "#FFFFFF",       // Contrast/labels
+          DEFAULT: "#F26522",
+        },
+        // Accent colors for UI
+        brand: {
+          primary: "#F26522",     // Shawarma Orange
+          secondary: "#FFC845",   // Flame Yellow
+          dark: "#0E0E0E",        // Deep Black
+          light: "#FFFFFF",       // White
+        },
+        // Legacy compatibility
         coffee: {
-          dark: "#3E2723",      // Espresso
-          medium: "#5D4037",     // Dark roast
-          light: "#8D6E63",      // Medium roast
-          latte: "#BCAAA4",      // Light roast
-          cream: "#EFEBE9",      // Cream/foam
-          DEFAULT: "#5D4037",
+          dark: "#0E0E0E",
+          medium: "#F26522",
+          light: "#FFC845",
+          latte: "#FFE4B5",
+          cream: "#FFF8F0",
+          DEFAULT: "#F26522",
         },
         brown: {
-          dark: "#3E2723",
-          medium: "#5D4037",
-          light: "#8D6E63",
-          DEFAULT: "#5D4037",
+          dark: "#0E0E0E",
+          medium: "#1a1a1a",
+          light: "#333333",
+          DEFAULT: "#0E0E0E",
         },
         cream: {
-          background: "#F5F1E8",
-          light: "#FFF8F0",
-          DEFAULT: "#F5F1E8",
+          background: "#FFF8F0",
+          light: "#FFFAF5",
+          DEFAULT: "#FFF8F0",
         },
         gold: {
-          primary: "#D4AF37",
-          secondary: "#C9A227",
+          primary: "#FFC845",
+          secondary: "#F26522",
         },
         black: {
-          primary: "#3E2723",     // Using coffee dark instead
-          DEFAULT: "#3E2723",
+          primary: "#0E0E0E",
+          DEFAULT: "#0E0E0E",
         },
-        charcoal: "#5D4037",    // Using coffee medium
+        charcoal: "#1a1a1a",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -88,8 +103,9 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        heading: ["var(--font-body)", "sans-serif"],
-        body: ["var(--font-body)", "sans-serif"],
+        heading: ["var(--font-heading)", "Anton", "sans-serif"],
+        body: ["var(--font-body)", "Inter", "sans-serif"],
+        display: ["var(--font-heading)", "Anton", "sans-serif"],
       },
       letterSpacing: {
         heading: "0.02em",

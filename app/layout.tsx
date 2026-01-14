@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Anton } from "next/font/google"
 import "./globals.css"
 import Script from "next/script"
 import Loader from "@/components/ui/Loader"
@@ -18,6 +18,14 @@ const inter = Inter({
   variable: "--font-body",
   display: "swap",
   weight: ["400", "500", "600", "700"],
+})
+
+// Anton - condensed display font for branding (matches signage)
+const anton = Anton({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+  weight: "400",
 })
 
 export const metadata: Metadata = {
@@ -75,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${anton.variable}`}>
       <head>
         <link rel="icon" href="/favicons/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicons/favicon-16x16.png" type="image/png" sizes="16x16" />
