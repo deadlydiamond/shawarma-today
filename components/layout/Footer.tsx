@@ -1,8 +1,9 @@
 "use client"
 
-import { MapPin, Phone, Clock, UtensilsCrossed, Heart } from "lucide-react"
+import { MapPin, Phone, Clock, Heart } from "lucide-react"
 import contentData from "@/src/content/content.json"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -16,9 +17,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-shawarma rounded-xl">
-                <UtensilsCrossed className="h-6 w-6 text-white" />
-              </div>
+              <Image
+                src="/logos/shawarma-logo.png"
+                alt="Today Shawarma"
+                width={48}
+                height={48}
+                className="rounded-xl"
+              />
               <span className="text-xl font-bold">Today Shawarma</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
