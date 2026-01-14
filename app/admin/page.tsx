@@ -40,10 +40,19 @@ const statusConfig: Record<Order["status"], { bg: string; text: string; icon: Re
   cancelled: { bg: "bg-red-500", text: "text-white", icon: <XCircle className="h-4 w-4" />, label: "Cancelled" },
 }
 
+// Helper to check payment status from special instructions
+const isOrderPaid = (order: Order) => {
+  return order.specialInstructions?.includes("✅ PAID") || false
+}
+
+const isOrderUnpaid = (order: Order) => {
+  return order.specialInstructions?.includes("💰 UNPAID") || false
+}
+
 export default function AdminDashboard() {
   const router = useRouter()
   const { staff, isAuthenticated, loading: authLoading, logout } = useAuth()
-  const { orders, loading: ordersLoading, updateOrderStatus, getTodayOrders, getTodayRevenue, refreshOrders } = useOrders()
+  const { orders, loading: ordersLoading, updateOrderStatus, updateOrderNotes, getTodayOrders, getTodayRevenue, refreshOrders } = useOrders()
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [filter, setFilter] = useState<"active" | "completed">("active")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -65,7 +74,11 @@ export default function AdminDashboard() {
   const completedOrders = orders.filter(o => ["completed", "cancelled"].includes(o.status))
   const filteredOrders = filter === "active" ? activeOrders : completedOrders
 
-  const kitchenOrders = orders.filter(o => o.status === "paid" || o.status === "preparing")
+  // Kitchen orders include preparing status (can start without payment)
+  const kitchenOrders = orders.filter(o => o.status === "preparing" || o.status === "ready")
+  
+  // Unpaid orders that are being prepared
+  const unpaidOrders = orders.filter(o => isOrderUnpaid(o) && !["completed", "cancelled"].includes(o.status))
 
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
@@ -187,14 +200,15 @@ export default function AdminDashboard() {
         </header>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-5 gap-4 mb-8">
           {[
-            { label: "Pending Payment", value: orders.filter(o => o.status === "pending").length, icon: Banknote, color: "bg-amber-500" },
+            { label: "Unpaid Orders", value: unpaidOrders.length, icon: Banknote, color: unpaidOrders.length > 0 ? "bg-red-500" : "bg-gray-400" },
             { label: "In Kitchen", value: kitchenOrders.length, icon: ChefHat, color: "bg-purple-500" },
             { label: "Ready", value: orders.filter(o => o.status === "ready").length, icon: Package, color: "bg-green-500" },
             { label: "Today's Orders", value: getTodayOrders().length, icon: ShoppingBag, color: "bg-shawarma" },
+            { label: "Today's Revenue", value: formatPrice(getTodayRevenue()), icon: CreditCard, color: "bg-emerald-500", isPrice: true },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white rounded-2xl p-5 border border-gray-100">
+            <div key={stat.label} className={`bg-white rounded-2xl p-5 border ${stat.label === "Unpaid Orders" && unpaidOrders.length > 0 ? "border-red-300 ring-2 ring-red-100" : "border-gray-100"}`}>
               <div className="flex items-center gap-4">
                 <div className={`p-3 rounded-xl ${stat.color}`}>
                   <stat.icon className="h-6 w-6 text-white" />
@@ -224,21 +238,29 @@ export default function AdminDashboard() {
                 .map(order => {
                   const waitTime = getWaitTime(order.createdAt)
                   const isUrgent = waitTime >= 15
+                  const isPaid = isOrderPaid(order)
+                  const isUnpaid = isOrderUnpaid(order)
                   return (
                     <div
                       key={order.id}
                       onClick={() => setSelectedOrder(order)}
-                      className={`bg-white rounded-xl p-4 cursor-pointer transition-all hover:scale-[1.02] ${isUrgent ? "ring-2 ring-red-500" : ""}`}
+                      className={`bg-white rounded-xl p-4 cursor-pointer transition-all hover:scale-[1.02] ${isUrgent ? "ring-2 ring-red-500" : ""} ${isUnpaid ? "ring-2 ring-amber-400" : ""}`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-mono font-bold text-gray-900">#{order.id.slice(-4)}</span>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig[order.status].bg} ${statusConfig[order.status].text}`}>
-                          {order.status === "preparing" ? "Cooking" : "New"}
+                          {order.status === "preparing" ? "Cooking" : "Ready"}
                         </span>
+                      </div>
+                      {/* Payment Status Badge */}
+                      <div className={`text-xs font-bold px-2 py-1 rounded-lg mb-2 text-center ${
+                        isPaid ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700 animate-pulse"
+                      }`}>
+                        {isPaid ? "✅ PAID" : "💰 UNPAID"}
                       </div>
                       <div className="flex items-center gap-1 text-sm text-gray-600 mb-2">
                         <MapPin className="h-3 w-3" />
-                        {order.tableNumber === "takeaway" ? "Takeaway" : `Table ${order.tableNumber}`}
+                        {order.tableNumber === "takeaway" ? "Takeaway" : order.tableNumber === "counter" ? "Counter" : `Table ${order.tableNumber}`}
                       </div>
                       <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
                         <Timer className="h-3 w-3" />
@@ -248,13 +270,11 @@ export default function AdminDashboard() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          updateOrderStatus(order.id, order.status === "paid" ? "preparing" : "ready")
+                          updateOrderStatus(order.id, "ready")
                         }}
-                        className={`w-full py-2 rounded-lg text-sm font-semibold text-white transition-colors ${
-                          order.status === "preparing" ? "bg-green-500 hover:bg-green-600" : "bg-purple-500 hover:bg-purple-600"
-                        }`}
+                        className="w-full py-2 rounded-lg text-sm font-semibold text-white bg-green-500 hover:bg-green-600 transition-colors"
                       >
-                        {order.status === "preparing" ? "Ready ✓" : "Start →"}
+                        Ready ✓
                       </button>
                     </div>
                   )
@@ -315,36 +335,48 @@ export default function AdminDashboard() {
                     <p className="text-gray-500">No {filter} orders</p>
                   </div>
                 ) : (
-                  filteredOrders.map(order => (
-                    <div
-                      key={order.id}
-                      onClick={() => setSelectedOrder(order)}
-                      className={`p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md ${
-                        selectedOrder?.id === order.id ? "border-shawarma bg-orange-50" : "border-gray-100 hover:border-gray-200"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-mono font-bold text-gray-900">#{order.id.slice(-4)}</span>
-                        <span className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 ${statusConfig[order.status].bg} ${statusConfig[order.status].text}`}>
-                          {statusConfig[order.status].icon}
-                          {statusConfig[order.status].label}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-3 text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            {order.tableNumber === "takeaway" ? "Takeaway" : `T${order.tableNumber}`}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatTime(order.createdAt)}
+                  filteredOrders.map(order => {
+                    const isPaid = isOrderPaid(order)
+                    const isUnpaid = isOrderUnpaid(order)
+                    return (
+                      <div
+                        key={order.id}
+                        onClick={() => setSelectedOrder(order)}
+                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md ${
+                          selectedOrder?.id === order.id ? "border-shawarma bg-orange-50" : isUnpaid ? "border-red-200 bg-red-50" : "border-gray-100 hover:border-gray-200"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-gray-900">#{order.id.slice(-4)}</span>
+                            {/* Payment Badge */}
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                              isPaid ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                            }`}>
+                              {isPaid ? "PAID" : "UNPAID"}
+                            </span>
+                          </div>
+                          <span className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 ${statusConfig[order.status].bg} ${statusConfig[order.status].text}`}>
+                            {statusConfig[order.status].icon}
+                            {statusConfig[order.status].label}
                           </span>
                         </div>
-                        <span className="font-semibold text-gray-900">{formatPrice(order.total)}</span>
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-3 text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {order.tableNumber === "takeaway" ? "Takeaway" : order.tableNumber === "counter" ? "Counter" : `T${order.tableNumber}`}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {formatTime(order.createdAt)}
+                            </span>
+                          </div>
+                          <span className="font-semibold text-gray-900">{formatPrice(order.total)}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    )
+                  }))
                 )}
               </div>
             </div>
@@ -366,11 +398,34 @@ export default function AdminDashboard() {
                     </span>
                   </div>
 
+                  {/* Payment Status */}
+                  <div className={`rounded-xl p-4 text-center mb-4 ${
+                    isOrderPaid(selectedOrder) 
+                      ? "bg-green-100 border-2 border-green-300" 
+                      : "bg-red-100 border-2 border-red-300 animate-pulse"
+                  }`}>
+                    <p className={`text-lg font-bold ${isOrderPaid(selectedOrder) ? "text-green-700" : "text-red-700"}`}>
+                      {isOrderPaid(selectedOrder) ? "✅ PAYMENT COLLECTED" : "💰 PAYMENT PENDING"}
+                    </p>
+                    {isOrderUnpaid(selectedOrder) && (
+                      <button
+                        onClick={async () => {
+                          const newInstructions = selectedOrder.specialInstructions?.replace("💰 UNPAID", "✅ PAID") || "✅ PAID"
+                          await updateOrderNotes(selectedOrder.id, newInstructions)
+                          setSelectedOrder({ ...selectedOrder, specialInstructions: newInstructions })
+                        }}
+                        className="mt-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold transition-colors"
+                      >
+                        Mark as Paid
+                      </button>
+                    )}
+                  </div>
+
                   {/* Location */}
                   <div className="bg-shawarma rounded-xl p-4 text-white text-center mb-4">
                     <p className="text-xs uppercase tracking-wide opacity-80">Deliver To</p>
                     <p className="text-2xl font-bold">
-                      {selectedOrder.tableNumber === "takeaway" ? "TAKEAWAY" : `TABLE ${selectedOrder.tableNumber}`}
+                      {selectedOrder.tableNumber === "takeaway" ? "TAKEAWAY" : selectedOrder.tableNumber === "counter" ? "COUNTER" : `TABLE ${selectedOrder.tableNumber}`}
                     </p>
                   </div>
 
@@ -384,17 +439,6 @@ export default function AdminDashboard() {
                       <p className="text-sm text-gray-500">{formatTime(selectedOrder.createdAt)}</p>
                     </div>
                   </div>
-
-                  {/* Special Instructions */}
-                  {selectedOrder.specialInstructions && (
-                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl mb-4">
-                      <div className="flex items-center gap-2 text-amber-700 mb-1">
-                        <AlertTriangle className="h-4 w-4" />
-                        <span className="text-sm font-semibold">Special Instructions</span>
-                      </div>
-                      <p className="text-sm text-amber-800">{selectedOrder.specialInstructions}</p>
-                    </div>
-                  )}
 
                   {/* Items */}
                   <div className="mb-4">
