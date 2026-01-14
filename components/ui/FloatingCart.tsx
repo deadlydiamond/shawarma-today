@@ -12,8 +12,8 @@ export function FloatingCart() {
   const totalItems = getTotalItems()
   const totalPrice = getTotalPrice()
   
-  // Don't show on checkout or admin pages
-  const hiddenPaths = ["/checkout", "/admin", "/order"]
+  // Don't show on checkout, admin, POS, or order pages
+  const hiddenPaths = ["/checkout", "/admin", "/order", "/pos"]
   const isHidden = hiddenPaths.some(path => pathname?.startsWith(path))
   
   if (isHidden || totalItems === 0) return null
