@@ -54,7 +54,7 @@ export default function Home() {
         <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 text-center">
           <div className="animate-fade-in">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading tracking-wide mb-8 text-white text-balance drop-shadow-2xl uppercase">
-              <span className="text-shawarma-orange drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">Authentic Shawarma</span>
+              <span className="text-shawarma drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">Authentic Shawarma</span>
               <br />
               <span className="text-white font-heading">made fresh daily</span>
           </h1>
@@ -66,7 +66,7 @@ export default function Home() {
                 View Menu
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </a>
-              <a href="#contact" className="inline-flex items-center justify-center px-8 py-3 bg-shawarma-orange border-2 border-shawarma-orange text-white hover:bg-[#d95a1e] min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
+              <a href="#contact" className="inline-flex items-center justify-center px-8 py-3 bg-shawarma border-2 border-shawarma text-white hover:bg-[#d95a1e] min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
                 Visit Us
               </a>
             </div>

@@ -391,27 +391,27 @@ html {
   display: none;
 }
 
-/* Custom scrollbar styling - brand color */
+/* Custom scrollbar styling - brand color palette */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: #310E05;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f7451b;
+  background: #F7451B;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #d93d17;
+  background: #C63716;
 }
 
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #f7451b #1a1a1a;
+  scrollbar-color: #F7451B #310E05;
 }

@@ -63,8 +63,8 @@ export default function Navbar() {
             <span className={cn(
               "font-heading text-2xl tracking-wide transition-colors uppercase -ml-2",
               (scrolled || isLightBackground) 
-                ? "text-shawarma-orange" 
-                : "text-shawarma-orange drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                ? "text-shawarma" 
+                : "text-shawarma drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
             )}>
               TODAY SHAWARMA
             </span>
@@ -138,7 +138,7 @@ export default function Navbar() {
             >
               <ShoppingBag className="h-5 w-5" />
               {getTotalItems() > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 bg-shawarma-orange text-white text-xs font-medium rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-5 w-5 bg-shawarma text-white text-xs font-medium rounded-full flex items-center justify-center">
                   {getTotalItems()}
                 </span>
               )}
@@ -215,7 +215,7 @@ export default function Navbar() {
               <ShoppingBag className="h-5 w-5" />
               Cart
               {getTotalItems() > 0 && (
-                <span className="ml-auto px-2 py-0.5 bg-shawarma-orange text-white text-xs font-medium rounded-full">
+                <span className="ml-auto px-2 py-0.5 bg-shawarma text-white text-xs font-medium rounded-full">
                   {getTotalItems()}
                 </span>
               )}

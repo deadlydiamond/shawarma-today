@@ -43,7 +43,7 @@ export default function Loader() {
           </div>
         ) : (
           <div className="w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
-            <div className="w-16 h-16 border-4 border-shawarma-orange/20 border-t-shawarma-orange rounded-full animate-spin"></div>
+            <div className="w-16 h-16 border-4 border-shawarma/20 border-t-shawarma rounded-full animate-spin"></div>
           </div>
         )}
         

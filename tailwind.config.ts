@@ -19,50 +19,71 @@ const config = {
     },
     extend: {
       colors: {
-        // Shawarma brand colors (extracted from signage)
+        // Today Shawarma Brand Palette
         shawarma: {
-          orange: "#F26522",      // Primary brand - appetite, heat, speed
-          black: "#0E0E0E",       // Deep black background
-          yellow: "#FFC845",      // Flame accent
-          white: "#FFFFFF",       // Contrast/labels
-          DEFAULT: "#F26522",
+          // Primary
+          DEFAULT: "#F7451B",
+          primary: "#F7451B",
+          // Light shades
+          50: "#FDDAD1",
+          100: "#FCB5A4",
+          200: "#FA8F76",
+          300: "#F96A49",
+          // Dark shades
+          600: "#C63716",
+          700: "#942910",
+          800: "#631C0B",
+          900: "#310E05",
+          // Accent variations
+          accent: "#E15331",
+          muted: "#CB6047",
+          subtle: "#B56E5D",
+          faded: "#9F7B73",
         },
-        // Accent colors for UI
+        // Complementary colors
         brand: {
-          primary: "#F26522",     // Shawarma Orange
-          secondary: "#FFC845",   // Flame Yellow
-          dark: "#0E0E0E",        // Deep Black
-          light: "#FFFFFF",       // White
+          primary: "#F7451B",     // Main orange-red
+          cyan: "#1BCDF7",        // Complement - cool accent
+          pink: "#F71B5F",        // Complement - vibrant
+          gold: "#F7B31B",        // Complement - warm
+          green: "#1BF745",       // Complement - fresh
+          purple: "#451BF7",      // Complement - bold
+        },
+        // UI shortcuts
+        flame: {
+          light: "#FA8F76",
+          DEFAULT: "#F7451B",
+          dark: "#C63716",
         },
         // Legacy compatibility
         coffee: {
-          dark: "#0E0E0E",
-          medium: "#F26522",
-          light: "#FFC845",
-          latte: "#FFE4B5",
-          cream: "#FFF8F0",
-          DEFAULT: "#F26522",
+          dark: "#310E05",
+          medium: "#F7451B",
+          light: "#FA8F76",
+          latte: "#FCB5A4",
+          cream: "#FDDAD1",
+          DEFAULT: "#F7451B",
         },
         brown: {
-          dark: "#0E0E0E",
-          medium: "#1a1a1a",
-          light: "#333333",
-          DEFAULT: "#0E0E0E",
+          dark: "#310E05",
+          medium: "#631C0B",
+          light: "#942910",
+          DEFAULT: "#310E05",
         },
         cream: {
-          background: "#FFF8F0",
-          light: "#FFFAF5",
-          DEFAULT: "#FFF8F0",
+          background: "#FDDAD1",
+          light: "#FFF8F0",
+          DEFAULT: "#FDDAD1",
         },
         gold: {
-          primary: "#FFC845",
-          secondary: "#F26522",
+          primary: "#F7B31B",
+          secondary: "#F96A49",
         },
         black: {
-          primary: "#0E0E0E",
-          DEFAULT: "#0E0E0E",
+          primary: "#310E05",
+          DEFAULT: "#310E05",
         },
-        charcoal: "#1a1a1a",
+        charcoal: "#631C0B",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
