@@ -115,6 +115,13 @@ export default function AdminDashboard() {
             <LayoutGrid className="h-6 w-6" />
           </Link>
           <Link
+            href="/admin/kitchen"
+            className="p-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+            title="Kitchen Display"
+          >
+            <ChefHat className="h-6 w-6" />
+          </Link>
+          <Link
             href="/pos"
             className="p-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
             title="POS - Walk-in Orders"
