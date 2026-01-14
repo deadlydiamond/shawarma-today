@@ -175,12 +175,13 @@ export default function POSPage() {
   const total = subtotal
 
   const handlePlaceOrder = async () => {
-    if (cart.length === 0 || !customerName.trim()) return
+    if (cart.length === 0) return
     
     setIsProcessing(true)
     
     // Generate 4-digit order code
     const orderCode = generateOrderCode()
+    const displayName = customerName.trim() || `Order #${orderCode}`
     
     try {
       const orderItems = cart.map(item => ({
@@ -195,11 +196,11 @@ export default function POSPage() {
 
       const orderId = await addOrder({
         items: orderItems,
-        customer: { name: `${customerName.trim()} #${orderCode}`, phone: "" },
+        customer: { name: displayName, phone: "" },
         subtotal,
         total,
         tableNumber,
-        specialInstructions: `Order Code: ${orderCode}`,
+        specialInstructions: "",
         status: "paid", // Walk-in orders are already paid
       })
 
@@ -210,7 +211,7 @@ export default function POSPage() {
         items: cart,
         subtotal,
         total,
-        customer: customerName,
+        customer: customerName.trim() || "",
         tableNumber,
         timestamp: new Date(),
       }
@@ -370,7 +371,7 @@ export default function POSPage() {
                 type="text"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Customer Name"
+                placeholder="Customer Name (optional)"
                 className="w-full pl-10 pr-4 py-2.5 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-shawarma"
               />
             </div>
@@ -452,7 +453,7 @@ export default function POSPage() {
           </div>
           <button
             onClick={handlePlaceOrder}
-            disabled={cart.length === 0 || !customerName.trim() || isProcessing}
+            disabled={cart.length === 0 || isProcessing}
             className="w-full py-4 bg-shawarma hover:bg-shawarma-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-colors"
           >
             {isProcessing ? (
@@ -492,7 +493,7 @@ export default function POSPage() {
               </div>
 
               <div className="mb-4 p-3 bg-gray-100 rounded-lg">
-                <p className="font-semibold">{lastReceipt.customer}</p>
+                <p className="font-semibold">{lastReceipt.customer || "Walk-in Customer"}</p>
                 <p className="text-sm text-gray-600">
                   {lastReceipt.tableNumber === "counter" ? "Counter" : 
                    lastReceipt.tableNumber === "takeaway" ? "Takeaway" :
