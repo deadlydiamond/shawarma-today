@@ -3,19 +3,18 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { supabase } from "@/lib/supabase"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Section } from "@/components/ui/Section"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { Clock, CheckCircle, ChefHat, Package, XCircle, Coffee, Bell, CreditCard, Banknote, MapPin } from "lucide-react"
+import { Clock, CheckCircle, ChefHat, Package, XCircle, MapPin, Receipt, UtensilsCrossed, CreditCard, Sparkles, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 interface OrderItem {
   id: string
   name: string
   price: string
   quantity: number
+  image?: string
   selected_size?: string
 }
 
@@ -27,62 +26,59 @@ interface Order {
   special_instructions?: string
   items: OrderItem[]
   total: number
-  status: "pending" | "paid" | "preparing" | "ready" | "completed" | "cancelled"
+  status: "pending" | "preparing" | "ready" | "completed" | "cancelled"
   created_at: string
+  pickup_time?: string
 }
 
 const statusConfig = {
   pending: {
-    label: "Awaiting Payment",
-    description: "Please pay at the counter to confirm your order",
-    icon: Banknote,
-    color: "text-yellow-600",
-    bg: "bg-yellow-100",
-    step: 1,
-  },
-  paid: {
-    label: "Payment Confirmed",
-    description: "Payment received - your order will be prepared shortly",
-    icon: CreditCard,
-    color: "text-emerald-600",
-    bg: "bg-emerald-100",
-    step: 2,
+    label: "Order Received",
+    description: "Your order has been sent to the kitchen",
+    icon: Receipt,
+    color: "text-blue-600",
+    bg: "bg-blue-100",
+    progress: 1,
   },
   preparing: {
-    label: "Preparing",
-    description: "We're making your order",
+    label: "Being Prepared",
+    description: "Our chefs are making your delicious food",
     icon: ChefHat,
     color: "text-purple-600",
     bg: "bg-purple-100",
-    step: 3,
+    progress: 2,
   },
   ready: {
-    label: "Ready for Pickup!",
-    description: "Your order is ready - please collect it",
+    label: "Ready to Serve!",
+    description: "Your food is on its way to your table",
     icon: Package,
     color: "text-green-600",
     bg: "bg-green-100",
-    step: 4,
+    progress: 3,
   },
   completed: {
     label: "Completed",
-    description: "Thank you for your order!",
+    description: "Thank you for dining with us!",
     icon: CheckCircle,
-    color: "text-gray-600",
+    color: "text-gray-500",
     bg: "bg-gray-100",
-    step: 5,
+    progress: 4,
   },
   cancelled: {
     label: "Cancelled",
     description: "This order has been cancelled",
     icon: XCircle,
-    color: "text-red-600",
+    color: "text-red-500",
     bg: "bg-red-100",
-    step: 0,
+    progress: 0,
   },
 }
 
-const steps = ["pending", "paid", "preparing", "ready"] as const
+const progressSteps = [
+  { key: "pending", label: "Received", icon: Receipt },
+  { key: "preparing", label: "Preparing", icon: ChefHat },
+  { key: "ready", label: "Ready", icon: Package },
+]
 
 export default function OrderTrackingPage() {
   const params = useParams()
@@ -101,7 +97,6 @@ export default function OrderTrackingPage() {
           .single()
 
         if (error || !data) {
-          // Try localStorage fallback
           const storedOrders = localStorage.getItem("cafe_orders")
           if (storedOrders) {
             const orders = JSON.parse(storedOrders)
@@ -136,7 +131,6 @@ export default function OrderTrackingPage() {
 
     fetchOrder()
 
-    // Real-time subscription for order updates
     const channel = supabase
       .channel(`order-${orderId}`)
       .on(
@@ -148,10 +142,8 @@ export default function OrderTrackingPage() {
           filter: `id=eq.${orderId}`,
         },
         (payload) => {
-          console.log("Order updated:", payload)
           setOrder(payload.new as Order)
           
-          // Play sound when order is ready
           if (payload.new.status === "ready") {
             try {
               const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
@@ -178,35 +170,44 @@ export default function OrderTrackingPage() {
 
   const formatPrice = (price: number) => `£${price.toFixed(2)}`
 
+  // Loading State
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <Section className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <Coffee className="h-12 w-12 animate-pulse mx-auto mb-4 text-foreground/50" />
-            <p className="text-foreground/60">Loading order...</p>
+        <main className="pt-24 pb-20 px-4">
+          <div className="max-w-md mx-auto text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <UtensilsCrossed className="h-8 w-8 text-gray-300" />
+            </div>
+            <p className="text-gray-500">Loading order...</p>
           </div>
-        </Section>
+        </main>
         <Footer />
       </div>
     )
   }
 
+  // Not Found State
   if (notFound || !order) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <Section className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <XCircle className="h-16 w-16 mx-auto mb-4 text-red-500" />
-            <h2 className="text-2xl font-semibold mb-2">Order Not Found</h2>
-            <p className="text-foreground/60 mb-6">We couldn&apos;t find order {orderId}</p>
-            <Button asChild>
-              <Link href="/">Back to Home</Link>
-            </Button>
+        <main className="pt-24 pb-20 px-4">
+          <div className="max-w-md mx-auto text-center">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <XCircle className="h-10 w-10 text-red-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Order Not Found</h2>
+            <p className="text-gray-500 mb-8">We couldn&apos;t find order #{orderId}</p>
+            <Link 
+              href="/"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-shawarma hover:bg-shawarma-600 text-white font-semibold rounded-2xl transition-all"
+            >
+              Back to Home
+            </Link>
           </div>
-        </Section>
+        </main>
         <Footer />
       </div>
     )
@@ -214,38 +215,84 @@ export default function OrderTrackingPage() {
 
   const currentStatus = statusConfig[order.status]
   const StatusIcon = currentStatus.icon
+  const currentProgress = currentStatus.progress
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      <Section>
+      <main className="pt-24 pb-20 px-4">
         <div className="max-w-2xl mx-auto">
+          
           {/* Status Header */}
-          <div className="text-center mb-8">
-            <div className={`w-24 h-24 ${currentStatus.bg} rounded-full flex items-center justify-center mx-auto mb-6`}>
-              <StatusIcon className={`h-12 w-12 ${currentStatus.color}`} />
+          <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 mb-6 text-center">
+            <div className={`w-20 h-20 ${currentStatus.bg} rounded-full flex items-center justify-center mx-auto mb-5`}>
+              <StatusIcon className={`h-10 w-10 ${currentStatus.color}`} />
             </div>
-            <h1 className={`text-3xl font-bold mb-2 ${currentStatus.color}`}>
+            <h1 className={`text-2xl font-bold mb-2 ${currentStatus.color}`}>
               {currentStatus.label}
             </h1>
-            <p className="text-foreground/60">{currentStatus.description}</p>
+            <p className="text-gray-500">{currentStatus.description}</p>
+            
+            {/* Order ID */}
+            <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
+              <span className="text-sm text-gray-500">Order</span>
+              <span className="font-mono font-bold text-gray-900">#{order.id.slice(-6).toUpperCase()}</span>
+            </div>
           </div>
 
-          {/* Order ID & Table */}
+          {/* Progress Steps */}
+          {order.status !== "cancelled" && order.status !== "completed" && (
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                {progressSteps.map((step, index) => {
+                  const StepIcon = step.icon
+                  const isActive = index < currentProgress
+                  const isCurrent = index === currentProgress - 1
+                  return (
+                    <div key={step.key} className="flex flex-col items-center flex-1">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                        isActive 
+                          ? isCurrent 
+                            ? 'bg-shawarma text-white scale-110 shadow-lg' 
+                            : 'bg-green-500 text-white' 
+                          : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        {isActive && !isCurrent ? (
+                          <CheckCircle className="h-6 w-6" />
+                        ) : (
+                          <StepIcon className="h-6 w-6" />
+                        )}
+                      </div>
+                      <span className={`text-xs mt-2 font-medium ${isActive ? 'text-gray-900' : 'text-gray-400'}`}>
+                        {step.label}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+              {/* Progress line */}
+              <div className="flex gap-1 px-6 -mt-[52px] mb-8">
+                {[1, 2].map((i) => (
+                  <div 
+                    key={i} 
+                    className={`flex-1 h-1 rounded-full transition-colors ${i < currentProgress ? 'bg-green-500' : 'bg-gray-200'}`} 
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Table & Time Info */}
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <Card>
-              <CardContent className="p-6 text-center">
-                <p className="text-sm text-foreground/60 mb-1">Order Number</p>
-                <p className="font-mono text-xl font-bold">{order.id}</p>
-              </CardContent>
-            </Card>
-            <div className="rounded-xl p-6 text-center" style={{ backgroundColor: '#2563eb', color: 'white' }}>
-              <p className="text-sm opacity-80 mb-1">Your Table</p>
-              <p className="text-xl font-bold flex items-center justify-center gap-2">
-                <MapPin className="h-5 w-5" />
+            <div className="bg-gray-900 rounded-2xl p-5 text-white">
+              <div className="flex items-center gap-2 text-gray-400 text-sm mb-1">
+                <MapPin className="h-4 w-4" />
+                Your Location
+              </div>
+              <p className="text-xl font-bold">
                 {(() => {
-                  const tableNum = order.table_number || (order as any).tableNumber || ""
+                  const tableNum = order.table_number || ""
                   if (!tableNum) return "—"
                   if (tableNum === "takeaway") return "Takeaway"
                   if (tableNum === "counter") return "Counter"
@@ -254,152 +301,99 @@ export default function OrderTrackingPage() {
                 })()}
               </p>
             </div>
+            <div className="bg-shawarma/10 rounded-2xl p-5">
+              <div className="flex items-center gap-2 text-shawarma-600 text-sm mb-1">
+                <Clock className="h-4 w-4" />
+                Estimated Time
+              </div>
+              <p className="text-xl font-bold text-shawarma-800">
+                {order.status === "pending" ? "10-15 min" : 
+                 order.status === "preparing" ? "5-10 min" : 
+                 order.status === "ready" ? "Now!" : "—"}
+              </p>
+            </div>
           </div>
-
-          {/* Estimated Wait Time */}
-          {(order.status === "pending" || order.status === "paid" || order.status === "preparing") && (
-            <Card className="mb-6 bg-blue-50 border-blue-200">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-blue-100 rounded-xl">
-                      <Clock className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-blue-800">Estimated Ready In</p>
-                      <p className="text-3xl font-bold text-blue-900">
-                        {order.status === "pending" ? "~15-20" : 
-                         order.status === "paid" ? "~10-15" : 
-                         "~5-10"} min
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-blue-700">
-                    {order.status === "pending" && "After payment"}
-                    {order.status === "paid" && "In queue"}
-                    {order.status === "preparing" && "Almost ready!"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Progress Steps */}
-          {order.status !== "cancelled" && order.status !== "completed" && (
-            <Card className="mb-6">
-              <CardContent className="p-4 sm:p-6">
-                <div className="relative">
-                  {/* Connecting line behind icons */}
-                  <div className="absolute top-5 sm:top-6 left-6 sm:left-7 right-6 sm:right-7 h-1 bg-gray-200 rounded" />
-                  <div 
-                    className="absolute top-5 sm:top-6 left-6 sm:left-7 h-1 bg-green-400 rounded transition-all"
-                    style={{ 
-                      width: `${Math.max(0, (steps.indexOf(order.status as typeof steps[number]) / (steps.length - 1)) * 100)}%`,
-                      maxWidth: 'calc(100% - 48px)'
-                    }}
-                  />
-                  
-                  {/* Steps */}
-                  <div className="relative flex justify-between">
-                    {steps.map((step, index) => {
-                      const stepConfig = statusConfig[step]
-                      const StepIcon = stepConfig.icon
-                      const isActive = steps.indexOf(order.status as typeof steps[number]) >= index
-                      const isCurrent = order.status === step
-                      
-                      return (
-                        <div key={step} className="flex flex-col items-center">
-                          <div
-                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all z-10 ${
-                              isActive
-                                ? isCurrent
-                                  ? `${stepConfig.bg} ${stepConfig.color} ring-4 ring-offset-2 ${stepConfig.bg.replace('100', '200')}`
-                                  : `${stepConfig.bg} ${stepConfig.color}`
-                                : "bg-gray-100 text-gray-400"
-                            }`}
-                            style={{ backgroundColor: isActive ? undefined : '#f3f4f6' }}
-                          >
-                            <StepIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-                          </div>
-                          <p 
-                            className={`text-[10px] sm:text-xs mt-2 text-center leading-tight max-w-[70px] ${isActive ? "text-foreground font-medium" : "text-gray-400"}`}
-                          >
-                            {stepConfig.label}
-                          </p>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Ready Alert */}
           {order.status === "ready" && (
-            <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 mb-6 text-center animate-pulse">
-              <Package className="h-12 w-12 text-green-600 mx-auto mb-3" />
-              <h2 className="text-xl font-bold text-green-800 mb-2">Your Order is Ready!</h2>
-              <p className="text-green-700">Please come to the counter to collect your order</p>
-              <p className="text-green-600 font-semibold mt-2">Name: {order.customer_name}</p>
+            <div className="bg-green-50 border-2 border-green-200 rounded-3xl p-6 mb-6 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <Package className="h-8 w-8 text-green-600" />
+              </div>
+              <h2 className="text-xl font-bold text-green-800 mb-2">Your Food is Ready!</h2>
+              <p className="text-green-700">
+                {order.table_number === "takeaway" 
+                  ? "Please collect from the counter" 
+                  : "It's on the way to your table!"}
+              </p>
+              <p className="text-green-600 font-semibold mt-3 text-lg">{order.customer_name}</p>
             </div>
           )}
 
           {/* Order Items */}
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-4">Order Items</h3>
-              <div className="space-y-3">
-                {order.items.map((item, index) => (
-                  <div key={index} className="flex justify-between text-sm">
-                    <div>
-                      <span className="font-medium">{item.quantity}x {item.name}</span>
-                      {item.selected_size && item.selected_size !== "regular" && (
-                        <span className="text-foreground/60 ml-1">({item.selected_size})</span>
-                      )}
-                    </div>
-                    <span>{item.price}</span>
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div className="p-5 border-b border-gray-100">
+              <h3 className="font-bold text-gray-900">Order Items</h3>
+            </div>
+            <div className="p-5 space-y-4">
+              {order.items.map((item, index) => (
+                <div key={index} className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
+                    {item.image ? (
+                      <Image src={item.image} alt={item.name} width={56} height={56} className="object-cover w-full h-full" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <UtensilsCrossed className="h-6 w-6 text-gray-300" />
+                      </div>
+                    )}
                   </div>
-                ))}
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900">{item.name}</p>
+                    <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                  </div>
+                  <p className="font-bold text-gray-900">{item.price}</p>
+                </div>
+              ))}
+            </div>
+            <div className="p-5 bg-gray-50 border-t border-gray-100">
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-bold text-gray-900">Total</span>
+                <span className="text-2xl font-bold text-gray-900">{formatPrice(order.total)}</span>
               </div>
-              <div className="border-t border-border mt-4 pt-4 flex justify-between font-semibold">
-                <span>Total</span>
-                <span>{formatPrice(order.total)}</span>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Payment Reminder */}
-          {order.status === "pending" && (
-            <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 text-center mb-6">
-              <Banknote className="h-8 w-8 text-amber-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-amber-800 mb-2">Payment Required</h3>
-              <p className="text-amber-700 text-sm">
-                Please go to the counter and pay <span className="font-bold">{formatPrice(order.total)}</span> to start your order.
-              </p>
-              <p className="text-amber-600 text-xs mt-2">Your order will be prepared after payment is confirmed.</p>
+          <div className="bg-green-50 rounded-2xl p-5 mb-6 border border-green-100">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-xl">
+                <CreditCard className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-green-800">Pay when you&apos;re done</p>
+                <p className="text-sm text-green-700">Enjoy your meal, pay at the cashier before leaving</p>
+              </div>
             </div>
-          )}
-          
-          {order.status === "paid" && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center mb-6">
-              <p className="text-emerald-800 text-sm">
-                ✅ Payment received! Your order is in the queue.
-              </p>
-            </div>
-          )}
+          </div>
 
           {/* Actions */}
-          <div className="flex gap-4 justify-center">
-            <Button asChild variant="outline">
-              <Link href="/">Back to Home</Link>
-            </Button>
-            <Button asChild variant="primary">
-              <Link href="/#menu">🍽️ Order More</Link>
-            </Button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link 
+              href="/"
+              className="flex-1 py-4 px-6 bg-white border-2 border-gray-200 text-gray-700 font-semibold rounded-2xl text-center hover:bg-gray-50 transition-colors"
+            >
+              Back to Home
+            </Link>
+            <Link 
+              href="/#menu"
+              className="flex-1 py-4 px-6 bg-shawarma hover:bg-shawarma-600 text-white font-semibold rounded-2xl text-center flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+            >
+              <Sparkles className="h-5 w-5" />
+              Order More
+            </Link>
           </div>
         </div>
-      </Section>
+      </main>
 
       <Footer />
     </div>

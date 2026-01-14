@@ -183,6 +183,10 @@ export default function Cart() {
                 <span>Service fee</span>
                 <span className="text-green-600 font-medium">Free</span>
               </div>
+              <div className="flex items-center gap-2 text-xs text-green-600 pt-1">
+                <span>💚</span>
+                <span>Pay after your meal at cashier</span>
+              </div>
             </div>
             
             {/* Divider */}

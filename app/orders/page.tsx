@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase"
 import { Button } from "@/components/ui/button"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { Phone, Clock, CheckCircle, ChefHat, Package, XCircle, Search, ArrowRight, CreditCard, Banknote, MapPin, Sparkles, Receipt, RefreshCw, UtensilsCrossed } from "lucide-react"
+import { Phone, Clock, CheckCircle, ChefHat, Package, XCircle, Search, ArrowRight, MapPin, Sparkles, Receipt, RefreshCw, UtensilsCrossed } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -26,27 +26,19 @@ interface Order {
   special_instructions?: string
   items: OrderItem[]
   total: number
-  status: "pending" | "paid" | "preparing" | "ready" | "completed" | "cancelled"
+  status: "pending" | "preparing" | "ready" | "completed" | "cancelled"
   created_at: string
   pickup_time?: string
 }
 
 const statusConfig = {
   pending: {
-    label: "Awaiting Payment",
-    icon: Banknote,
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    border: "border-amber-200",
+    label: "Order Received",
+    icon: Receipt,
+    color: "text-blue-600",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
     progress: 1,
-  },
-  paid: {
-    label: "Payment Confirmed",
-    icon: CreditCard,
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    progress: 2,
   },
   preparing: {
     label: "Being Prepared",
@@ -54,15 +46,15 @@ const statusConfig = {
     color: "text-purple-600",
     bg: "bg-purple-50",
     border: "border-purple-200",
-    progress: 3,
+    progress: 2,
   },
   ready: {
-    label: "Ready for Pickup!",
+    label: "Ready to Serve!",
     icon: Package,
     color: "text-green-600",
     bg: "bg-green-50",
     border: "border-green-200",
-    progress: 4,
+    progress: 3,
   },
   completed: {
     label: "Completed",
@@ -70,7 +62,7 @@ const statusConfig = {
     color: "text-gray-500",
     bg: "bg-gray-50",
     border: "border-gray-200",
-    progress: 4,
+    progress: 3,
   },
   cancelled: {
     label: "Cancelled",
@@ -83,8 +75,7 @@ const statusConfig = {
 }
 
 const progressSteps = [
-  { label: "Ordered", icon: Receipt },
-  { label: "Confirmed", icon: CreditCard },
+  { label: "Received", icon: Receipt },
   { label: "Preparing", icon: ChefHat },
   { label: "Ready", icon: Package },
 ]
@@ -199,7 +190,7 @@ export default function MyOrdersPage() {
   }
 
   const activeOrders = orders.filter(o => 
-    ["pending", "paid", "preparing", "ready"].includes(o.status)
+    ["pending", "preparing", "ready"].includes(o.status)
   )
   const pastOrders = orders.filter(o => 
     ["completed", "cancelled"].includes(o.status)

@@ -447,7 +447,7 @@ export default function Checkout() {
                     <ChefHat className="h-5 w-5 text-shawarma" />
                     <div>
                       <p className="text-sm font-semibold text-shawarma-800">Ready in ~{getEstimatedWaitTime().min}-{getEstimatedWaitTime().max} min</p>
-                      <p className="text-xs text-shawarma-600">After payment confirmation</p>
+                      <p className="text-xs text-shawarma-600">We&apos;ll start preparing right away</p>
                     </div>
                   </div>
 
@@ -499,13 +499,13 @@ export default function Checkout() {
                   )}
 
                   {/* Payment Info */}
-                  <div className="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-100">
-                    <div className="flex items-center gap-2 text-amber-800">
+                  <div className="mt-4 p-3 bg-green-50 rounded-xl border border-green-100">
+                    <div className="flex items-center gap-2 text-green-800">
                       <CreditCard className="h-4 w-4" />
-                      <span className="text-sm font-medium">Pay at counter</span>
+                      <span className="text-sm font-medium">Pay after your meal</span>
                     </div>
-                    <p className="text-xs text-amber-700 mt-1">
-                      Your order starts after payment confirmation
+                    <p className="text-xs text-green-700 mt-1">
+                      Enjoy your food, pay at cashier when you&apos;re done
                     </p>
                   </div>
                 </div>
