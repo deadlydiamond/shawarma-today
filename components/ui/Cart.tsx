@@ -1,14 +1,21 @@
 "use client"
 
-import { X, Plus, Minus, ShoppingBag } from "lucide-react"
+import { X, Plus, Minus, ShoppingBag, Trash2, Clock, ArrowRight, Sparkles } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import Image from "next/image"
 import Link from "next/link"
+import { useState, useEffect } from "react"
 
 export default function Cart() {
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, isOpen, setIsOpen } = useCart()
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsAnimating(true)
+    }
+  }, [isOpen])
 
   const formatPrice = (price: number) => {
     return `£${price.toFixed(2)}`
@@ -24,54 +31,88 @@ export default function Cart() {
     return parseFloat(priceStr.replace("£", "").replace("+", ""))
   }
 
+  const handleClose = () => {
+    setIsAnimating(false)
+    setTimeout(() => setIsOpen(false), 300)
+  }
+
   if (!isOpen) return null
+
+  const totalItems = getTotalItems()
+  const totalPrice = getTotalPrice()
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop with blur */}
       <div
-        className="fixed inset-0 bg-black/50 z-50 transition-opacity"
-        onClick={() => setIsOpen(false)}
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity duration-300 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}
+        onClick={handleClose}
       />
 
       {/* Cart Sidebar */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col animate-slide-in">
+      <div className={`fixed right-0 top-0 h-full w-full max-w-[420px] bg-gray-50 shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out ${isAnimating ? 'translate-x-0' : 'translate-x-full'}`}>
+        
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
-          <div className="flex items-center gap-3">
-            <ShoppingBag className="h-6 w-6 text-foreground" strokeWidth={2} />
-            <h2 className="text-2xl font-semibold">Your Order</h2>
-            {getTotalItems() > 0 && (
-              <span className="px-2 py-1 bg-gray-900 text-white text-xs font-medium rounded-full">
-                {getTotalItems()}
-              </span>
-            )}
+        <div className="bg-white px-6 py-5 border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-shawarma rounded-xl">
+                <ShoppingBag className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Your Order</h2>
+                <p className="text-sm text-gray-500">{totalItems} {totalItems === 1 ? 'item' : 'items'}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleClose}
+              className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors"
+              aria-label="Close cart"
+            >
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
           </div>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            aria-label="Close cart"
-          >
-            <X className="h-5 w-5" />
-          </button>
         </div>
 
+        {/* Estimated Time Banner */}
+        {cartItems.length > 0 && (
+          <div className="bg-shawarma-50 px-6 py-3 flex items-center gap-2">
+            <Clock className="h-4 w-4 text-shawarma" />
+            <span className="text-sm font-medium text-shawarma-800">Ready in 15-20 mins</span>
+          </div>
+        )}
+
         {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto px-4 py-4">
           {cartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <ShoppingBag className="h-16 w-16 text-foreground/20 mb-4" strokeWidth={1.5} />
-              <p className="text-lg font-medium text-foreground/60 mb-2">Your cart is empty</p>
-              <p className="text-sm text-foreground/50">Add items from the menu to get started</p>
+            <div className="flex flex-col items-center justify-center h-full text-center px-6">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                <ShoppingBag className="h-10 w-10 text-gray-300" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Your cart is empty</h3>
+              <p className="text-gray-500 mb-8 max-w-[250px]">Looks like you haven&apos;t added anything to your cart yet</p>
+              <Button 
+                variant="primary" 
+                onClick={handleClose}
+                className="gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                Browse Menu
+              </Button>
             </div>
           ) : (
-            <div className="space-y-4">
-              {cartItems.map((item) => {
+            <div className="space-y-3">
+              {cartItems.map((item, index) => {
                 const itemPrice = getItemPrice(item)
                 return (
-                  <Card key={`${item.id}-${item.selectedSize}`} className="p-4">
+                  <div 
+                    key={`${item.id}-${item.selectedSize}`} 
+                    className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
                     <div className="flex gap-4">
-                      <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                      {/* Image */}
+                      <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
                         <Image
                           src={item.image}
                           alt={item.name}
@@ -79,79 +120,103 @@ export default function Cart() {
                           className="object-cover"
                         />
                       </div>
+                      
+                      {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold text-sm text-foreground">{item.name}</h3>
-                            {item.selectedSize && item.selectedSize !== "regular" && (
-                              <p className="text-xs text-foreground/60 capitalize">{item.selectedSize}</p>
-                            )}
-                          </div>
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">{item.name}</h3>
                           <button
                             onClick={() => removeFromCart(item.id, item.selectedSize)}
-                            className="p-1 hover:bg-gray-100 rounded transition-colors"
+                            className="p-1.5 hover:bg-red-50 rounded-lg transition-colors group flex-shrink-0"
                             aria-label="Remove item"
                           >
-                            <X className="h-4 w-4 text-foreground/60" />
+                            <Trash2 className="h-4 w-4 text-gray-400 group-hover:text-red-500 transition-colors" />
                           </button>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
+                        
+                        {item.selectedSize && item.selectedSize !== "regular" && (
+                          <p className="text-xs text-gray-500 capitalize mb-2">{item.selectedSize} size</p>
+                        )}
+                        
+                        {/* Price & Quantity */}
+                        <div className="flex items-center justify-between mt-2">
+                          <p className="font-bold text-gray-900">{formatPrice(itemPrice * item.quantity)}</p>
+                          
+                          {/* Quantity Controls */}
+                          <div className="flex items-center gap-1 bg-gray-100 rounded-full p-1">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedSize)}
-                              className="p-1 hover:bg-gray-100 rounded transition-colors"
+                              className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-full transition-colors"
                               aria-label="Decrease quantity"
                             >
-                              <Minus className="h-4 w-4 text-foreground/70" />
+                              <Minus className="h-4 w-4 text-gray-600" />
                             </button>
-                            <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
+                            <span className="w-8 text-center font-bold text-sm text-gray-900">{item.quantity}</span>
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedSize)}
-                              className="p-1 hover:bg-gray-100 rounded transition-colors"
+                              className="w-8 h-8 flex items-center justify-center hover:bg-white rounded-full transition-colors"
                               aria-label="Increase quantity"
                             >
-                              <Plus className="h-4 w-4 text-foreground/70" />
+                              <Plus className="h-4 w-4 text-gray-600" />
                             </button>
                           </div>
-                          <p className="font-semibold text-sm">{formatPrice(itemPrice * item.quantity)}</p>
                         </div>
                       </div>
                     </div>
-                  </Card>
+                  </div>
                 )
               })}
             </div>
           )}
         </div>
 
-        {/* Footer */}
+        {/* Footer - Sticky Checkout */}
         {cartItems.length > 0 && (
-          <div className="border-t border-border p-6 space-y-4">
-            <div className="flex items-center justify-between text-lg font-semibold">
-              <span>Total</span>
-              <span>{formatPrice(getTotalPrice())}</span>
+          <div className="bg-white border-t border-gray-100 p-6 space-y-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+            {/* Subtotal */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <span>Subtotal</span>
+                <span>{formatPrice(totalPrice)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <span>Service fee</span>
+                <span className="text-green-600 font-medium">Free</span>
+              </div>
             </div>
-            <Button
-              asChild
-              size="lg"
-              variant="primary"
-              className="w-full"
-              onClick={() => setIsOpen(false)}
+            
+            {/* Divider */}
+            <div className="h-px bg-gray-100" />
+            
+            {/* Total */}
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-bold text-gray-900">Total</span>
+              <span className="text-2xl font-bold text-gray-900">{formatPrice(totalPrice)}</span>
+            </div>
+
+            {/* Checkout Button */}
+            <Link 
+              href="/checkout" 
+              onClick={handleClose}
+              className="flex items-center justify-center gap-3 w-full py-4 px-6 bg-shawarma hover:bg-shawarma-600 text-white font-bold text-lg rounded-2xl transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
             >
-              <Link href="/checkout" className="flex items-center justify-center gap-3"><ShoppingBag className="h-5 w-5 text-white" /> Proceed to Checkout</Link>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full"
-              onClick={() => setIsOpen(false)}
+              <span>Checkout</span>
+              <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1">
+                <span className="text-sm">{formatPrice(totalPrice)}</span>
+                <ArrowRight className="h-4 w-4" />
+              </div>
+            </Link>
+            
+            {/* Continue Shopping */}
+            <button
+              onClick={handleClose}
+              className="w-full py-3 text-gray-600 hover:text-gray-900 font-medium text-sm transition-colors"
             >
               Continue Shopping
-            </Button>
+            </button>
           </div>
         )}
       </div>
-
     </>
   )
 }
