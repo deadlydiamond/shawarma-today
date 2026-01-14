@@ -34,12 +34,18 @@ interface CartItem {
 
 interface OrderReceipt {
   orderId: string
+  orderCode: string // 4-digit code for easy lookup
   items: CartItem[]
   subtotal: number
   total: number
   customer: string
   tableNumber: string
   timestamp: Date
+}
+
+// Generate a random 4-digit order code
+const generateOrderCode = () => {
+  return Math.floor(1000 + Math.random() * 9000).toString()
 }
 
 // Menu categories with items
@@ -173,6 +179,9 @@ export default function POSPage() {
     
     setIsProcessing(true)
     
+    // Generate 4-digit order code
+    const orderCode = generateOrderCode()
+    
     try {
       const orderItems = cart.map(item => ({
         id: item.id,
@@ -186,17 +195,18 @@ export default function POSPage() {
 
       const orderId = await addOrder({
         items: orderItems,
-        customer: { name: customerName.trim(), phone: "" },
+        customer: { name: `${customerName.trim()} #${orderCode}`, phone: "" },
         subtotal,
         total,
         tableNumber,
-        specialInstructions: "",
+        specialInstructions: `Order Code: ${orderCode}`,
         status: "paid", // Walk-in orders are already paid
       })
 
       // Create receipt
       const receipt: OrderReceipt = {
         orderId: orderId || `WI-${Date.now().toString(36).toUpperCase()}`,
+        orderCode,
         items: cart,
         subtotal,
         total,
@@ -469,8 +479,13 @@ export default function POSPage() {
                 <p className="text-gray-500 text-sm">Tel: 0131 XXX XXXX</p>
               </div>
 
+              {/* Large Order Code */}
+              <div className="text-center mb-4 p-4 bg-shawarma rounded-xl">
+                <p className="text-white/80 text-sm font-medium">ORDER NUMBER</p>
+                <p className="text-white text-5xl font-bold tracking-wider">{lastReceipt.orderCode}</p>
+              </div>
+
               <div className="text-center mb-4">
-                <p className="text-sm text-gray-500">Order #{lastReceipt.orderId.slice(-6).toUpperCase()}</p>
                 <p className="text-sm text-gray-500">
                   {lastReceipt.timestamp.toLocaleDateString("en-GB")} {lastReceipt.timestamp.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                 </p>
