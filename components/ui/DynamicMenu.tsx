@@ -2,22 +2,22 @@
 
 import { useMenu } from "@/contexts/MenuContext"
 import { MenuItem, useCart } from "@/contexts/CartContext"
-import { Beef, UtensilsCrossed, Salad, CupSoda, Cookie, Plus, Flame, Leaf, Sparkles, WheatOff, MilkOff } from "lucide-react"
+import { Plus, Minus, Flame, Leaf, Sparkles, WheatOff, Check, ShoppingBag } from "lucide-react"
 import { useMemo, useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
 type CategoryFilter = "all" | "pizzas" | "fatayer" | "wraps" | "meals" | "grill" | "sides" | "drinks"
 
-const categoryConfig: { id: CategoryFilter; label: string; icon: React.ReactNode; emoji: string }[] = [
-  { id: "all", label: "All", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🍽️" },
-  { id: "pizzas", label: "Pizzas", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🍕" },
-  { id: "fatayer", label: "Fatayer", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🫓" },
-  { id: "wraps", label: "Wraps", icon: <Beef className="h-5 w-5" />, emoji: "🌯" },
-  { id: "meals", label: "Meals", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🍽️" },
-  { id: "grill", label: "Grill", icon: <Beef className="h-5 w-5" />, emoji: "🍢" },
-  { id: "sides", label: "Sides", icon: <Salad className="h-5 w-5" />, emoji: "🍟" },
-  { id: "drinks", label: "Drinks", icon: <CupSoda className="h-5 w-5" />, emoji: "🥤" },
+const categoryConfig: { id: CategoryFilter; label: string; emoji: string }[] = [
+  { id: "all", label: "All", emoji: "🍽️" },
+  { id: "pizzas", label: "Pizzas", emoji: "🍕" },
+  { id: "fatayer", label: "Fatayer", emoji: "🫓" },
+  { id: "wraps", label: "Wraps", emoji: "🌯" },
+  { id: "meals", label: "Meals", emoji: "🍛" },
+  { id: "grill", label: "Grill", emoji: "🍢" },
+  { id: "sides", label: "Sides", emoji: "🍟" },
+  { id: "drinks", label: "Drinks", emoji: "🥤" },
 ]
 
 // Fallback menu items - TODAY SHAWARMA ACTUAL MENU
@@ -29,21 +29,21 @@ const fallbackMenuItems: Record<string, ExtendedMenuItem[]> = {
     { id: "pz4", name: "Meat Feast", description: "Chicken, lamb & pepperoni", price: "£6.99", image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=75", category: "Pizzas", isPopular: true },
     { id: "pz5", name: "Veggie Pizza", description: "Mushrooms, onions, sweetcorn & green peppers", price: "£5.50", image: "https://images.unsplash.com/photo-1511689660979-10d2b1aada49?w=400&q=75", category: "Pizzas", isVegetarian: true },
     { id: "pz6", name: "Mighty Meaty", description: "Chicken, lamb, donner, spicy beef", price: "£6.99", image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=400&q=75", category: "Pizzas", isPopular: true, isNew: true },
-    { id: "pz7", name: "Garlic Bread with Cheese", description: "10\" garlic bread topped with cheese", price: "£3.99", image: "https://images.unsplash.com/photo-1619531040576-f9416740661b?w=400&q=75", category: "Pizzas", isVegetarian: true },
+    { id: "pz7", name: "Garlic Bread", description: "10\" garlic bread with cheese", price: "£3.99", image: "https://images.unsplash.com/photo-1619531040576-f9416740661b?w=400&q=75", category: "Pizzas", isVegetarian: true },
   ],
   fatayer: [
-    { id: "ft1", name: "Chicken Fatayer", description: "10\" flatbread with chicken filling", price: "£4.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isPopular: true },
-    { id: "ft2", name: "Lamb Fatayer", description: "10\" flatbread with lamb filling", price: "£5.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
-    { id: "ft3", name: "Mix Fatayer", description: "10\" flatbread with mixed filling", price: "£5.50", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
-    { id: "ft4", name: "Veggie Fatayer", description: "10\" flatbread with vegetable filling", price: "£4.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isVegetarian: true },
-    { id: "ft5", name: "Cheese Fatayer", description: "10\" flatbread with cheese filling", price: "£3.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isVegetarian: true },
+    { id: "ft1", name: "Chicken Fatayer", description: "10\" flatbread with chicken", price: "£4.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isPopular: true },
+    { id: "ft2", name: "Lamb Fatayer", description: "10\" flatbread with lamb", price: "£5.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
+    { id: "ft3", name: "Mix Fatayer", description: "10\" flatbread with mix filling", price: "£5.50", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
+    { id: "ft4", name: "Veggie Fatayer", description: "10\" flatbread with vegetables", price: "£4.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isVegetarian: true },
+    { id: "ft5", name: "Cheese Fatayer", description: "10\" flatbread with cheese", price: "£3.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isVegetarian: true },
   ],
   wraps: [
-    { id: "wr1", name: "Lamb Shawarma Wrap", description: "Tender lamb shawarma in wrap", price: "£4.99", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps", isPopular: true },
-    { id: "wr2", name: "Chicken Shawarma Wrap", description: "Marinated chicken shawarma in wrap", price: "£4.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps", isPopular: true },
+    { id: "wr1", name: "Lamb Shawarma Wrap", description: "Tender lamb in wrap", price: "£4.99", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps", isPopular: true },
+    { id: "wr2", name: "Chicken Shawarma Wrap", description: "Marinated chicken in wrap", price: "£4.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps", isPopular: true },
     { id: "wr3", name: "Falafel Wrap", description: "Crispy falafel with salad", price: "£4.99", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Wraps", isVegan: true },
-    { id: "wr4", name: "Lamb Shawarma Sandwich", description: "Tender lamb shawarma in bread", price: "£4.99", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps" },
-    { id: "wr5", name: "Chicken Shawarma Sandwich", description: "Marinated chicken shawarma in bread", price: "£4.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps" },
+    { id: "wr4", name: "Lamb Sandwich", description: "Tender lamb in bread", price: "£4.99", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps" },
+    { id: "wr5", name: "Chicken Sandwich", description: "Marinated chicken in bread", price: "£4.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps" },
   ],
   meals: [
     { id: "ml1", name: "Lamb Shawarma Meal", description: "With chips & salad", price: "£7.99", image: "https://images.unsplash.com/photo-1547424850-2bef379d8159?w=400&q=75", category: "Meals", isPopular: true },
@@ -51,15 +51,15 @@ const fallbackMenuItems: Record<string, ExtendedMenuItem[]> = {
     { id: "ml3", name: "Falafel Meal", description: "6 pcs with naan & salad", price: "£5.99", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Meals", isVegan: true },
   ],
   grill: [
-    { id: "gr1", name: "Mix Platter", description: "2 Chicken Tikka, 2 Lamb Tikka, 4 Kebabs, 5 Lamb Chops, 6 Wings, Rice & Salad", price: "£60.00", image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=75", category: "Grill", isPopular: true },
-    { id: "gr2", name: "Mix Kebab Full", description: "2 Kebabs, Chicken Tikka, Lamb Tikka, 2 Naan & Salad", price: "£17.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr3", name: "Mix Kebab Half", description: "Lamb Kebab, Chicken Tikka, Lamb Tikka & Salad", price: "£14.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr4", name: "Lamb Chops (5)", description: "With salad & naan", price: "£13.00", priceLarge: "£16.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr5", name: "Lamb Kebab (2)", description: "With salad & naan", price: "£11.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr6", name: "Lamb Tikka (2)", description: "With salad & naan", price: "£13.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr7", name: "Chicken Tikka (2)", description: "With salad & naan", price: "£10.00", image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=75", category: "Grill" },
-    { id: "gr8", name: "Chicken Wings (10)", description: "With salad & naan", price: "£9.00", image: "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=400&q=75", category: "Grill", isPopular: true },
-    { id: "gr9", name: "Dolma", description: "Available Saturday only", price: "£12.00", image: "https://images.unsplash.com/photo-1621532074858-a7e5a99a4e9e?w=400&q=75", category: "Grill", isNew: true },
+    { id: "gr1", name: "Mix Platter", description: "The ultimate feast for sharing", price: "£60.00", image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=75", category: "Grill", isPopular: true },
+    { id: "gr2", name: "Mix Kebab Full", description: "2 Kebabs, Tikka, Naan & Salad", price: "£17.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr3", name: "Mix Kebab Half", description: "Kebab, Tikka & Salad", price: "£14.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr4", name: "Lamb Chops", description: "5 pcs with salad & naan", price: "£13.00", priceLarge: "£16.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr5", name: "Lamb Kebab", description: "2 pcs with salad & naan", price: "£11.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr6", name: "Lamb Tikka", description: "2 pcs with salad & naan", price: "£13.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr7", name: "Chicken Tikka", description: "2 pcs with salad & naan", price: "£10.00", image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=75", category: "Grill" },
+    { id: "gr8", name: "Chicken Wings", description: "10 pcs with salad & naan", price: "£9.00", image: "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=400&q=75", category: "Grill", isPopular: true },
+    { id: "gr9", name: "Dolma", description: "Saturday special", price: "£12.00", image: "https://images.unsplash.com/photo-1621532074858-a7e5a99a4e9e?w=400&q=75", category: "Grill", isNew: true },
   ],
   sides: [
     { id: "sd1", name: "Chips", description: "Crispy golden chips", price: "£2.50", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=75", category: "Sides", isVegan: true },
@@ -76,16 +76,15 @@ const fallbackMenuItems: Record<string, ExtendedMenuItem[]> = {
 }
 
 const defaultCategories = [
-  { id: "1", slug: "pizzas", name: "Pizzas (10\")", sortOrder: 1, isActive: true },
-  { id: "2", slug: "fatayer", name: "Fatayer (10\")", sortOrder: 2, isActive: true },
-  { id: "3", slug: "wraps", name: "Sandwiches & Wraps", sortOrder: 3, isActive: true },
+  { id: "1", slug: "pizzas", name: "Pizzas", sortOrder: 1, isActive: true },
+  { id: "2", slug: "fatayer", name: "Fatayer", sortOrder: 2, isActive: true },
+  { id: "3", slug: "wraps", name: "Wraps & Sandwiches", sortOrder: 3, isActive: true },
   { id: "4", slug: "meals", name: "Meals", sortOrder: 4, isActive: true },
   { id: "5", slug: "grill", name: "Grill & Platters", sortOrder: 5, isActive: true },
-  { id: "6", slug: "sides", name: "Extras", sortOrder: 6, isActive: true },
+  { id: "6", slug: "sides", name: "Sides", sortOrder: 6, isActive: true },
   { id: "7", slug: "drinks", name: "Drinks", sortOrder: 7, isActive: true },
 ]
 
-// Extended MenuItem type with all tags and sizes
 type ExtendedMenuItem = MenuItem & { 
   id: string
   isPopular?: boolean
@@ -98,13 +97,16 @@ type ExtendedMenuItem = MenuItem & {
   priceKids?: string
 }
 
-// Compact Menu Item Component
-function CompactMenuItem({ item }: { item: ExtendedMenuItem }) {
-  const { addToCart } = useCart()
+// Modern Menu Item Card
+function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isCompact?: boolean }) {
+  const { addToCart, items, updateQuantity } = useCart()
   const [imageLoaded, setImageLoaded] = useState(false)
   const [selectedSize, setSelectedSize] = useState<"regular" | "large" | "kids">("regular")
+  const [justAdded, setJustAdded] = useState(false)
   
   const hasSizes = !!(item.priceLarge || item.priceKids)
+  const cartItem = items.find(i => i.id === item.id && i.size === selectedSize)
+  const quantity = cartItem?.quantity || 0
   
   const getDisplayPrice = () => {
     if (selectedSize === "large" && item.priceLarge) return item.priceLarge
@@ -123,22 +125,37 @@ function CompactMenuItem({ item }: { item: ExtendedMenuItem }) {
       category: item.category,
       description: item.description,
     }, selectedSize)
+    setJustAdded(true)
+    setTimeout(() => setJustAdded(false), 1000)
   }
 
-  // Collect all tags
-  const tags = []
-  if (item.isNew) tags.push({ label: "NEW", icon: Sparkles, bg: "bg-blue-500" })
-  if (item.isPopular) tags.push({ label: "HOT", icon: Flame, bg: "bg-orange-500" })
-  if (item.isVegan) tags.push({ label: "V", icon: Leaf, bg: "bg-green-600" })
-  if (item.isVegetarian && !item.isVegan) tags.push({ label: "VG", icon: Leaf, bg: "bg-green-500" })
-  if (item.isGlutenFree) tags.push({ label: "GF", icon: WheatOff, bg: "bg-amber-600" })
-  if (item.isDairyFree) tags.push({ label: "DF", icon: MilkOff, bg: "bg-purple-500" })
+  const handleIncrement = () => {
+    if (cartItem) {
+      updateQuantity(cartItem.id, cartItem.size || "regular", quantity + 1)
+    } else {
+      handleAdd()
+    }
+  }
 
-  return (
-    <div className="w-full">
-      <div className="relative">
+  const handleDecrement = () => {
+    if (cartItem && quantity > 0) {
+      updateQuantity(cartItem.id, cartItem.size || "regular", quantity - 1)
+    }
+  }
+
+  const tags = []
+  if (item.isNew) tags.push({ label: "NEW", icon: Sparkles, color: "bg-blue-500" })
+  if (item.isPopular) tags.push({ label: "POPULAR", icon: Flame, color: "bg-shawarma" })
+  if (item.isVegan) tags.push({ label: "Vegan", icon: Leaf, color: "bg-green-600" })
+  if (item.isVegetarian && !item.isVegan) tags.push({ label: "Veggie", icon: Leaf, color: "bg-green-500" })
+  if (item.isGlutenFree) tags.push({ label: "GF", icon: WheatOff, color: "bg-amber-600" })
+
+  if (isCompact) {
+    // Compact card for grid view
+    return (
+      <div className="group relative bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
         {/* Image */}
-        <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-gray-100">
+        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
           )}
@@ -146,73 +163,211 @@ function CompactMenuItem({ item }: { item: ExtendedMenuItem }) {
             src={item.image}
             alt={item.name}
             fill
-            className={cn("object-cover", imageLoaded ? "opacity-100" : "opacity-0")}
-            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 15vw"
+            className={cn("object-cover transition-transform duration-300 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             onLoad={() => setImageLoaded(true)}
           />
-          {/* Tags - show up to 3 */}
+          {/* Tags */}
           {tags.length > 0 && (
-            <div className="absolute top-1.5 left-1.5 flex flex-wrap gap-1">
-              {tags.slice(0, 3).map((tag, i) => (
-                <span key={i} className={cn("px-1.5 py-0.5 text-white text-[9px] font-bold rounded-full flex items-center gap-0.5", tag.bg)}>
-                  <tag.icon className="h-2.5 w-2.5" />
+            <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+              {tags.slice(0, 2).map((tag, i) => (
+                <span key={i} className={cn("px-2 py-0.5 text-white text-[10px] font-bold rounded-full flex items-center gap-1", tag.color)}>
+                  <tag.icon className="h-3 w-3" />
                   {tag.label}
                 </span>
               ))}
             </div>
           )}
         </div>
-        {/* Add Button */}
-        <button
-          onClick={handleAdd}
-          className="absolute -bottom-2 right-2 w-7 h-7 bg-gray-900 hover:bg-gray-800 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95"
-        >
-          <Plus className="h-4 w-4" strokeWidth={3} />
-        </button>
-      </div>
-      {/* Info */}
-      <div className="mt-3 px-0.5">
-        <h4 className="font-semibold text-gray-900 text-sm truncate">{item.name}</h4>
-        <p className="text-[11px] text-gray-500 truncate">{item.description}</p>
-        
-        {/* Size selector */}
-        {hasSizes && (
-          <div className="flex gap-1 mt-2">
-            <button
-              onClick={() => setSelectedSize("regular")}
-              className={cn(
-                "px-2 py-0.5 text-[10px] rounded-full transition-colors",
-                selectedSize === "regular" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600"
-              )}
-            >
-              {item.priceKids ? "Reg" : "Reg"}
-            </button>
-            {item.priceLarge && (
+
+        {/* Content */}
+        <div className="p-3">
+          <h4 className="font-semibold text-gray-900 text-sm leading-tight mb-1 line-clamp-1">{item.name}</h4>
+          <p className="text-xs text-gray-500 line-clamp-1 mb-2">{item.description}</p>
+          
+          {/* Size selector */}
+          {hasSizes && (
+            <div className="flex gap-1 mb-2">
               <button
-                onClick={() => setSelectedSize("large")}
+                onClick={() => setSelectedSize("regular")}
                 className={cn(
-                  "px-2 py-0.5 text-[10px] rounded-full transition-colors",
-                  selectedSize === "large" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600"
+                  "flex-1 py-1 text-[10px] font-medium rounded-lg transition-colors",
+                  selectedSize === "regular" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 )}
               >
-                Lrg
+                Regular
               </button>
-            )}
-            {item.priceKids && (
+              {item.priceLarge && (
+                <button
+                  onClick={() => setSelectedSize("large")}
+                  className={cn(
+                    "flex-1 py-1 text-[10px] font-medium rounded-lg transition-colors",
+                    selectedSize === "large" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  )}
+                >
+                  Large
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Price & Add */}
+          <div className="flex items-center justify-between">
+            <span className="text-base font-bold text-gray-900">{getDisplayPrice()}</span>
+            
+            {quantity > 0 ? (
+              <div className="flex items-center gap-1 bg-gray-900 rounded-full">
+                <button
+                  onClick={handleDecrement}
+                  className="w-8 h-8 flex items-center justify-center text-white hover:bg-gray-800 rounded-full transition-colors"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="w-6 text-center text-white font-semibold text-sm">{quantity}</span>
+                <button
+                  onClick={handleIncrement}
+                  className="w-8 h-8 flex items-center justify-center text-white hover:bg-gray-800 rounded-full transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={() => setSelectedSize("kids")}
+                onClick={handleAdd}
                 className={cn(
-                  "px-2 py-0.5 text-[10px] rounded-full transition-colors",
-                  selectedSize === "kids" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600"
+                  "h-9 px-4 rounded-full font-semibold text-sm flex items-center gap-1.5 transition-all duration-200",
+                  justAdded 
+                    ? "bg-green-500 text-white" 
+                    : "bg-shawarma hover:bg-shawarma-600 text-white hover:scale-105"
                 )}
               >
-                Kids
+                {justAdded ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Added
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    Add
+                  </>
+                )}
               </button>
             )}
           </div>
-        )}
-        
-        <p className="text-sm font-bold text-gray-900 mt-1">{getDisplayPrice()}</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Large featured card
+  return (
+    <div className="group relative bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
+      <div className="flex flex-col sm:flex-row">
+        {/* Image */}
+        <div className="relative w-full sm:w-48 h-48 sm:h-auto overflow-hidden bg-gray-100 flex-shrink-0">
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+          )}
+          <Image
+            src={item.image}
+            alt={item.name}
+            fill
+            className={cn("object-cover transition-transform duration-300 group-hover:scale-105", imageLoaded ? "opacity-100" : "opacity-0")}
+            sizes="(max-width: 640px) 100vw, 200px"
+            onLoad={() => setImageLoaded(true)}
+          />
+          {/* Tags */}
+          {tags.length > 0 && (
+            <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+              {tags.map((tag, i) => (
+                <span key={i} className={cn("px-2.5 py-1 text-white text-xs font-bold rounded-full flex items-center gap-1", tag.color)}>
+                  <tag.icon className="h-3.5 w-3.5" />
+                  {tag.label}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <h4 className="font-bold text-gray-900 text-lg mb-1">{item.name}</h4>
+            <p className="text-sm text-gray-500 mb-3">{item.description}</p>
+            
+            {/* Size selector */}
+            {hasSizes && (
+              <div className="flex gap-2 mb-3">
+                <button
+                  onClick={() => setSelectedSize("regular")}
+                  className={cn(
+                    "px-4 py-1.5 text-xs font-semibold rounded-full transition-colors",
+                    selectedSize === "regular" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  )}
+                >
+                  Regular
+                </button>
+                {item.priceLarge && (
+                  <button
+                    onClick={() => setSelectedSize("large")}
+                    className={cn(
+                      "px-4 py-1.5 text-xs font-semibold rounded-full transition-colors",
+                      selectedSize === "large" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    )}
+                  >
+                    Large
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Price & Add */}
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-xl font-bold text-gray-900">{getDisplayPrice()}</span>
+            
+            {quantity > 0 ? (
+              <div className="flex items-center gap-2 bg-gray-900 rounded-full px-1">
+                <button
+                  onClick={handleDecrement}
+                  className="w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 rounded-full transition-colors"
+                >
+                  <Minus className="h-5 w-5" />
+                </button>
+                <span className="w-8 text-center text-white font-bold">{quantity}</span>
+                <button
+                  onClick={handleIncrement}
+                  className="w-10 h-10 flex items-center justify-center text-white hover:bg-gray-800 rounded-full transition-colors"
+                >
+                  <Plus className="h-5 w-5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleAdd}
+                className={cn(
+                  "h-11 px-6 rounded-full font-semibold flex items-center gap-2 transition-all duration-200",
+                  justAdded 
+                    ? "bg-green-500 text-white" 
+                    : "bg-shawarma hover:bg-shawarma-600 text-white hover:scale-105 shadow-lg"
+                )}
+              >
+                {justAdded ? (
+                  <>
+                    <Check className="h-5 w-5" />
+                    Added!
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-5 w-5" />
+                    Add to Order
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -232,6 +387,7 @@ export function DynamicMenu({
   const { categories, menuItems, loading } = useMenu()
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all")
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const tabsRef = useRef<HTMLDivElement>(null)
 
   // Listen for hash changes
   useEffect(() => {
@@ -290,69 +446,87 @@ export function DynamicMenu({
     ? displayCategories.filter(cat => showCategories.includes(cat.slug))
     : displayCategories.filter(cat => cat.isActive)
 
+  // Get all items for "all" category view
+  const allItems = useMemo(() => {
+    return Object.values(displayItems).flat()
+  }, [displayItems])
+
+  // Get popular items
+  const popularItems = useMemo(() => {
+    return allItems.filter(item => item.isPopular).slice(0, 4)
+  }, [allItems])
+
   // Scroll to category
   const scrollToCategory = (categorySlug: string) => {
     setActiveCategory(categorySlug as CategoryFilter)
     if (categorySlug === "all") return
     const ref = categoryRefs.current[categorySlug]
     if (ref) {
-      ref.scrollIntoView({ behavior: "smooth", block: "start" })
+      const offset = 120
+      const top = ref.getBoundingClientRect().top + window.scrollY - offset
+      window.scrollTo({ top, behavior: "smooth" })
     }
   }
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Skeleton tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded-xl animate-pulse" />
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="flex-shrink-0 w-24 h-12 bg-gray-100 rounded-full animate-pulse" />
           ))}
         </div>
-        {/* Skeleton items - 2 rows */}
-        <div className="overflow-x-auto pb-2 scrollbar-hide">
-          <div className="grid gap-3 grid-flow-col" style={{ gridTemplateRows: 'repeat(2, auto)', width: 'max-content' }}>
-            {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="w-[140px]">
-                <div className="w-full h-[100px] bg-gray-100 rounded-xl animate-pulse" />
-                <div className="mt-2 h-4 bg-gray-100 rounded animate-pulse" />
-                <div className="mt-1 h-3 w-2/3 bg-gray-100 rounded animate-pulse" />
+        {/* Skeleton grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+            <div key={i} className="bg-gray-100 rounded-2xl animate-pulse">
+              <div className="aspect-[4/3]" />
+              <div className="p-3 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className="h-8 bg-gray-200 rounded w-full" />
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Category Tabs - Food Panda Style */}
-      <div className="sticky top-20 z-30 bg-white/95 backdrop-blur-md py-3 -mx-6 px-6">
-        <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+    <div className="space-y-8">
+      {/* Category Pills - Sticky */}
+      <div 
+        ref={tabsRef}
+        className="sticky top-16 z-40 bg-white/95 backdrop-blur-lg py-4 -mx-6 px-6 border-b border-gray-100"
+      >
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
           {categoryConfig.map((cat) => {
             const isActive = activeCategory === cat.id
             const itemCount = cat.id === "all" 
-              ? Object.values(displayItems).flat().length 
+              ? allItems.length 
               : (displayItems[cat.id] || []).length
+            
+            if (cat.id !== "all" && itemCount === 0) return null
             
             return (
               <button
                 key={cat.id}
                 onClick={() => scrollToCategory(cat.id)}
                 className={cn(
-                  "flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[72px] rounded-2xl transition-all duration-200",
+                  "flex-shrink-0 px-4 py-2.5 rounded-full font-medium text-sm flex items-center gap-2 transition-all duration-200 whitespace-nowrap",
                   isActive
-                    ? "bg-gray-900 text-white shadow-lg scale-105"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    ? "bg-gray-900 text-white shadow-lg"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 )}
               >
-                <span className="text-2xl mb-0.5">{cat.emoji}</span>
-                <span className="text-xs font-medium">{cat.label}</span>
+                <span className="text-base">{cat.emoji}</span>
+                <span>{cat.label}</span>
                 {itemCount > 0 && (
                   <span className={cn(
-                    "text-[10px] mt-0.5",
-                    isActive ? "text-white/80" : "text-gray-400"
+                    "text-xs px-1.5 py-0.5 rounded-full",
+                    isActive ? "bg-white/20" : "bg-gray-200"
                   )}>
                     {itemCount}
                   </span>
@@ -363,8 +537,23 @@ export function DynamicMenu({
         </div>
       </div>
 
-      {/* Menu Sections - Horizontal Scroll */}
-      <div className="space-y-8">
+      {/* Popular Items - Featured Section */}
+      {activeCategory === "all" && popularItems.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Flame className="h-5 w-5 text-shawarma" />
+            <h3 className="text-xl font-bold text-gray-900">Most Popular</h3>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {popularItems.map((item) => (
+              <MenuItemCard key={item.id} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Menu Sections */}
+      <div className="space-y-10">
         {filteredCategories
           .filter(category => activeCategory === "all" || category.slug === activeCategory)
           .map((category) => {
@@ -372,34 +561,40 @@ export function DynamicMenu({
             if (items.length === 0) return null
 
             const categoryConf = categoryConfig.find(c => c.id === category.slug)
+            const showFeatured = activeCategory === "all" && items.some(i => i.isPopular)
 
             return (
               <div 
                 key={category.slug} 
                 ref={el => { categoryRefs.current[category.slug] = el }}
-                className="scroll-mt-40"
+                className="scroll-mt-32"
               >
                 {/* Category Header */}
                 {showCategoryHeaders && (
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{categoryConf?.emoji || "🍽️"}</span>
-                      <h3 className="text-lg font-bold text-gray-900">{category.name}</h3>
-                      <span className="text-sm text-gray-400">({items.length})</span>
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{categoryConf?.emoji || "🍽️"}</span>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
+                        <p className="text-sm text-gray-500">{items.length} items</p>
+                      </div>
                     </div>
-                    <button 
-                      onClick={() => setActiveCategory(category.slug as CategoryFilter)}
-                      className="text-sm text-gray-900 font-medium hover:underline"
-                    >
-                      See all →
-                    </button>
+                    {activeCategory === "all" && (
+                      <button 
+                        onClick={() => setActiveCategory(category.slug as CategoryFilter)}
+                        className="text-sm text-shawarma font-semibold hover:underline flex items-center gap-1"
+                      >
+                        View all
+                        <span>→</span>
+                      </button>
+                    )}
                   </div>
                 )}
 
-                {/* Responsive Grid - fills screen width, minimal scrolling */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 md:gap-4">
-                  {items.map((item) => (
-                    <CompactMenuItem key={item.id} item={item} />
+                {/* Items Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                  {(activeCategory === "all" ? items.slice(0, 5) : items).map((item) => (
+                    <MenuItemCard key={item.id} item={item} isCompact />
                   ))}
                 </div>
               </div>
@@ -409,14 +604,17 @@ export function DynamicMenu({
 
       {/* Empty State */}
       {filteredCategories.filter(cat => activeCategory === "all" || cat.slug === activeCategory).every(cat => (displayItems[cat.slug] || []).length === 0) && (
-        <div className="text-center py-12">
-          <span className="text-4xl mb-4 block">🍽️</span>
+        <div className="text-center py-16">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ShoppingBag className="h-10 w-10 text-gray-400" />
+          </div>
           <h3 className="text-lg font-semibold text-gray-700 mb-2">No items found</h3>
+          <p className="text-gray-500 mb-4">Try selecting a different category</p>
           <button
             onClick={() => setActiveCategory("all")}
-            className="text-gray-900 font-medium hover:underline"
+            className="text-shawarma font-semibold hover:underline"
           >
-            View all items
+            View all items →
           </button>
         </div>
       )}
