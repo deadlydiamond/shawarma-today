@@ -22,6 +22,9 @@ import {
   LayoutGrid,
   Clock,
   Receipt,
+  CreditCard,
+  AlertCircle,
+  DollarSign,
 } from "lucide-react"
 
 interface CartItem {
@@ -117,7 +120,7 @@ const menuItems: CartItem[] = [
 export default function POSPage() {
   const router = useRouter()
   const { isAuthenticated, loading: authLoading } = useAuth()
-  const { addOrder } = useOrders()
+  const { addOrder, orders, updateOrderStatus, updateOrderNotes } = useOrders()
   
   const [activeCategory, setActiveCategory] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
@@ -129,6 +132,43 @@ export default function POSPage() {
   const [lastReceipt, setLastReceipt] = useState<OrderReceipt | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const receiptRef = useRef<HTMLDivElement>(null)
+  
+  // Payment lookup
+  const [showPaymentLookup, setShowPaymentLookup] = useState(false)
+  const [paymentSearchCode, setPaymentSearchCode] = useState("")
+  const [foundOrder, setFoundOrder] = useState<typeof orders[0] | null>(null)
+  
+  // Search for order by code
+  const searchOrderByCode = () => {
+    const code = paymentSearchCode.trim()
+    if (!code) return
+    
+    // Search in special instructions for the order code
+    const order = orders.find(o => 
+      o.specialInstructions?.includes(`#${code}`) || 
+      o.customer.name.includes(`#${code}`) ||
+      o.id.includes(code)
+    )
+    setFoundOrder(order || null)
+  }
+  
+  // Mark order as paid
+  const markAsPaid = async () => {
+    if (!foundOrder) return
+    
+    // Update special instructions to show PAID
+    const newInstructions = foundOrder.specialInstructions?.replace("💰 UNPAID", "✅ PAID") || "✅ PAID"
+    await updateOrderNotes(foundOrder.id, newInstructions)
+    
+    // Refresh search to show updated status
+    setFoundOrder({ ...foundOrder, specialInstructions: newInstructions })
+  }
+  
+  // Get unpaid orders count
+  const unpaidOrders = orders.filter(o => 
+    o.specialInstructions?.includes("💰 UNPAID") && 
+    !["completed", "cancelled"].includes(o.status)
+  )
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -205,8 +245,8 @@ export default function POSPage() {
         subtotal,
         total,
         tableNumber,
-        specialInstructions: `Ready in ${prepTime} mins (${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })})`,
-        status: "paid", // Walk-in orders are already paid
+        specialInstructions: `#${orderCode} | Ready ${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} | 💰 UNPAID`,
+        status: "preparing", // Start preparing immediately, payment collected later
       })
 
       // Create receipt
@@ -293,9 +333,24 @@ export default function POSPage() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3 text-gray-400 text-sm">
-            <Clock className="h-4 w-4" />
-            {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+          <div className="flex items-center gap-4">
+            {/* Payment Lookup Button */}
+            <button
+              onClick={() => setShowPaymentLookup(true)}
+              className="relative flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors"
+            >
+              <DollarSign className="h-5 w-5" />
+              <span>Payments</span>
+              {unpaidOrders.length > 0 && (
+                <span className="absolute -top-2 -right-2 h-6 w-6 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                  {unpaidOrders.length}
+                </span>
+              )}
+            </button>
+            <div className="flex items-center gap-2 text-gray-400 text-sm">
+              <Clock className="h-4 w-4" />
+              {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+            </div>
           </div>
         </header>
 
@@ -579,6 +634,160 @@ export default function POSPage() {
                 <CheckCircle className="h-5 w-5" />
                 Done
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Lookup Modal */}
+      {showPaymentLookup && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden">
+            {/* Header */}
+            <div className="p-4 bg-amber-500 flex items-center justify-between">
+              <div className="flex items-center gap-3 text-white">
+                <DollarSign className="h-6 w-6" />
+                <h2 className="text-xl font-bold">Payment Lookup</h2>
+              </div>
+              <button
+                onClick={() => {
+                  setShowPaymentLookup(false)
+                  setPaymentSearchCode("")
+                  setFoundOrder(null)
+                }}
+                className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {/* Search */}
+              <div className="flex gap-2 mb-6">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={paymentSearchCode}
+                    onChange={(e) => setPaymentSearchCode(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && searchOrderByCode()}
+                    placeholder="Enter 4-digit order code"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-lg font-mono focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    maxLength={4}
+                  />
+                </div>
+                <button
+                  onClick={searchOrderByCode}
+                  className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors"
+                >
+                  Search
+                </button>
+              </div>
+
+              {/* Result */}
+              {foundOrder ? (
+                <div className="border border-gray-200 rounded-xl overflow-hidden">
+                  {/* Order Header */}
+                  <div className="p-4 bg-gray-50 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Order</p>
+                      <p className="text-xl font-bold text-gray-900">{foundOrder.customer.name}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-gray-900">£{foundOrder.total.toFixed(2)}</p>
+                      <p className="text-sm text-gray-500">
+                        {foundOrder.tableNumber === "counter" ? "Counter" : 
+                         foundOrder.tableNumber === "takeaway" ? "Takeaway" : 
+                         `Table ${foundOrder.tableNumber}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Payment Status */}
+                  <div className="p-4">
+                    {foundOrder.specialInstructions?.includes("💰 UNPAID") ? (
+                      <div className="flex items-center justify-between p-4 bg-red-50 border-2 border-red-200 rounded-xl mb-4">
+                        <div className="flex items-center gap-3">
+                          <AlertCircle className="h-8 w-8 text-red-500" />
+                          <div>
+                            <p className="font-bold text-red-700">PAYMENT NOT COLLECTED</p>
+                            <p className="text-sm text-red-600">Please collect payment before handover</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between p-4 bg-green-50 border-2 border-green-200 rounded-xl mb-4">
+                        <div className="flex items-center gap-3">
+                          <CheckCircle className="h-8 w-8 text-green-500" />
+                          <div>
+                            <p className="font-bold text-green-700">PAYMENT COLLECTED</p>
+                            <p className="text-sm text-green-600">Order is ready for handover</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Items Preview */}
+                    <div className="mb-4">
+                      <p className="text-sm text-gray-500 mb-2">{foundOrder.items.length} items</p>
+                      <div className="text-sm text-gray-600">
+                        {foundOrder.items.slice(0, 3).map((item, i) => (
+                          <span key={i}>{item.quantity}x {item.name}{i < 2 && foundOrder.items.length > 1 ? ", " : ""}</span>
+                        ))}
+                        {foundOrder.items.length > 3 && <span> +{foundOrder.items.length - 3} more</span>}
+                      </div>
+                    </div>
+
+                    {/* Mark as Paid Button */}
+                    {foundOrder.specialInstructions?.includes("💰 UNPAID") && (
+                      <button
+                        onClick={markAsPaid}
+                        className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-colors"
+                      >
+                        <CreditCard className="h-6 w-6" />
+                        Mark Payment Collected
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : paymentSearchCode && (
+                <div className="text-center py-8 text-gray-500">
+                  <AlertCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>No order found with code &quot;{paymentSearchCode}&quot;</p>
+                </div>
+              )}
+
+              {/* Unpaid Orders List */}
+              {unpaidOrders.length > 0 && !foundOrder && (
+                <div className="mt-6">
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                    Unpaid Orders ({unpaidOrders.length})
+                  </h3>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {unpaidOrders.map(order => {
+                      // Extract order code from special instructions
+                      const codeMatch = order.specialInstructions?.match(/#(\d{4})/)
+                      const code = codeMatch ? codeMatch[1] : order.id.slice(-4)
+                      return (
+                        <button
+                          key={order.id}
+                          onClick={() => {
+                            setPaymentSearchCode(code)
+                            setFoundOrder(order)
+                          }}
+                          className="w-full p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl flex items-center justify-between transition-colors text-left"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono font-bold text-red-700">#{code}</span>
+                            <span className="text-gray-700">{order.customer.name.split("#")[0].trim()}</span>
+                          </div>
+                          <span className="font-bold text-gray-900">£{order.total.toFixed(2)}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
