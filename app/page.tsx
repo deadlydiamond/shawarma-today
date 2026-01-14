@@ -44,8 +44,8 @@ export default function Home() {
             className="object-cover"
             priority
           />
-          {/* Black 70% opacity overlay */}
-          <div className="absolute inset-0 bg-black/70" />
+          {/* Black 85% opacity overlay */}
+          <div className="absolute inset-0 bg-black/85" />
         </div>
         
         {/* Content */}
