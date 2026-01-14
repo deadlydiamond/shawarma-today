@@ -423,7 +423,7 @@ export function DynamicMenu({
       {/* Category Pills - Sticky */}
       <div 
         ref={tabsRef}
-        className="sticky top-16 z-40 bg-white/95 backdrop-blur-lg py-4 -mx-6 px-6 border-b border-gray-100"
+        className="sticky top-20 z-40 bg-white/95 backdrop-blur-lg py-4 -mx-6 px-6 border-b border-gray-100"
       >
         <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide md:justify-center">
           {categoryConfig.map((cat) => {
