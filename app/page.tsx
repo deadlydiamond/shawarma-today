@@ -669,18 +669,18 @@ export default function Home() {
               </div>
 
               {/* Contact Card */}
-              <div className="bg-gray-900 rounded-3xl p-6 shadow-lg text-white">
+              <div className="bg-shawarma rounded-3xl p-6 shadow-lg text-white">
                 <h3 className="text-lg font-bold mb-4">Get in Touch</h3>
                 <div className="space-y-4">
                   <a
                     href={`tel:${contentData.phone.replace(/\s/g, "")}`}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors group"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors group"
                   >
-                    <div className="p-2 rounded-lg bg-shawarma">
-                      <Phone className="h-4 w-4 text-white" />
+                    <div className="p-2 rounded-lg bg-white">
+                      <Phone className="h-4 w-4 text-shawarma" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-400">Call to order</p>
+                      <p className="text-xs text-white/70">Call to order</p>
                       <p className="font-semibold">{contentData.phone}</p>
                     </div>
                   </a>
@@ -689,7 +689,7 @@ export default function Home() {
                     href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contentData.address.line1 + ', ' + contentData.address.city + ' ' + contentData.address.postcode)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-shawarma hover:bg-shawarma-600 rounded-xl font-semibold transition-colors"
+                    className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white text-shawarma hover:bg-white/90 rounded-xl font-semibold transition-colors"
                   >
                     <MapPin className="h-4 w-4" />
                     Get Directions
