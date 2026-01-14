@@ -41,6 +41,8 @@ interface OrderReceipt {
   customer: string
   tableNumber: string
   timestamp: Date
+  prepTime: number // minutes until ready
+  readyTime: Date // calculated ready time
 }
 
 // Generate a random 4-digit order code
@@ -122,6 +124,7 @@ export default function POSPage() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [customerName, setCustomerName] = useState("")
   const [tableNumber, setTableNumber] = useState("counter")
+  const [prepTime, setPrepTime] = useState(10) // default 10 minutes
   const [showReceipt, setShowReceipt] = useState(false)
   const [lastReceipt, setLastReceipt] = useState<OrderReceipt | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -182,6 +185,8 @@ export default function POSPage() {
     // Generate 4-digit order code
     const orderCode = generateOrderCode()
     const displayName = customerName.trim() || `Order #${orderCode}`
+    const now = new Date()
+    const readyTime = new Date(now.getTime() + prepTime * 60000)
     
     try {
       const orderItems = cart.map(item => ({
@@ -200,7 +205,7 @@ export default function POSPage() {
         subtotal,
         total,
         tableNumber,
-        specialInstructions: "",
+        specialInstructions: `Ready in ${prepTime} mins (${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })})`,
         status: "paid", // Walk-in orders are already paid
       })
 
@@ -213,7 +218,9 @@ export default function POSPage() {
         total,
         customer: customerName.trim() || "",
         tableNumber,
-        timestamp: new Date(),
+        timestamp: now,
+        prepTime,
+        readyTime,
       }
 
       setLastReceipt(receipt)
@@ -221,6 +228,7 @@ export default function POSPage() {
       setCart([])
       setCustomerName("")
       setTableNumber("counter")
+      setPrepTime(10) // Reset to default
     } catch (error) {
       console.error("Failed to place order:", error)
     } finally {
@@ -390,6 +398,27 @@ export default function POSPage() {
                 </button>
               ))}
             </div>
+            {/* Prep Time Selector */}
+            <div>
+              <p className="text-gray-400 text-xs mb-2 flex items-center gap-1">
+                <Clock className="h-3 w-3" /> Ready in
+              </p>
+              <div className="flex gap-2">
+                {[5, 10, 15, 20, 30].map(mins => (
+                  <button
+                    key={mins}
+                    onClick={() => setPrepTime(mins)}
+                    className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${
+                      prepTime === mins
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                    }`}
+                  >
+                    {mins}m
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -486,9 +515,18 @@ export default function POSPage() {
                 <p className="text-white text-5xl font-bold tracking-wider">{lastReceipt.orderCode}</p>
               </div>
 
+              {/* Ready Time - Prominent */}
+              <div className="text-center mb-4 p-4 bg-green-500 rounded-xl">
+                <p className="text-white/80 text-sm font-medium">READY AT</p>
+                <p className="text-white text-3xl font-bold">
+                  {lastReceipt.readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                </p>
+                <p className="text-white/80 text-sm">~{lastReceipt.prepTime} minutes</p>
+              </div>
+
               <div className="text-center mb-4">
                 <p className="text-sm text-gray-500">
-                  {lastReceipt.timestamp.toLocaleDateString("en-GB")} {lastReceipt.timestamp.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                  Ordered: {lastReceipt.timestamp.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
 
