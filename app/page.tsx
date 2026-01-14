@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Section } from "@/components/ui/Section"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { Beef, UtensilsCrossed, Salad, Heart, MapPin, Phone, Clock, ArrowRight, Star, Camera, Percent, Tag } from "lucide-react"
+import { Beef, UtensilsCrossed, Salad, Heart, MapPin, Phone, Clock, Star, Camera, Percent, Tag } from "lucide-react"
 import contentData from "@/src/content/content.json"
 import PopularTimes from "@/components/ui/PopularTimes"
 import { DynamicMenu } from "@/components/ui/DynamicMenu"
@@ -62,12 +62,11 @@ export default function Home() {
               Traditional Middle Eastern flavours, served fast and fresh
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a href="#menu" className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-white text-shawarma-black hover:bg-gray-100 min-w-[160px] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg group">
-                View Menu
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <a href="#menu" className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-white text-shawarma-black hover:bg-gray-100 min-w-[160px] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
+                <UtensilsCrossed className="h-5 w-5" /> View Menu
               </a>
-              <a href="#contact" className="inline-flex items-center justify-center px-8 py-3 bg-shawarma border-2 border-shawarma text-white hover:bg-[#d95a1e] min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
-                Visit Us
+              <a href="#contact" className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-shawarma border-2 border-shawarma text-white hover:bg-[#d95a1e] min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
+                <MapPin className="h-5 w-5" /> Visit Us
               </a>
             </div>
           </div>
@@ -182,8 +181,8 @@ export default function Home() {
                   </div>
                 </div>
                 <CardContent className="p-3">
-                  <span className="text-xs font-medium text-gray-500 group-hover:text-gray-900 transition-colors flex items-center gap-1">
-                    View Menu <ArrowRight className="h-3 w-3" />
+                  <span className="text-xs font-medium text-gray-500 group-hover:text-gray-900 transition-colors flex items-center gap-2">
+                    <UtensilsCrossed className="h-3 w-3" /> View Menu
                   </span>
                 </CardContent>
               </Card>
@@ -567,14 +566,14 @@ export default function Home() {
                 href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contentData.address.line1 + ', ' + contentData.address.city + ' ' + contentData.address.postcode)}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="flex items-center gap-3"
               >
-                <MapPin className="h-4 w-4" /> Get Directions
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <MapPin className="h-5 w-5" /> Get Directions
               </a>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <a href={`tel:${contentData.phone.replace(/\s/g, "")}`}>
-                Call Us
+              <a href={`tel:${contentData.phone.replace(/\s/g, "")}`} className="flex items-center gap-3">
+                <Phone className="h-5 w-5" /> Call Us
               </a>
             </Button>
           </div>
