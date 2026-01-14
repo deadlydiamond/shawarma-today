@@ -23,6 +23,7 @@ import {
   Clock,
   Receipt,
   CreditCard,
+  Banknote,
   AlertCircle,
   DollarSign,
 } from "lucide-react"
@@ -129,11 +130,10 @@ export default function POSPage() {
   const [customerName, setCustomerName] = useState("")
   const [tableNumber, setTableNumber] = useState("counter")
   const [prepTime, setPrepTime] = useState(10) // default 10 minutes
-  const [paidNow, setPaidNow] = useState(false) // Payment collected at order time
-  const [showPaymentConfirm, setShowPaymentConfirm] = useState(false) // Payment confirmation popup
   const [showReceipt, setShowReceipt] = useState(false)
   const [lastReceipt, setLastReceipt] = useState<OrderReceipt | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [showReceiptPaymentOptions, setShowReceiptPaymentOptions] = useState(false)
   const receiptRef = useRef<HTMLDivElement>(null)
   
   // Payment lookup
@@ -245,15 +245,13 @@ export default function POSPage() {
         description: "",
       }))
 
-      const paymentStatus = paidNow ? "✅ PAID" : "💰 UNPAID"
-      
       const orderId = await addOrder({
         items: orderItems,
         customer: { name: displayName, phone: "" },
         subtotal,
         total,
         tableNumber,
-        specialInstructions: `#${orderCode} | Ready ${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} | ${paymentStatus}`,
+        specialInstructions: `#${orderCode} | Ready ${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} | 💰 UNPAID`,
         status: "preparing", // Start preparing immediately
       })
 
@@ -269,7 +267,7 @@ export default function POSPage() {
         timestamp: now,
         prepTime,
         readyTime,
-        isPaid: paidNow,
+        isPaid: false, // Payment collected after order via receipt popup
       }
 
       setLastReceipt(receipt)
@@ -278,7 +276,6 @@ export default function POSPage() {
       setCustomerName("")
       setTableNumber("counter")
       setPrepTime(10) // Reset to default
-      setPaidNow(false) // Reset payment toggle
     } catch (error) {
       console.error("Failed to place order:", error)
     } finally {
@@ -547,21 +544,6 @@ export default function POSPage() {
           </div>
           
           {/* Payment Status */}
-          {paidNow ? (
-            <div className="w-full py-3 mb-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-green-500 text-white">
-              <CheckCircle className="h-5 w-5" />
-              Payment Collected ✓
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowPaymentConfirm(true)}
-              className="w-full py-3 mb-3 rounded-xl font-semibold flex items-center justify-center gap-2 bg-gray-700 text-gray-300 border-2 border-dashed border-gray-500 hover:bg-gray-600 transition-all"
-            >
-              <CreditCard className="h-5 w-5" />
-              Tap to Collect Payment
-            </button>
-          )}
-          
           <button
             onClick={handlePlaceOrder}
             disabled={cart.length === 0 || isProcessing}
@@ -656,25 +638,64 @@ export default function POSPage() {
 
             {/* Actions */}
             <div className="p-4 bg-gray-50 space-y-3">
-              {/* Mark as Paid button - only if not paid */}
-              {!lastReceipt.isPaid && (
+              {/* Collect Payment section - only if not paid */}
+              {!lastReceipt.isPaid && !showReceiptPaymentOptions && (
                 <button
-                  onClick={async () => {
-                    // Find and update the order
-                    const order = orders.find(o => 
-                      o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
-                    )
-                    if (order) {
-                      const newInstructions = order.specialInstructions?.replace("💰 UNPAID", "✅ PAID") || "✅ PAID"
-                      await updateOrderNotes(order.id, newInstructions)
-                    }
-                    setLastReceipt({ ...lastReceipt, isPaid: true })
-                  }}
+                  onClick={() => setShowReceiptPaymentOptions(true)}
                   className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
                 >
                   <CreditCard className="h-6 w-6" />
                   Collect Payment • £{lastReceipt.total.toFixed(2)}
                 </button>
+              )}
+
+              {/* Payment Options - Cash or Card */}
+              {!lastReceipt.isPaid && showReceiptPaymentOptions && (
+                <div className="bg-white rounded-xl border-2 border-green-200 p-4">
+                  <p className="text-center text-gray-600 mb-3 font-medium">Select Payment Method</p>
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <button
+                      onClick={async () => {
+                        const order = orders.find(o => 
+                          o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
+                        )
+                        if (order) {
+                          const newInstructions = order.specialInstructions?.replace("💰 UNPAID", "✅ PAID (Cash)") || "✅ PAID (Cash)"
+                          await updateOrderNotes(order.id, newInstructions)
+                        }
+                        setLastReceipt({ ...lastReceipt, isPaid: true })
+                        setShowReceiptPaymentOptions(false)
+                      }}
+                      className="p-4 bg-green-100 hover:bg-green-200 rounded-xl text-center transition-colors border-2 border-green-300"
+                    >
+                      <Banknote className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                      <span className="font-bold text-green-700">Cash</span>
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const order = orders.find(o => 
+                          o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
+                        )
+                        if (order) {
+                          const newInstructions = order.specialInstructions?.replace("💰 UNPAID", "✅ PAID (Card)") || "✅ PAID (Card)"
+                          await updateOrderNotes(order.id, newInstructions)
+                        }
+                        setLastReceipt({ ...lastReceipt, isPaid: true })
+                        setShowReceiptPaymentOptions(false)
+                      }}
+                      className="p-4 bg-blue-100 hover:bg-blue-200 rounded-xl text-center transition-colors border-2 border-blue-300"
+                    >
+                      <CreditCard className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                      <span className="font-bold text-blue-700">Card</span>
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setShowReceiptPaymentOptions(false)}
+                    className="w-full py-2 text-gray-500 hover:text-gray-700 text-sm font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
               )}
               
               <div className="flex gap-3">
@@ -686,7 +707,10 @@ export default function POSPage() {
                   Print
                 </button>
                 <button
-                  onClick={() => setShowReceipt(false)}
+                  onClick={() => {
+                    setShowReceipt(false)
+                    setShowReceiptPaymentOptions(false)
+                  }}
                   className="flex-1 py-3 bg-shawarma hover:bg-shawarma-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
                 >
                   <CheckCircle className="h-5 w-5" />
@@ -852,68 +876,6 @@ export default function POSPage() {
         </div>
       )}
 
-      {/* Payment Confirmation Popup */}
-      {showPaymentConfirm && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
-          <div className="bg-white rounded-2xl max-w-sm w-full overflow-hidden">
-            {/* Header */}
-            <div className="p-6 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="h-8 w-8 text-green-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Collect Payment</h2>
-              <p className="text-4xl font-bold text-green-600 mb-2">£{total.toFixed(2)}</p>
-              <p className="text-gray-500">Confirm payment has been received</p>
-            </div>
-
-            {/* Payment Methods */}
-            <div className="px-6 pb-4">
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => {
-                    setPaidNow(true)
-                    setShowPaymentConfirm(false)
-                  }}
-                  className="p-4 bg-gray-100 hover:bg-gray-200 rounded-xl text-center transition-colors"
-                >
-                  <span className="text-2xl mb-1 block">💵</span>
-                  <span className="font-semibold text-gray-700">Cash</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setPaidNow(true)
-                    setShowPaymentConfirm(false)
-                  }}
-                  className="p-4 bg-gray-100 hover:bg-gray-200 rounded-xl text-center transition-colors"
-                >
-                  <span className="text-2xl mb-1 block">💳</span>
-                  <span className="font-semibold text-gray-700">Card</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="p-4 bg-gray-50 flex gap-3">
-              <button
-                onClick={() => setShowPaymentConfirm(false)}
-                className="flex-1 py-3 border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl font-semibold transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setPaidNow(true)
-                  setShowPaymentConfirm(false)
-                }}
-                className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
-              >
-                <CheckCircle className="h-5 w-5" />
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
