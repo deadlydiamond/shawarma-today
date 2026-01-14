@@ -137,6 +137,15 @@ export default function POSPage() {
   const [showReceiptPaymentOptions, setShowReceiptPaymentOptions] = useState(false)
   const receiptRef = useRef<HTMLDivElement>(null)
   
+  // Industry-standard POS features
+  const [heldOrders, setHeldOrders] = useState<Array<{ id: string; name: string; items: CartItem[]; table: string; time: Date }>>([])
+  const [showHeldOrders, setShowHeldOrders] = useState(false)
+  const [discount, setDiscount] = useState(0) // Percentage discount
+  const [showDiscount, setShowDiscount] = useState(false)
+  const [cashTendered, setCashTendered] = useState(0)
+  const [showCashDrawer, setShowCashDrawer] = useState(false)
+  const [orderNotes, setOrderNotes] = useState("")
+  
   // Payment lookup
   const [showPaymentLookup, setShowPaymentLookup] = useState(false)
   const [paymentSearchCode, setPaymentSearchCode] = useState("")
@@ -176,6 +185,60 @@ export default function POSPage() {
     o.specialInstructions?.includes("💰 UNPAID") && 
     !["completed", "cancelled"].includes(o.status)
   )
+
+  // Hold/Park current order
+  const holdOrder = () => {
+    if (cart.length === 0) return
+    const heldOrder = {
+      id: `held-${Date.now()}`,
+      name: customerName || `Table ${tableNumber}`,
+      items: [...cart],
+      table: tableNumber,
+      time: new Date()
+    }
+    setHeldOrders(prev => [...prev, heldOrder])
+    clearCart()
+  }
+
+  // Recall held order
+  const recallOrder = (heldId: string) => {
+    const held = heldOrders.find(h => h.id === heldId)
+    if (held) {
+      setCart(held.items)
+      setTableNumber(held.table)
+      setCustomerName(held.name)
+      setHeldOrders(prev => prev.filter(h => h.id !== heldId))
+      setShowHeldOrders(false)
+    }
+  }
+
+  // Delete held order
+  const deleteHeldOrder = (heldId: string) => {
+    setHeldOrders(prev => prev.filter(h => h.id !== heldId))
+  }
+
+  // Clear cart
+  const clearCart = () => {
+    setCart([])
+    setCustomerName("")
+    setTableNumber("counter")
+    setDiscount(0)
+    setOrderNotes("")
+  }
+
+  // Apply discount
+  const applyDiscount = (percent: number) => {
+    setDiscount(percent)
+    setShowDiscount(false)
+  }
+
+  // Calculate totals with discount
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const discountAmount = subtotal * (discount / 100)
+  const total = subtotal - discountAmount
+
+  // Calculate change
+  const changeDue = cashTendered > 0 ? cashTendered - total : 0
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -246,13 +309,23 @@ export default function POSPage() {
         description: "",
       }))
 
+      // Build special instructions
+      let instructions = `#${orderCode} | Ready ${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}`
+      if (discount > 0) {
+        instructions += ` | ${discount}% OFF (-£${discountAmount.toFixed(2)})`
+      }
+      if (orderNotes.trim()) {
+        instructions += ` | Note: ${orderNotes.trim()}`
+      }
+      instructions += " | 💰 UNPAID"
+
       const orderId = await addOrder({
         items: orderItems,
         customer: { name: displayName, phone: "" },
         subtotal,
         total,
         tableNumber,
-        specialInstructions: `#${orderCode} | Ready ${readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} | 💰 UNPAID`,
+        specialInstructions: instructions,
         status: "preparing", // Start preparing immediately
       })
 
@@ -273,10 +346,7 @@ export default function POSPage() {
 
       setLastReceipt(receipt)
       setShowReceipt(true)
-      setCart([])
-      setCustomerName("")
-      setTableNumber("counter")
-      setPrepTime(10) // Reset to default
+      clearCart() // Use clearCart to reset all states
     } catch (error) {
       console.error("Failed to place order:", error)
     } finally {
@@ -419,19 +489,70 @@ export default function POSPage() {
       <div className="w-[400px] bg-gray-800 flex flex-col h-full border-l border-gray-700">
         {/* Cart Header */}
         <div className="p-4 border-b border-gray-700">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <ShoppingBag className="h-5 w-5" />
               Current Order
             </h2>
-            {cart.length > 0 && (
-              <button
-                onClick={clearCart}
-                className="text-red-400 hover:text-red-300 text-sm"
-              >
-                Clear All
-              </button>
-            )}
+            <div className="flex items-center gap-2">
+              {heldOrders.length > 0 && (
+                <button
+                  onClick={() => setShowHeldOrders(true)}
+                  className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg flex items-center gap-1"
+                >
+                  <Clock className="h-3 w-3" />
+                  {heldOrders.length} Held
+                </button>
+              )}
+              {cart.length > 0 && (
+                <button
+                  onClick={clearCart}
+                  className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-lg"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Action Buttons - Industry Standard */}
+          <div className="grid grid-cols-4 gap-2 mb-3">
+            <button
+              onClick={holdOrder}
+              disabled={cart.length === 0}
+              className="py-2 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-700 disabled:text-gray-500 text-white text-xs font-bold rounded-lg transition-colors"
+            >
+              HOLD
+            </button>
+            <button
+              onClick={() => setShowDiscount(true)}
+              disabled={cart.length === 0}
+              className="py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 disabled:text-gray-500 text-white text-xs font-bold rounded-lg transition-colors"
+            >
+              {discount > 0 ? `${discount}% OFF` : "DISC"}
+            </button>
+            <button
+              onClick={() => setShowHeldOrders(true)}
+              className="py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors relative"
+            >
+              RECALL
+              {heldOrders.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center">
+                  {heldOrders.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setShowPaymentLookup(true)}
+              className="py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-colors relative"
+            >
+              LOOKUP
+              {unpaidOrders.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center">
+                  {unpaidOrders.length}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Customer & Table */}
@@ -443,35 +564,35 @@ export default function POSPage() {
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 placeholder="Customer Name (optional)"
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-700 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-shawarma"
+                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-shawarma text-sm"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               {["counter", "1", "2", "3", "4", "5", "takeaway"].map(t => (
                 <button
                   key={t}
                   onClick={() => setTableNumber(t)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                     tableNumber === t
                       ? "bg-shawarma text-white"
                       : "bg-gray-700 text-gray-400 hover:bg-gray-600"
                   }`}
                 >
-                  {t === "counter" ? "Cntr" : t === "takeaway" ? "T/A" : `T${t}`}
+                  {t === "counter" ? "CNT" : t === "takeaway" ? "T/A" : `T${t}`}
                 </button>
               ))}
             </div>
             {/* Prep Time Selector */}
-            <div>
-              <p className="text-gray-400 text-xs mb-2 flex items-center gap-1">
-                <Clock className="h-3 w-3" /> Ready in
-              </p>
-              <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-400 text-xs flex items-center gap-1">
+                <Clock className="h-3 w-3" /> Ready:
+              </span>
+              <div className="flex gap-1 flex-1">
                 {[5, 10, 15, 20, 30].map(mins => (
                   <button
                     key={mins}
                     onClick={() => setPrepTime(mins)}
-                    className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                       prepTime === mins
                         ? "bg-green-500 text-white"
                         : "bg-gray-700 text-gray-400 hover:bg-gray-600"
@@ -533,29 +654,48 @@ export default function POSPage() {
           )}
         </div>
 
-        {/* Cart Footer */}
-        <div className="p-4 border-t border-gray-700 bg-gray-800">
-          <div className="flex justify-between text-gray-400 text-sm mb-2">
-            <span>Subtotal</span>
-            <span>£{subtotal.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-white text-xl font-bold mb-3">
-            <span>Total</span>
-            <span>£{total.toFixed(2)}</span>
+        {/* Cart Footer - Industry Standard Totals */}
+        <div className="p-4 border-t border-gray-700 bg-gray-900">
+          {/* Totals Breakdown */}
+          <div className="space-y-1 mb-3">
+            <div className="flex justify-between text-gray-400 text-sm">
+              <span>Subtotal ({cart.reduce((sum, i) => sum + i.quantity, 0)} items)</span>
+              <span>£{subtotal.toFixed(2)}</span>
+            </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-green-400 text-sm">
+                <span className="flex items-center gap-1">
+                  Discount ({discount}%)
+                  <button onClick={() => setDiscount(0)} className="text-red-400 hover:text-red-300">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+                <span>-£{discountAmount.toFixed(2)}</span>
+              </div>
+            )}
           </div>
           
-          {/* Payment Status */}
+          {/* Total - Large & Prominent */}
+          <div className="flex justify-between items-center text-white text-2xl font-bold mb-4 py-2 border-t border-gray-700">
+            <span>TOTAL</span>
+            <span className="text-green-400">£{total.toFixed(2)}</span>
+          </div>
+          
+          {/* Place Order Button - Large & Prominent */}
           <button
             onClick={handlePlaceOrder}
             disabled={cart.length === 0 || isProcessing}
-            className="w-full py-4 bg-shawarma hover:bg-shawarma-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-colors"
+            className="w-full py-5 bg-green-500 hover:bg-green-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded-xl font-bold text-xl flex items-center justify-center gap-3 transition-colors shadow-lg"
           >
             {isProcessing ? (
-              <>Processing...</>
+              <span className="flex items-center gap-2">
+                <RefreshCw className="h-6 w-6 animate-spin" />
+                Processing...
+              </span>
             ) : (
               <>
-                <Receipt className="h-5 w-5" />
-                Place Order • £{total.toFixed(2)}
+                <Receipt className="h-6 w-6" />
+                PLACE ORDER
               </>
             )}
           </button>
@@ -916,6 +1056,124 @@ export default function POSPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Held Orders Modal */}
+      {showHeldOrders && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden">
+            <div className="p-4 bg-amber-500 flex items-center justify-between">
+              <div className="flex items-center gap-3 text-white">
+                <Clock className="h-6 w-6" />
+                <h2 className="text-xl font-bold">Held Orders ({heldOrders.length})</h2>
+              </div>
+              <button
+                onClick={() => setShowHeldOrders(false)}
+                className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-4 max-h-[60vh] overflow-y-auto">
+              {heldOrders.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <Clock className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                  <p className="font-medium">No held orders</p>
+                  <p className="text-sm">Use HOLD to park orders for later</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {heldOrders.map(held => (
+                    <div key={held.id} className="border border-gray-200 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p className="font-bold text-gray-900">{held.name || "No Name"}</p>
+                          <p className="text-sm text-gray-500">
+                            {held.table === "counter" ? "Counter" : held.table === "takeaway" ? "Takeaway" : `Table ${held.table}`}
+                            {" • "}
+                            {held.time.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                        </div>
+                        <p className="text-xl font-bold text-gray-900">
+                          £{held.items.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="text-sm text-gray-600 mb-3">
+                        {held.items.map(i => `${i.quantity}x ${i.name}`).join(", ")}
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => recallOrder(held.id)}
+                          className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-colors"
+                        >
+                          Recall
+                        </button>
+                        <button
+                          onClick={() => deleteHeldOrder(held.id)}
+                          className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Discount Modal */}
+      {showDiscount && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-white rounded-2xl max-w-sm w-full overflow-hidden">
+            <div className="p-4 bg-purple-500 flex items-center justify-between">
+              <div className="flex items-center gap-3 text-white">
+                <DollarSign className="h-6 w-6" />
+                <h2 className="text-xl font-bold">Apply Discount</h2>
+              </div>
+              <button
+                onClick={() => setShowDiscount(false)}
+                className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-center text-gray-600 mb-4">Select discount percentage</p>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {[5, 10, 15, 20, 25, 50].map(percent => (
+                  <button
+                    key={percent}
+                    onClick={() => applyDiscount(percent)}
+                    className={`py-4 rounded-xl text-lg font-bold transition-colors ${
+                      discount === percent
+                        ? "bg-purple-500 text-white"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                    }`}
+                  >
+                    {percent}%
+                  </button>
+                ))}
+              </div>
+              <div className="border-t pt-4">
+                <p className="text-sm text-gray-500 text-center mb-2">Subtotal: £{subtotal.toFixed(2)}</p>
+                {discount > 0 && (
+                  <p className="text-lg font-bold text-center text-green-600">
+                    After {discount}% off: £{(subtotal - subtotal * discount / 100).toFixed(2)}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setShowDiscount(false)}
+                className="w-full mt-4 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold transition-colors"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>
