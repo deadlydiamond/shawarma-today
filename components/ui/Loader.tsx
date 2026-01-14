@@ -29,7 +29,7 @@ export default function Loader() {
   if (!loading) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0E0E0E]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#f7451b]">
       <div className="flex flex-col items-center gap-6">
         {/* Lottie Animation */}
         {animationData ? (
