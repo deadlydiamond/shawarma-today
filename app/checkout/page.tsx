@@ -4,27 +4,21 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useCart } from "@/contexts/CartContext"
 import { useOrders } from "@/contexts/OrderContext"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Section } from "@/components/ui/Section"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { ArrowLeft, Loader2, User, MapPin, MessageSquare, Clock } from "lucide-react"
+import { ArrowLeft, Loader2, User, MapPin, MessageSquare, Clock, Minus, Plus, Trash2, ShoppingBag, CreditCard, Shield, ChefHat, Sparkles, ArrowRight, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { Minus, Plus, X } from "lucide-react"
 
 export default function Checkout() {
   const router = useRouter()
-  const { cartItems, updateQuantity, removeFromCart, getTotalPrice, clearCart } = useCart()
+  const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, clearCart } = useCart()
   const { addOrder, orders } = useOrders()
   
-  // Calculate estimated wait time based on queue
   const getEstimatedWaitTime = () => {
     const activeOrders = orders.filter(o => 
       o.status === "paid" || o.status === "preparing"
     ).length
-    // Base time: 10-15 min + 3 min per order in queue
     const baseMin = 10 + (activeOrders * 3)
     const baseMax = 15 + (activeOrders * 3)
     return {
@@ -32,6 +26,7 @@ export default function Checkout() {
       max: Math.min(baseMax, 45)
     }
   }
+
   const [orderType, setOrderType] = useState<"dine-in" | "takeaway">("dine-in")
   const [formData, setFormData] = useState({
     name: "",
@@ -43,9 +38,7 @@ export default function Checkout() {
   const [errors, setErrors] = useState<{ name?: string; phone?: string; tableNumber?: string; pickupTime?: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const formatPrice = (price: number) => {
-    return `£${price.toFixed(2)}`
-  }
+  const formatPrice = (price: number) => `£${price.toFixed(2)}`
 
   const getItemPrice = (item: any) => {
     let priceStr = item.price
@@ -57,20 +50,15 @@ export default function Checkout() {
     return parseFloat(priceStr.replace("£", "").replace("+", ""))
   }
 
-  // Generate pickup time options (next 2 hours in 15 min intervals)
   const getPickupTimeOptions = () => {
     const options: { value: string; label: string }[] = []
     const now = new Date()
-    
-    // Round up to next 15 minutes + add 10 min buffer for preparation
     const minutes = now.getMinutes()
     const roundedMinutes = Math.ceil((minutes + 10) / 15) * 15
     now.setMinutes(roundedMinutes, 0, 0)
     
-    // Add "ASAP" option
-    options.push({ value: "asap", label: "ASAP (as soon as ready)" })
+    options.push({ value: "asap", label: "🚀 ASAP (as soon as ready)" })
     
-    // Generate time slots for next 2 hours
     for (let i = 0; i < 8; i++) {
       const time = new Date(now.getTime() + i * 15 * 60 * 1000)
       const hours = time.getHours()
@@ -86,26 +74,22 @@ export default function Checkout() {
   const validateForm = () => {
     const newErrors: { name?: string; phone?: string; tableNumber?: string; pickupTime?: string } = {}
     
-    // Name validation
     if (!formData.name.trim()) {
       newErrors.name = "Name is required"
     } else if (formData.name.trim().length < 2) {
       newErrors.name = "Name must be at least 2 characters"
     }
     
-    // Phone validation
     if (!formData.phone.trim()) {
       newErrors.phone = "Phone number is required"
     } else if (!/^[\d\s+()-]{10,}$/.test(formData.phone.trim())) {
       newErrors.phone = "Please enter a valid phone number"
     }
     
-    // Table number validation - only required for dine-in
     if (orderType === "dine-in" && !formData.tableNumber.trim()) {
       newErrors.tableNumber = "Please select your table"
     }
     
-    // Pickup time validation - required for both
     if (!formData.pickupTime) {
       newErrors.pickupTime = "Please select a pickup time"
     }
@@ -117,13 +101,10 @@ export default function Checkout() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm()) return
 
     setIsSubmitting(true)
 
-    // Create order
     const orderItems = cartItems.map(item => ({
       id: item.id,
       name: item.name,
@@ -147,10 +128,8 @@ export default function Checkout() {
     })
 
     if (newOrderId) {
-      // Save phone for order lookup
       localStorage.setItem("customer_phone", formData.phone)
       clearCart()
-      // Redirect to order tracking page
       router.push(`/order/${newOrderId}`)
     } else {
       alert("Failed to place order. Please try again.")
@@ -165,403 +144,376 @@ export default function Checkout() {
     })
   }
 
+  const isFormValid = formData.name.trim() && formData.phone.trim() && formData.pickupTime && (orderType === "takeaway" || formData.tableNumber)
+
+  // Empty Cart State
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <Section className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <h2 className="text-3xl font-semibold mb-4">Your cart is empty</h2>
-            <p className="text-foreground/60 mb-8">Add items from the menu to continue</p>
-            <Button asChild>
-              <Link href="/#menu">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Menu
-              </Link>
-            </Button>
+        <main className="pt-24 pb-20 px-4">
+          <div className="max-w-md mx-auto text-center">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ShoppingBag className="h-10 w-10 text-gray-300" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Your cart is empty</h2>
+            <p className="text-gray-500 mb-8">Add some delicious items to get started!</p>
+            <Link 
+              href="/#menu"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-shawarma hover:bg-shawarma-600 text-white font-semibold rounded-2xl transition-all hover:scale-105"
+            >
+              <Sparkles className="h-5 w-5" />
+              Browse Menu
+            </Link>
           </div>
-        </Section>
+        </main>
         <Footer />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      <Section>
+      <main className="pt-24 pb-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <Link href="/#menu" className="inline-flex items-center gap-2 text-foreground/70 hover:text-foreground mb-8 transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Menu
-          </Link>
+          
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <Link 
+              href="/#menu" 
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              <span className="font-medium">Back to Menu</span>
+            </Link>
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Shield className="h-4 w-4 text-green-500" />
+              Secure Checkout
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Order Summary */}
-            <div className="lg:col-span-2">
-              <Card className="mb-6">
-                <CardContent className="p-6">
-                  <h2 className="text-2xl font-semibold mb-6">Order Summary</h2>
-                  <div className="space-y-4">
-                    {cartItems.map((item) => {
-                      const itemPrice = getItemPrice(item)
-                      return (
-                        <div key={`${item.id}-${item.selectedSize}`} className="flex gap-4 pb-4 border-b border-border/50 last:border-0">
-                          <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between mb-2">
-                              <div>
-                                <h3 className="font-semibold text-sm text-foreground">{item.name}</h3>
-                                {item.selectedSize && item.selectedSize !== "regular" && (
-                                  <p className="text-xs text-foreground/60 capitalize">{item.selectedSize}</p>
-                                )}
-                              </div>
-                              <button
-                                onClick={() => removeFromCart(item.id, item.selectedSize)}
-                                className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                aria-label="Remove item"
-                              >
-                                <X className="h-4 w-4 text-foreground/60" />
-                              </button>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedSize)}
-                                  className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                  aria-label="Decrease quantity"
-                                >
-                                  <Minus className="h-4 w-4 text-foreground/70" />
-                                </button>
-                                <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
-                                <button
-                                  onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedSize)}
-                                  className="p-1 hover:bg-gray-100 rounded transition-colors"
-                                  aria-label="Increase quantity"
-                                >
-                                  <Plus className="h-4 w-4 text-foreground/70" />
-                                </button>
-                              </div>
-                              <p className="font-semibold text-sm">{formatPrice(itemPrice * item.quantity)}</p>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-
+            
+            {/* Left Column - Forms */}
+            <div className="lg:col-span-2 space-y-6">
+              
               {/* Order Type Selection */}
-              <Card className="mb-6">
-                <CardContent className="p-6">
-                  <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
-                    <MapPin className="h-6 w-6" />
-                    Order Type
-                  </h2>
-                  <p className="text-sm text-foreground/60 mb-4">How would you like your order?</p>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setOrderType("dine-in")}
-                      className={`p-4 rounded-xl border-2 transition-all text-left ${
-                        orderType === "dine-in"
-                          ? "border-green-500 bg-green-50 ring-2 ring-green-200"
-                          : "border-gray-200 hover:border-gray-300 bg-white"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          orderType === "dine-in" ? "bg-green-500 text-white" : "bg-gray-100 text-gray-500"
-                        }`}>
-                          🍽️
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">Dine In</p>
-                          <p className="text-xs text-foreground/60">Eat at the café</p>
-                        </div>
-                      </div>
-                      {orderType === "dine-in" && (
-                        <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
-                          ✓ Selected
-                        </div>
-                      )}
-                    </button>
-                    
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOrderType("takeaway")
-                        setFormData({ ...formData, tableNumber: "" })
-                        setErrors({ ...errors, tableNumber: undefined })
-                      }}
-                      className={`p-4 rounded-xl border-2 transition-all text-left ${
-                        orderType === "takeaway"
-                          ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
-                          : "border-gray-200 hover:border-gray-300 bg-white"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          orderType === "takeaway" ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-500"
-                        }`}>
-                          🥡
-                        </div>
-                        <div>
-                          <p className="font-semibold text-foreground">Takeaway</p>
-                          <p className="text-xs text-foreground/60">Take your order to go</p>
-                        </div>
-                      </div>
-                      {orderType === "takeaway" && (
-                        <div className="mt-2 text-xs text-blue-600 flex items-center gap-1">
-                          ✓ Selected
-                        </div>
-                      )}
-                    </button>
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="p-2.5 bg-shawarma rounded-xl">
+                    <MapPin className="h-5 w-5 text-white" />
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Customer Information */}
-              <Card className="mb-6">
-                <CardContent className="p-6">
-                  <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
-                    <User className="h-6 w-6" />
-                    Your Details
-                  </h2>
-                  <p className="text-sm text-foreground/60 mb-6">For order identification</p>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-medium mb-2">
-                        Name *
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={(e) => {
-                          handleChange(e)
-                          if (errors.name) setErrors({ ...errors, name: undefined })
-                        }}
-                        placeholder="Your name"
-                        className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white ${
-                          errors.name 
-                            ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
-                            : "border-foreground/20 focus:ring-foreground/20 focus:border-foreground/40"
-                        }`}
-                      />
-                      {errors.name && (
-                        <p className="mt-1 text-sm text-red-500">{errors.name}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                        Phone Number *
-                      </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={(e) => {
-                          handleChange(e)
-                          if (errors.phone) setErrors({ ...errors, phone: undefined })
-                        }}
-                        placeholder="e.g. 07123 456789"
-                        className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white ${
-                          errors.phone 
-                            ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
-                            : "border-foreground/20 focus:ring-foreground/20 focus:border-foreground/40"
-                        }`}
-                      />
-                      {errors.phone && (
-                        <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
-                      )}
-                    </div>
-                    
-                    {/* Table Number - Only for Dine In */}
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Order Type</h2>
+                    <p className="text-sm text-gray-500">How would you like your order?</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setOrderType("dine-in")}
+                    className={`relative p-5 rounded-2xl border-2 transition-all ${
+                      orderType === "dine-in"
+                        ? "border-shawarma bg-shawarma/5"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
                     {orderType === "dine-in" && (
-                      <div>
-                        <label htmlFor="tableNumber" className="block text-sm font-medium mb-2 flex items-center gap-2">
-                          <MapPin className="h-4 w-4" />
-                          Table / Seating Location *
-                        </label>
-                        <select
-                          id="tableNumber"
-                          name="tableNumber"
-                          value={formData.tableNumber}
-                          onChange={(e) => {
-                            handleChange(e)
-                            if (errors.tableNumber) setErrors({ ...errors, tableNumber: undefined })
-                          }}
-                          className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white ${
-                            errors.tableNumber 
-                              ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
-                              : "border-foreground/20 focus:ring-foreground/20 focus:border-foreground/40"
-                          }`}
-                        >
-                          <option value="">Select your table</option>
-                          {[...Array(20)].map((_, i) => (
-                            <option key={i + 1} value={`${i + 1}`}>
-                              Table {i + 1}
-                            </option>
-                          ))}
-                          <option value="counter">Counter Seating</option>
-                          <option value="outdoor">Outdoor Area</option>
-                        </select>
-                        {errors.tableNumber && (
-                          <p className="mt-1 text-sm text-red-500">{errors.tableNumber}</p>
-                        )}
+                      <div className="absolute top-3 right-3">
+                        <CheckCircle className="h-5 w-5 text-shawarma" />
                       </div>
                     )}
+                    <div className="text-4xl mb-3">🍽️</div>
+                    <p className="font-bold text-gray-900">Dine In</p>
+                    <p className="text-sm text-gray-500">Eat at the restaurant</p>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderType("takeaway")
+                      setFormData({ ...formData, tableNumber: "" })
+                      setErrors({ ...errors, tableNumber: undefined })
+                    }}
+                    className={`relative p-5 rounded-2xl border-2 transition-all ${
+                      orderType === "takeaway"
+                        ? "border-shawarma bg-shawarma/5"
+                        : "border-gray-200 hover:border-gray-300 bg-white"
+                    }`}
+                  >
+                    {orderType === "takeaway" && (
+                      <div className="absolute top-3 right-3">
+                        <CheckCircle className="h-5 w-5 text-shawarma" />
+                      </div>
+                    )}
+                    <div className="text-4xl mb-3">🥡</div>
+                    <p className="font-bold text-gray-900">Takeaway</p>
+                    <p className="text-sm text-gray-500">Take your order to go</p>
+                  </button>
+                </div>
+              </div>
 
-                    {/* Pickup Time - For both Dine In and Takeaway */}
+              {/* Customer Details */}
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="p-2.5 bg-shawarma rounded-xl">
+                    <User className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Your Details</h2>
+                    <p className="text-sm text-gray-500">For order identification</p>
+                  </div>
+                </div>
+                
+                <form className="space-y-4">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Name *</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={(e) => {
+                        handleChange(e)
+                        if (errors.name) setErrors({ ...errors, name: undefined })
+                      }}
+                      placeholder="Your name"
+                      className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all ${
+                        errors.name 
+                          ? "border-red-300 focus:border-red-500" 
+                          : "border-gray-100 focus:border-shawarma"
+                      }`}
+                    />
+                    {errors.name && <p className="mt-1.5 text-sm text-red-500">{errors.name}</p>}
+                  </div>
+
+                  {/* Phone */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={(e) => {
+                        handleChange(e)
+                        if (errors.phone) setErrors({ ...errors, phone: undefined })
+                      }}
+                      placeholder="07123 456789"
+                      className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all ${
+                        errors.phone 
+                          ? "border-red-300 focus:border-red-500" 
+                          : "border-gray-100 focus:border-shawarma"
+                      }`}
+                    />
+                    {errors.phone && <p className="mt-1.5 text-sm text-red-500">{errors.phone}</p>}
+                  </div>
+
+                  {/* Table Number - Dine In Only */}
+                  {orderType === "dine-in" && (
                     <div>
-                      <label htmlFor="pickupTime" className="block text-sm font-medium mb-2 flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        {orderType === "dine-in" ? "When would you like it served?" : "Pickup Time"} *
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Table / Location *
                       </label>
                       <select
-                        id="pickupTime"
-                        name="pickupTime"
-                        value={formData.pickupTime}
+                        name="tableNumber"
+                        value={formData.tableNumber}
                         onChange={(e) => {
                           handleChange(e)
-                          if (errors.pickupTime) setErrors({ ...errors, pickupTime: undefined })
+                          if (errors.tableNumber) setErrors({ ...errors, tableNumber: undefined })
                         }}
-                        className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white ${
-                          errors.pickupTime 
-                            ? "border-red-500 focus:ring-red-200 focus:border-red-500" 
-                            : "border-foreground/20 focus:ring-foreground/20 focus:border-foreground/40"
+                        className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all appearance-none ${
+                          errors.tableNumber 
+                            ? "border-red-300 focus:border-red-500" 
+                            : "border-gray-100 focus:border-shawarma"
                         }`}
                       >
-                        <option value="">Select a time</option>
-                        {getPickupTimeOptions().map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
+                        <option value="">Select your table</option>
+                        {[...Array(20)].map((_, i) => (
+                          <option key={i + 1} value={`${i + 1}`}>Table {i + 1}</option>
                         ))}
+                        <option value="counter">Counter Seating</option>
+                        <option value="outdoor">Outdoor Area</option>
                       </select>
-                      {errors.pickupTime && (
-                        <p className="mt-1 text-sm text-red-500">{errors.pickupTime}</p>
-                      )}
-                      <p className="mt-1 text-xs text-foreground/50">
-                        {orderType === "dine-in" 
-                          ? "We'll bring it to your table at the selected time" 
-                          : "Your order will be ready for collection at this time"}
-                      </p>
+                      {errors.tableNumber && <p className="mt-1.5 text-sm text-red-500">{errors.tableNumber}</p>}
                     </div>
+                  )}
 
-                    {/* Special Instructions */}
-                    <div>
-                      <label htmlFor="specialInstructions" className="block text-sm font-medium mb-2 flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4" />
-                        Special Instructions / Allergies
-                      </label>
-                      <textarea
-                        id="specialInstructions"
-                        name="specialInstructions"
-                        value={formData.specialInstructions}
-                        onChange={handleChange}
-                        placeholder="e.g. No nuts, extra hot, oat milk, gluten-free..."
-                        rows={3}
-                        className="w-full px-4 py-3 border-2 border-foreground/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/40 bg-white resize-none"
-                      />
-                      <p className="mt-1 text-xs text-foreground/50">
-                        Please mention any allergies or dietary requirements
-                      </p>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
+                  {/* Pickup Time */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-shawarma" />
+                      {orderType === "dine-in" ? "When would you like it served?" : "Pickup Time"} *
+                    </label>
+                    <select
+                      name="pickupTime"
+                      value={formData.pickupTime}
+                      onChange={(e) => {
+                        handleChange(e)
+                        if (errors.pickupTime) setErrors({ ...errors, pickupTime: undefined })
+                      }}
+                      className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all appearance-none ${
+                        errors.pickupTime 
+                          ? "border-red-300 focus:border-red-500" 
+                          : "border-gray-100 focus:border-shawarma"
+                      }`}
+                    >
+                      <option value="">Select a time</option>
+                      {getPickupTimeOptions().map((option) => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
+                      ))}
+                    </select>
+                    {errors.pickupTime && <p className="mt-1.5 text-sm text-red-500">{errors.pickupTime}</p>}
+                  </div>
+
+                  {/* Special Instructions */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-gray-400" />
+                      Special Instructions
+                    </label>
+                    <textarea
+                      name="specialInstructions"
+                      value={formData.specialInstructions}
+                      onChange={handleChange}
+                      placeholder="Any allergies or special requests..."
+                      rows={3}
+                      className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-shawarma transition-all resize-none"
+                    />
+                  </div>
+                </form>
+              </div>
             </div>
 
-            {/* Order Total */}
+            {/* Right Column - Order Summary */}
             <div className="lg:col-span-1">
-              <Card className="sticky top-24">
-                <CardContent className="p-6">
-                  <h2 className="text-2xl font-semibold mb-6">Order Total</h2>
-                  
-                  {/* Estimated Wait Time */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Clock className="h-5 w-5 text-blue-600" />
+              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 sticky top-24 overflow-hidden">
+                
+                {/* Header */}
+                <div className="p-5 border-b border-gray-100">
+                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <ShoppingBag className="h-5 w-5 text-shawarma" />
+                    Order Summary
+                  </h2>
+                </div>
+
+                {/* Items */}
+                <div className="max-h-[300px] overflow-y-auto p-5 space-y-4">
+                  {cartItems.map((item) => {
+                    const itemPrice = getItemPrice(item)
+                    return (
+                      <div key={`${item.id}-${item.selectedSize}`} className="flex gap-3">
+                        <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                          <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{item.name}</h3>
+                          <p className="text-sm font-bold text-gray-900 mt-1">{formatPrice(itemPrice * item.quantity)}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <div className="flex items-center bg-gray-100 rounded-full">
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedSize)}
+                                className="w-7 h-7 flex items-center justify-center hover:bg-gray-200 rounded-full transition-colors"
+                              >
+                                <Minus className="h-3.5 w-3.5 text-gray-600" />
+                              </button>
+                              <span className="w-6 text-center font-semibold text-sm">{item.quantity}</span>
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedSize)}
+                                className="w-7 h-7 flex items-center justify-center hover:bg-gray-200 rounded-full transition-colors"
+                              >
+                                <Plus className="h-3.5 w-3.5 text-gray-600" />
+                              </button>
+                            </div>
+                            <button
+                              onClick={() => removeFromCart(item.id, item.selectedSize)}
+                              className="p-1.5 hover:bg-red-50 rounded-lg transition-colors group"
+                            >
+                              <Trash2 className="h-4 w-4 text-gray-400 group-hover:text-red-500" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm text-blue-800 font-medium">Estimated Wait Time</p>
-                        <p className="text-2xl font-bold text-blue-900">~{getEstimatedWaitTime().min}-{getEstimatedWaitTime().max} min</p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-blue-600 mt-2">After payment confirmation</p>
-                  </div>
-                  
-                  <div className="space-y-3 mb-6">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-foreground/70">Items ({cartItems.reduce((sum, item) => sum + item.quantity, 0)})</span>
-                      <span>{formatPrice(getTotalPrice())}</span>
-                    </div>
-                    <div className="border-t border-border pt-3 flex justify-between text-xl font-semibold">
-                      <span>Total</span>
-                      <span>{formatPrice(getTotalPrice())}</span>
+                    )
+                  })}
+                </div>
+
+                {/* Totals */}
+                <div className="p-5 border-t border-gray-100 bg-gray-50/50">
+                  {/* Wait Time */}
+                  <div className="flex items-center gap-3 p-3 bg-shawarma/10 rounded-xl mb-4">
+                    <ChefHat className="h-5 w-5 text-shawarma" />
+                    <div>
+                      <p className="text-sm font-semibold text-shawarma-800">Ready in ~{getEstimatedWaitTime().min}-{getEstimatedWaitTime().max} min</p>
+                      <p className="text-xs text-shawarma-600">After payment confirmation</p>
                     </div>
                   </div>
 
-                  <Button
-                    size="lg"
-                    variant="primary"
-                    className="w-full mb-4 text-lg py-6"
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Subtotal ({getTotalItems()} items)</span>
+                      <span>{formatPrice(getTotalPrice())}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Service fee</span>
+                      <span className="text-green-600 font-medium">Free</span>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-gray-200 my-4" />
+
+                  <div className="flex justify-between items-center mb-5">
+                    <span className="text-lg font-bold text-gray-900">Total</span>
+                    <span className="text-2xl font-bold text-gray-900">{formatPrice(getTotalPrice())}</span>
+                  </div>
+
+                  {/* Checkout Button */}
+                  <button
                     onClick={handleSubmit}
-                    disabled={
-                      isSubmitting || 
-                      !formData.name.trim() || 
-                      !formData.phone.trim() || 
-                      !formData.pickupTime ||
-                      (orderType === "dine-in" && !formData.tableNumber)
-                    }
+                    disabled={isSubmitting || !isFormValid}
+                    className={`w-full py-4 px-6 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${
+                      isFormValid
+                        ? "bg-shawarma hover:bg-shawarma-600 text-white hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
+                        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    }`}
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        <Loader2 className="h-5 w-5 animate-spin" />
                         Sending Order...
                       </>
                     ) : (
                       <>
-                        🍳 Send Order to Kitchen
+                        Send to Kitchen
+                        <ArrowRight className="h-5 w-5" />
                       </>
                     )}
-                  </Button>
+                  </button>
 
-                  {(!formData.name.trim() || !formData.phone.trim() || !formData.pickupTime || (orderType === "dine-in" && !formData.tableNumber)) && (
-                    <p className="text-sm text-amber-600 text-center mb-4">
+                  {!isFormValid && (
+                    <p className="text-xs text-amber-600 text-center mt-3">
                       Please fill in all required fields
                     </p>
                   )}
 
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
-                    <p className="text-sm text-amber-800 text-center font-medium">
-                      💳 Pay at counter to start your order
-                    </p>
-                    <p className="text-xs text-amber-700 text-center">
-                      Your order will be prepared after payment is confirmed by staff
+                  {/* Payment Info */}
+                  <div className="mt-4 p-3 bg-amber-50 rounded-xl border border-amber-100">
+                    <div className="flex items-center gap-2 text-amber-800">
+                      <CreditCard className="h-4 w-4" />
+                      <span className="text-sm font-medium">Pay at counter</span>
+                    </div>
+                    <p className="text-xs text-amber-700 mt-1">
+                      Your order starts after payment confirmation
                     </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </Section>
+      </main>
 
       <Footer />
     </div>
