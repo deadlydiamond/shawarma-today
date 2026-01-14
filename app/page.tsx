@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Section } from "@/components/ui/Section"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { Beef, UtensilsCrossed, Salad, Heart, MapPin, Phone, Clock, Star, Percent, Tag } from "lucide-react"
+import { Beef, UtensilsCrossed, Salad, Heart, MapPin, Phone, Clock, Star, Percent, Tag, ArrowRight } from "lucide-react"
 import Reviews from "@/components/ui/Reviews"
 import contentData from "@/src/content/content.json"
 import PopularTimes from "@/components/ui/PopularTimes"
@@ -341,22 +341,27 @@ export default function Home() {
         <Reviews />
       </Section>
 
-      {/* Contact Section - More compact */}
-      <Section id="contact" className="relative py-12">
-        <div className="relative z-10">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-2 text-gray-900">
-              Visit Us
+      {/* Visit Us Section - Trendy Layout */}
+      <Section id="contact" className="relative py-16 bg-gray-50">
+        <div className="relative z-10 max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 bg-shawarma/10 text-shawarma font-semibold text-sm rounded-full mb-4">
+              📍 Find Us
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+              Visit Our Restaurant
             </h2>
-            <p className="text-gray-600">
-              We&apos;d love to see you at our restaurant
+            <p className="text-gray-600 max-w-lg mx-auto">
+              Fresh shawarma, warm hospitality, and the best Middle Eastern flavors in Edinburgh
             </p>
           </div>
 
-          {/* Google Maps - Black and White */}
-          <Card className="mb-12 overflow-hidden p-0">
-            <div className="relative w-full h-96">
+          {/* Main Content - Bento Grid Style */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Map - Takes 2 columns on large screens */}
+            <div className="lg:col-span-2 relative rounded-3xl overflow-hidden shadow-2xl group h-[400px] lg:h-auto">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2233.5!2d-3.1675541!3d55.9573123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4887b9001f5acead%3A0x388a5a0797201ff0!2sToday%20Shawarma!5e0!3m2!1sen!2suk!4v1234567890123"
                 width="100%"
@@ -365,79 +370,100 @@ export default function Home() {
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="w-full h-full"
+                className="w-full h-full min-h-[400px]"
               ></iframe>
-            </div>
-            <div className="p-6 glass">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-shawarma">
-                    <MapPin className="h-4 w-4 text-white" strokeWidth={2} />
-                  </div>
-                  <div className="text-foreground/80">
-                    <p className="font-medium">{contentData.address.line1}</p>
-                    <p className="text-sm">{contentData.address.city} {contentData.address.postcode}</p>
+              
+              {/* Floating Address Card */}
+              <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-sm">
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/20">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-shawarma flex-shrink-0">
+                      <MapPin className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900">Today Shawarma</h4>
+                      <p className="text-sm text-gray-600">{contentData.address.line1}</p>
+                      <p className="text-sm text-gray-600">{contentData.address.city} {contentData.address.postcode}</p>
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contentData.address.line1 + ', ' + contentData.address.city + ' ' + contentData.address.postcode)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-shawarma hover:text-shawarma-600 font-medium text-sm mt-2 transition-colors"
+                      >
+                        Get Directions <ArrowRight className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
                   </div>
                 </div>
-              <a
-                href={`tel:${contentData.phone.replace(/\s/g, "")}`}
-                  className="flex items-center gap-3 text-gray-700 hover:text-gray-900 transition-colors"
-              >
-                  <div className="p-2 rounded-lg bg-shawarma">
-                    <Phone className="h-4 w-4 text-white" strokeWidth={2} />
-                  </div>
-                  <span className="font-medium">{contentData.phone}</span>
-              </a>
               </div>
             </div>
-          </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-            <Card className="p-10">
-              <div className="flex items-center justify-center gap-4 mb-8">
-                <div className="p-3 rounded-xl bg-shawarma">
-                  <Clock className="h-6 w-6 text-white" strokeWidth={2} />
-                </div>
-                <h3 className="text-xl font-semibold">Opening Hours</h3>
-              </div>
-              <div className="space-y-3 max-w-md mx-auto">
-                {contentData.hours.items.map((item) => (
-                  <div key={item.day} className="flex justify-between text-base text-gray-700">
-                    <span className="font-medium">{item.day}</span>
-                    <span>
-                      {item.open} - {item.close}
-                    </span>
+            {/* Right Column - Info Cards */}
+            <div className="flex flex-col gap-6">
+              
+              {/* Opening Hours Card */}
+              <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 flex-1">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="p-2.5 rounded-xl bg-shawarma">
+                    <Clock className="h-5 w-5 text-white" />
                   </div>
-                ))}
+                  <h3 className="text-lg font-bold text-gray-900">Opening Hours</h3>
+                </div>
+                <div className="space-y-2.5">
+                  {contentData.hours.items.map((item) => {
+                    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' })
+                    const isToday = item.day.toLowerCase().includes(today.toLowerCase().slice(0, 3))
+                    return (
+                      <div 
+                        key={item.day} 
+                        className={`flex justify-between items-center py-1.5 px-3 rounded-lg transition-colors ${isToday ? 'bg-shawarma/10 text-shawarma font-semibold' : 'text-gray-600'}`}
+                      >
+                        <span className="text-sm">{item.day}</span>
+                        <span className="text-sm font-medium">{item.open} - {item.close}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+                <p className="text-xs text-gray-500 mt-4 text-center">
+                  {contentData.hours.note}
+                </p>
               </div>
-              <p className="text-sm text-gray-500 mt-6 text-center italic">
-                {contentData.hours.note}
-              </p>
-            </Card>
 
-            {/* Popular Times Widget */}
+              {/* Contact Card */}
+              <div className="bg-gray-900 rounded-3xl p-6 shadow-lg text-white">
+                <h3 className="text-lg font-bold mb-4">Get in Touch</h3>
+                <div className="space-y-4">
+                  <a
+                    href={`tel:${contentData.phone.replace(/\s/g, "")}`}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-colors group"
+                  >
+                    <div className="p-2 rounded-lg bg-shawarma">
+                      <Phone className="h-4 w-4 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">Call to order</p>
+                      <p className="font-semibold">{contentData.phone}</p>
+                    </div>
+                  </a>
+                  
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contentData.address.line1 + ', ' + contentData.address.city + ' ' + contentData.address.postcode)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-shawarma hover:bg-shawarma-600 rounded-xl font-semibold transition-colors"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Get Directions
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Popular Times - Full Width Below */}
+          <div className="mt-6">
             <PopularTimes />
           </div>
-
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" asChild variant="primary" className="group">
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contentData.address.line1 + ', ' + contentData.address.city + ' ' + contentData.address.postcode)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3"
-              >
-                <MapPin className="h-5 w-5" /> Get Directions
-              </a>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <a href={`tel:${contentData.phone.replace(/\s/g, "")}`} className="flex items-center gap-3">
-                <Phone className="h-5 w-5" /> Call Us
-              </a>
-            </Button>
-          </div>
-        </div>
         </div>
       </Section>
 
