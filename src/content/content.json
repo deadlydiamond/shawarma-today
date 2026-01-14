@@ -1,16 +1,16 @@
 {
-  "name": "Shawarma Today",
+  "name": "Today Shawarma",
   "tagline": "Authentic Middle Eastern flavours, made fresh daily.",
   "address": {
-    "line1": "123 High Street",
+    "line1": "Leith Walk",
     "city": "Edinburgh",
-    "postcode": "EH1 1AA",
+    "postcode": "EH6",
     "country": "United Kingdom"
   },
-  "phone": "+44 131 123 4567",
+  "phone": "+44 131 XXX XXXX",
   "socials": {
-    "facebook": "https://www.facebook.com/shawarmatoday/",
-    "instagram": "https://www.instagram.com/shawarmatoday/"
+    "facebook": "https://www.facebook.com/todayshawarma/",
+    "instagram": "https://www.instagram.com/todayshawarma/"
   },
   "hours": {
     "note": "Hours may vary. Please call to confirm.",
@@ -21,7 +21,11 @@
       { "day": "Thursday", "open": "11:00", "close": "22:00" },
       { "day": "Friday", "open": "11:00", "close": "23:00" },
       { "day": "Saturday", "open": "11:00", "close": "23:00" },
-      { "day": "Sunday", "open": "12:00", "close": "21:00" }
+      { "day": "Sunday", "open": "12:00", "close": "22:00" }
     ]
+  },
+  "coordinates": {
+    "lat": 55.9573123,
+    "lng": -3.1675541
   }
 }
