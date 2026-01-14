@@ -236,9 +236,9 @@ export default function Home() {
                       </div>
                     </div>
                     <CardContent className="p-3">
-                      <span className="text-xs font-medium text-gray-500 group-hover:text-shawarma transition-colors flex items-center gap-2">
+                      <span className="text-xs font-semibold text-white flex items-center gap-2 bg-shawarma px-3 py-2 rounded-lg group-hover:bg-shawarma-600 transition-colors">
                         <UtensilsCrossed className="h-3 w-3 group-hover:rotate-12 transition-transform" /> View Menu
-                        <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                        <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" />
                       </span>
                     </CardContent>
                   </Card>
