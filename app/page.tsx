@@ -124,25 +124,25 @@ export default function Home() {
         <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 overflow-x-auto pb-4 -mx-6 px-6 md:mx-0 md:px-0 md:overflow-visible scrollbar-hide snap-x snap-mandatory">
           {[
             {
+              icon: UtensilsCrossed,
+              title: "10\" Pizzas",
+              description: "Fresh baked pizzas from £4.99",
+              image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=75",
+              filter: "pizzas",
+            },
+            {
               icon: Beef,
-              title: "Shawarma Wraps",
-              description: "Tender meat, fresh veggies, signature sauces",
+              title: "Shawarma & Wraps",
+              description: "Lamb & chicken wraps from £4.50",
               image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=600&q=75",
               filter: "wraps",
             },
             {
-              icon: UtensilsCrossed,
-              title: "Plates & Platters",
-              description: "Generous portions with all the sides",
-              image: "https://images.unsplash.com/photo-1547424850-2bef379d8159?w=600&q=75",
-              filter: "plates",
-            },
-            {
-              icon: Salad,
-              title: "Sides & Salads",
-              description: "Fresh mezze, dips, and salads",
-              image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=75",
-              filter: "sides",
+              icon: Beef,
+              title: "Grill & Platters",
+              description: "Kebabs, tikka & mix platters",
+              image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=75",
+              filter: "grill",
             },
           ].map((feature, index) => (
             <button

@@ -7,54 +7,82 @@ import { useMemo, useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
-type CategoryFilter = "all" | "wraps" | "plates" | "sides" | "drinks" | "desserts"
+type CategoryFilter = "all" | "pizzas" | "fatayer" | "wraps" | "meals" | "grill" | "sides" | "drinks"
 
 const categoryConfig: { id: CategoryFilter; label: string; icon: React.ReactNode; emoji: string }[] = [
   { id: "all", label: "All", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🍽️" },
+  { id: "pizzas", label: "Pizzas", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🍕" },
+  { id: "fatayer", label: "Fatayer", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🫓" },
   { id: "wraps", label: "Wraps", icon: <Beef className="h-5 w-5" />, emoji: "🌯" },
-  { id: "plates", label: "Plates", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🍛" },
-  { id: "sides", label: "Sides", icon: <Salad className="h-5 w-5" />, emoji: "🥗" },
+  { id: "meals", label: "Meals", icon: <UtensilsCrossed className="h-5 w-5" />, emoji: "🍽️" },
+  { id: "grill", label: "Grill", icon: <Beef className="h-5 w-5" />, emoji: "🍢" },
+  { id: "sides", label: "Sides", icon: <Salad className="h-5 w-5" />, emoji: "🍟" },
   { id: "drinks", label: "Drinks", icon: <CupSoda className="h-5 w-5" />, emoji: "🥤" },
 ]
 
-// Fallback menu items
+// Fallback menu items - TODAY SHAWARMA ACTUAL MENU
 const fallbackMenuItems: Record<string, ExtendedMenuItem[]> = {
-  wraps: [
-    { id: "w1", name: "Chicken Shawarma", description: "Marinated chicken, garlic sauce", price: "£8.50", priceLarge: "£10.50", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps", isPopular: true },
-    { id: "w2", name: "Lamb Shawarma", description: "Tender lamb, tahini", price: "£9.50", priceLarge: "£11.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps", isPopular: true },
-    { id: "w3", name: "Mixed Shawarma", description: "Chicken & lamb combo", price: "£10.00", priceLarge: "£12.00", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps", isNew: true },
-    { id: "w4", name: "Falafel Wrap", description: "Crispy falafel, hummus", price: "£7.50", priceLarge: "£9.50", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Wraps", isVegan: true, isPopular: true },
-    { id: "w5", name: "Halloumi Wrap", description: "Grilled halloumi, salad", price: "£8.00", priceLarge: "£10.00", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps", isVegetarian: true },
-    { id: "w6", name: "Kofta Wrap", description: "Spiced beef kofta", price: "£8.50", priceLarge: "£10.50", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps" },
+  pizzas: [
+    { id: "pz1", name: "Margherita", description: "Cheese & tomato", price: "£4.99", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=75", category: "Pizzas", isVegetarian: true },
+    { id: "pz2", name: "Chicken Pizza", description: "Chicken, mushroom & sweetcorn", price: "£5.99", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=75", category: "Pizzas", isPopular: true },
+    { id: "pz3", name: "Lamb Pizza", description: "Lamb, green chilli & onions", price: "£6.99", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=75", category: "Pizzas" },
+    { id: "pz4", name: "Meat Feast", description: "Chicken, lamb & pepperoni", price: "£6.99", image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=75", category: "Pizzas", isPopular: true },
+    { id: "pz5", name: "Veggie Pizza", description: "Mushrooms, onions, sweetcorn & green peppers", price: "£5.50", image: "https://images.unsplash.com/photo-1511689660979-10d2b1aada49?w=400&q=75", category: "Pizzas", isVegetarian: true },
+    { id: "pz6", name: "Mighty Meaty", description: "Chicken, lamb, donner, spicy beef", price: "£6.99", image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=400&q=75", category: "Pizzas", isPopular: true, isNew: true },
+    { id: "pz7", name: "Garlic Bread with Cheese", description: "10\" garlic bread topped with cheese", price: "£3.99", image: "https://images.unsplash.com/photo-1619531040576-f9416740661b?w=400&q=75", category: "Pizzas", isVegetarian: true },
   ],
-  plates: [
-    { id: "p1", name: "Chicken Plate", description: "Rice, salad, hummus", price: "£12.50", image: "https://images.unsplash.com/photo-1547424850-2bef379d8159?w=400&q=75", category: "Plates", isPopular: true },
-    { id: "p2", name: "Lamb Plate", description: "Rice, salad, baba ganoush", price: "£13.50", image: "https://images.unsplash.com/photo-1547424850-2bef379d8159?w=400&q=75", category: "Plates" },
-    { id: "p3", name: "Mixed Grill", description: "Chicken, lamb, kofta", price: "£15.00", image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=75", category: "Plates", isPopular: true, isNew: true },
-    { id: "p4", name: "Falafel Plate", description: "6 pcs, rice, salads", price: "£10.50", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Plates", isVegan: true },
+  fatayer: [
+    { id: "ft1", name: "Chicken Fatayer", description: "10\" flatbread with chicken filling", price: "£4.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isPopular: true },
+    { id: "ft2", name: "Lamb Fatayer", description: "10\" flatbread with lamb filling", price: "£5.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
+    { id: "ft3", name: "Mix Fatayer", description: "10\" flatbread with mixed filling", price: "£5.50", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
+    { id: "ft4", name: "Veggie Fatayer", description: "10\" flatbread with vegetable filling", price: "£4.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isVegetarian: true },
+    { id: "ft5", name: "Cheese Fatayer", description: "10\" flatbread with cheese filling", price: "£3.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isVegetarian: true },
+  ],
+  wraps: [
+    { id: "wr1", name: "Lamb Shawarma Wrap", description: "Tender lamb shawarma in wrap", price: "£4.99", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps", isPopular: true },
+    { id: "wr2", name: "Chicken Shawarma Wrap", description: "Marinated chicken shawarma in wrap", price: "£4.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps", isPopular: true },
+    { id: "wr3", name: "Falafel Wrap", description: "Crispy falafel with salad", price: "£4.99", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Wraps", isVegan: true },
+    { id: "wr4", name: "Lamb Shawarma Sandwich", description: "Tender lamb shawarma in bread", price: "£4.99", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps" },
+    { id: "wr5", name: "Chicken Shawarma Sandwich", description: "Marinated chicken shawarma in bread", price: "£4.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps" },
+  ],
+  meals: [
+    { id: "ml1", name: "Lamb Shawarma Meal", description: "With chips & salad", price: "£7.99", image: "https://images.unsplash.com/photo-1547424850-2bef379d8159?w=400&q=75", category: "Meals", isPopular: true },
+    { id: "ml2", name: "Chicken Shawarma Meal", description: "With chips & salad", price: "£6.99", image: "https://images.unsplash.com/photo-1547424850-2bef379d8159?w=400&q=75", category: "Meals", isPopular: true },
+    { id: "ml3", name: "Falafel Meal", description: "6 pcs with naan & salad", price: "£5.99", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Meals", isVegan: true },
+  ],
+  grill: [
+    { id: "gr1", name: "Mix Platter", description: "2 Chicken Tikka, 2 Lamb Tikka, 4 Kebabs, 5 Lamb Chops, 6 Wings, Rice & Salad", price: "£60.00", image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=75", category: "Grill", isPopular: true },
+    { id: "gr2", name: "Mix Kebab Full", description: "2 Kebabs, Chicken Tikka, Lamb Tikka, 2 Naan & Salad", price: "£17.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr3", name: "Mix Kebab Half", description: "Lamb Kebab, Chicken Tikka, Lamb Tikka & Salad", price: "£14.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr4", name: "Lamb Chops (5)", description: "With salad & naan", price: "£13.00", priceLarge: "£16.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr5", name: "Lamb Kebab (2)", description: "With salad & naan", price: "£11.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr6", name: "Lamb Tikka (2)", description: "With salad & naan", price: "£13.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
+    { id: "gr7", name: "Chicken Tikka (2)", description: "With salad & naan", price: "£10.00", image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=75", category: "Grill" },
+    { id: "gr8", name: "Chicken Wings (10)", description: "With salad & naan", price: "£9.00", image: "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=400&q=75", category: "Grill", isPopular: true },
+    { id: "gr9", name: "Dolma", description: "Available Saturday only", price: "£12.00", image: "https://images.unsplash.com/photo-1621532074858-a7e5a99a4e9e?w=400&q=75", category: "Grill", isNew: true },
   ],
   sides: [
-    { id: "s1", name: "Hummus", description: "Classic chickpea dip", price: "£4.00", image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&q=75", category: "Sides", isVegan: true, isGlutenFree: true, isPopular: true },
-    { id: "s2", name: "Baba Ganoush", description: "Smoky aubergine dip", price: "£4.50", image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&q=75", category: "Sides", isVegan: true, isGlutenFree: true },
-    { id: "s3", name: "Tabbouleh", description: "Fresh parsley salad", price: "£4.00", image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=75", category: "Sides", isVegan: true },
-    { id: "s4", name: "Fattoush", description: "Crispy pita salad", price: "£4.50", image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=75", category: "Sides", isVegan: true },
-    { id: "s5", name: "Fries", description: "Crispy seasoned fries", price: "£3.50", priceLarge: "£5.00", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=75", category: "Sides", isVegan: true },
-    { id: "s6", name: "Garlic Sauce", description: "Creamy garlic toum", price: "£1.50", image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&q=75", category: "Sides", isVegetarian: true, isGlutenFree: true },
+    { id: "sd1", name: "Chips", description: "Crispy golden chips", price: "£2.50", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=75", category: "Sides", isVegan: true },
+    { id: "sd2", name: "Fresh Salad", description: "Mixed fresh salad", price: "£2.50", image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=75", category: "Sides", isVegan: true, isGlutenFree: true },
+    { id: "sd3", name: "Falafel", description: "Crispy chickpea falafel", price: "£3.99", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Sides", isVegan: true, isPopular: true },
+    { id: "sd4", name: "Hummus", description: "Classic chickpea dip", price: "£3.00", image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&q=75", category: "Sides", isVegan: true, isGlutenFree: true },
+    { id: "sd5", name: "Tub of Sauce", description: "Garlic, chilli or tahini", price: "£0.50", image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&q=75", category: "Sides", isVegetarian: true },
   ],
   drinks: [
-    { id: "d1", name: "Fresh Lemonade", description: "Mint & lemon", price: "£3.50", priceLarge: "£4.50", image: "https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=400&q=75", category: "Drinks", isVegan: true, isPopular: true },
-    { id: "d2", name: "Ayran", description: "Yogurt drink", price: "£2.50", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=75", category: "Drinks", isVegetarian: true },
-    { id: "d3", name: "Mango Lassi", description: "Creamy mango", price: "£3.50", image: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=400&q=75", category: "Drinks", isVegetarian: true },
-    { id: "d4", name: "Turkish Tea", description: "Traditional çay", price: "£2.00", image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=400&q=75", category: "Drinks", isVegan: true },
-    { id: "d5", name: "Soft Drinks", description: "Coke, Fanta, Sprite", price: "£2.00", image: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=400&q=75", category: "Drinks", isVegan: true },
+    { id: "dr1", name: "Can of Drink", description: "Coke, Fanta, Sprite", price: "£1.00", image: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=400&q=75", category: "Drinks", isVegan: true },
+    { id: "dr2", name: "Bottle", description: "500ml soft drink", price: "£1.50", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=75", category: "Drinks", isVegan: true },
+    { id: "dr3", name: "Ayran", description: "Traditional yogurt drink", price: "£1.00", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=75", category: "Drinks", isVegetarian: true, isPopular: true },
   ],
 }
 
 const defaultCategories = [
-  { id: "1", slug: "wraps", name: "Shawarma Wraps", sortOrder: 1, isActive: true },
-  { id: "2", slug: "plates", name: "Plates & Platters", sortOrder: 2, isActive: true },
-  { id: "3", slug: "sides", name: "Sides & Dips", sortOrder: 3, isActive: true },
-  { id: "4", slug: "drinks", name: "Drinks", sortOrder: 4, isActive: true },
+  { id: "1", slug: "pizzas", name: "Pizzas (10\")", sortOrder: 1, isActive: true },
+  { id: "2", slug: "fatayer", name: "Fatayer (10\")", sortOrder: 2, isActive: true },
+  { id: "3", slug: "wraps", name: "Sandwiches & Wraps", sortOrder: 3, isActive: true },
+  { id: "4", slug: "meals", name: "Meals", sortOrder: 4, isActive: true },
+  { id: "5", slug: "grill", name: "Grill & Platters", sortOrder: 5, isActive: true },
+  { id: "6", slug: "sides", name: "Extras", sortOrder: 6, isActive: true },
+  { id: "7", slug: "drinks", name: "Drinks", sortOrder: 7, isActive: true },
 ]
 
 // Extended MenuItem type with all tags and sizes
