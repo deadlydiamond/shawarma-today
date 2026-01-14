@@ -390,16 +390,9 @@ export function DynamicMenu({
     return allItems.filter(item => item.isPopular).slice(0, 4)
   }, [allItems])
 
-  // Scroll to category
-  const scrollToCategory = (categorySlug: string) => {
+  // Change category filter (no scroll)
+  const selectCategory = (categorySlug: string) => {
     setActiveCategory(categorySlug as CategoryFilter)
-    if (categorySlug === "all") return
-    const ref = categoryRefs.current[categorySlug]
-    if (ref) {
-      const offset = 120
-      const top = ref.getBoundingClientRect().top + window.scrollY - offset
-      window.scrollTo({ top, behavior: "smooth" })
-    }
   }
 
   if (loading) {
@@ -461,7 +454,7 @@ export function DynamicMenu({
             return (
               <button
                 key={cat.id}
-                onClick={() => scrollToCategory(cat.id)}
+                onClick={() => selectCategory(cat.id)}
                 className={cn(
                   "flex-shrink-0 flex flex-col items-center gap-1.5 transition-all duration-300 group press-effect",
                 )}
