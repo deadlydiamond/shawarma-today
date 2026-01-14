@@ -151,20 +151,42 @@ export default function POSPage() {
   const [paymentSearchCode, setPaymentSearchCode] = useState("")
   const [foundOrder, setFoundOrder] = useState<typeof orders[0] | null>(null)
   
-  // Search for order by code
+  // Get order code from order
+  // Get order code helper
+  const getOrderCode = (order: typeof orders[0]) => {
+    const codeMatch = order.specialInstructions?.match(/#(\d{4})/)
+    return codeMatch ? codeMatch[1] : order.id.slice(-4)
+  }
+
+  // Get unpaid orders
+  const unpaidOrders = orders.filter(o => 
+    o.specialInstructions?.includes("💰 UNPAID") && 
+    !["completed", "cancelled"].includes(o.status)
+  )
+
+  // Filter unpaid orders based on search
+  const filteredUnpaidOrders = paymentSearchCode.trim() 
+    ? unpaidOrders.filter(o => {
+        const code = getOrderCode(o)
+        const searchTerm = paymentSearchCode.trim().replace("#", "").toLowerCase()
+        return code.includes(searchTerm) || 
+               o.customer.name.toLowerCase().includes(searchTerm)
+      })
+    : unpaidOrders
+
+  // Search for exact order by code
   const searchOrderByCode = () => {
     const code = paymentSearchCode.trim().replace("#", "")
     if (!code) return
     
     // Search in special instructions, customer name, or order ID
-    const order = orders.find(o => 
-      o.specialInstructions?.includes(`#${code}`) || 
-      o.specialInstructions?.includes(code) ||
-      o.customer.name.includes(`#${code}`) ||
-      o.customer.name.includes(code) ||
-      o.id.toLowerCase().includes(code.toLowerCase()) ||
-      o.id.slice(-4) === code
-    )
+    const order = orders.find(o => {
+      const orderCode = getOrderCode(o)
+      return orderCode === code ||
+        o.specialInstructions?.includes(`#${code}`) || 
+        o.customer.name.includes(`#${code}`) ||
+        o.id.toLowerCase().includes(code.toLowerCase())
+    })
     setFoundOrder(order || null)
   }
   
@@ -179,12 +201,6 @@ export default function POSPage() {
     // Refresh search to show updated status
     setFoundOrder({ ...foundOrder, specialInstructions: newInstructions })
   }
-  
-  // Get unpaid orders count
-  const unpaidOrders = orders.filter(o => 
-    o.specialInstructions?.includes("💰 UNPAID") && 
-    !["completed", "cancelled"].includes(o.status)
-  )
 
   // Hold/Park current order
   const holdOrder = () => {
@@ -903,35 +919,38 @@ export default function POSPage() {
             </div>
 
             <div className="p-6">
-              {/* Search Input */}
-              <div className="flex gap-2 mb-6">
-                <div className="flex-1 relative">
-                  <input
-                    type="text"
-                    value={paymentSearchCode}
-                    onChange={(e) => setPaymentSearchCode(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && searchOrderByCode()}
-                    placeholder="Enter order code"
-                    className="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-xl text-2xl font-mono text-white text-center placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 tracking-widest"
-                    maxLength={4}
-                  />
-                </div>
-                <button
-                  onClick={searchOrderByCode}
-                  className="px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg"
-                >
-                  Find
-                </button>
+              {/* Search Input - Real-time filtering */}
+              <div className="relative mb-6">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                <input
+                  type="text"
+                  value={paymentSearchCode}
+                  onChange={(e) => {
+                    setPaymentSearchCode(e.target.value)
+                    setFoundOrder(null) // Clear selected order when typing
+                  }}
+                  placeholder="Search by order code or name..."
+                  className="w-full pl-12 pr-12 py-4 bg-white/5 border border-white/10 rounded-xl text-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  autoFocus
+                />
+                {paymentSearchCode && (
+                  <button
+                    onClick={() => { setPaymentSearchCode(""); setFoundOrder(null) }}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-white transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                )}
               </div>
 
-              {/* Result */}
-              {foundOrder ? (
-                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+              {/* Selected Order Detail */}
+              {foundOrder && (
+                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden mb-4">
                   {/* Order Info */}
                   <div className="p-4 flex items-center justify-between">
                     <div>
-                      <p className="text-gray-400 text-sm">Customer</p>
-                      <p className="text-white font-bold text-lg">{foundOrder.customer.name.split("#")[0].trim()}</p>
+                      <p className="text-gray-400 text-sm">Order #{getOrderCode(foundOrder)}</p>
+                      <p className="text-white font-bold text-lg">{foundOrder.customer.name.split("#")[0].trim() || "Walk-in"}</p>
                       <p className="text-gray-500 text-sm">
                         {foundOrder.tableNumber === "counter" ? "Counter" : 
                          foundOrder.tableNumber === "takeaway" ? "Takeaway" : 
@@ -974,42 +993,72 @@ export default function POSPage() {
                       </div>
                     )}
                   </div>
-                </div>
-              ) : paymentSearchCode && (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
-                    <AlertCircle className="h-8 w-8 text-gray-600" />
-                  </div>
-                  <p className="text-white font-medium">No order found</p>
-                  <p className="text-gray-500 text-sm">Code &quot;{paymentSearchCode}&quot; not found</p>
+                  
+                  {/* Back Button */}
+                  <button
+                    onClick={() => setFoundOrder(null)}
+                    className="w-full py-3 text-gray-400 hover:text-white hover:bg-white/5 border-t border-white/10 transition-colors text-sm"
+                  >
+                    ← Back to list
+                  </button>
                 </div>
               )}
 
-              {/* Unpaid Orders List */}
-              {unpaidOrders.length > 0 && !foundOrder && (
-                <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                    Unpaid Orders ({unpaidOrders.length})
+              {/* Unpaid Orders List - Always visible unless viewing specific order */}
+              {!foundOrder && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                    <span>
+                      {paymentSearchCode.trim() ? "Matching Orders" : "Unpaid Orders"} 
+                      ({filteredUnpaidOrders.length})
+                    </span>
+                    {paymentSearchCode.trim() && filteredUnpaidOrders.length === 0 && (
+                      <span className="text-red-400 normal-case font-normal">No matches</span>
+                    )}
                   </h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {unpaidOrders.map(order => {
-                      const codeMatch = order.specialInstructions?.match(/#(\d{4})/)
-                      const code = codeMatch ? codeMatch[1] : order.id.slice(-4)
-                      return (
-                        <button
-                          key={order.id}
-                          onClick={() => { setPaymentSearchCode(code); setFoundOrder(order) }}
-                          className="w-full p-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl flex items-center justify-between transition-colors text-left"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center font-mono font-bold text-red-400">{code}</span>
-                            <span className="text-white">{order.customer.name.split("#")[0].trim()}</span>
-                          </div>
-                          <span className="font-bold text-white">£{order.total.toFixed(2)}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
+                  
+                  {filteredUnpaidOrders.length === 0 && !paymentSearchCode.trim() ? (
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle className="h-8 w-8 text-green-500" />
+                      </div>
+                      <p className="text-white font-medium">All caught up!</p>
+                      <p className="text-gray-500 text-sm">No unpaid orders</p>
+                    </div>
+                  ) : filteredUnpaidOrders.length === 0 && paymentSearchCode.trim() ? (
+                    <div className="text-center py-8">
+                      <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3">
+                        <Search className="h-6 w-6 text-gray-600" />
+                      </div>
+                      <p className="text-gray-400 text-sm">No orders match &quot;{paymentSearchCode}&quot;</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+                      {filteredUnpaidOrders.map(order => {
+                        const code = getOrderCode(order)
+                        return (
+                          <button
+                            key={order.id}
+                            onClick={() => { setPaymentSearchCode(code); setFoundOrder(order) }}
+                            className="w-full p-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl flex items-center justify-between transition-colors text-left group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center font-mono font-bold text-red-400 text-lg group-hover:bg-red-500/30 transition-colors">{code}</span>
+                              <div>
+                                <p className="text-white font-medium">{order.customer.name.split("#")[0].trim() || "Walk-in"}</p>
+                                <p className="text-gray-500 text-sm">
+                                  {order.tableNumber === "counter" ? "Counter" : 
+                                   order.tableNumber === "takeaway" ? "Takeaway" : 
+                                   `Table ${order.tableNumber}`}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="font-bold text-white text-lg">£{order.total.toFixed(2)}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
