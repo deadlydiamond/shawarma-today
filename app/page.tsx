@@ -248,7 +248,7 @@ export default function Home() {
         {/* Active Promotions Banner */}
         {activePromotions.length > 0 && (
           <div className="mb-12">
-            <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-6 md:p-8 text-white shadow-xl">
+            <div className="bg-gradient-to-r from-shawarma to-shawarma-600 rounded-2xl p-6 md:p-8 text-white shadow-xl">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-white/20 rounded-full">
                   <Percent className="h-6 w-6" />
