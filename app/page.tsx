@@ -41,7 +41,7 @@ export default function Home() {
             src="/hero-bg.jpg"
             alt="Today Shawarma Restaurant"
             fill
-            className="object-cover"
+            className="object-cover object-[center_20%]"
             priority
           />
           {/* Black 85% opacity overlay */}
