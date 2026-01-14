@@ -21,7 +21,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           {
             "glass-strong text-foreground hover:scale-105 shadow-lg hover:shadow-xl": variant === "default",
             "bg-shawarma hover:bg-shawarma-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105": variant === "primary",
-            "glass border-2 border-white/40 text-foreground hover:border-white/60 hover:scale-105": variant === "outline",
+            "bg-shawarma-50 hover:bg-shawarma-100 text-shawarma-800 border-2 border-shawarma-100 hover:border-shawarma-200 hover:scale-105 shadow-md": variant === "outline",
             "hover:bg-white/20 backdrop-blur-sm": variant === "ghost",
             "underline-offset-4 hover:underline": variant === "link",
             "h-9 px-4 text-sm": size === "sm",

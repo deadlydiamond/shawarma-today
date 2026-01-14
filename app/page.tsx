@@ -62,7 +62,7 @@ export default function Home() {
               Traditional Middle Eastern flavours, served fast and fresh
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a href="#menu" className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-white text-shawarma-black hover:bg-gray-100 min-w-[160px] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
+              <a href="#menu" className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-shawarma-50 text-shawarma-800 hover:bg-shawarma-100 border-2 border-shawarma-100 min-w-[160px] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
                 <UtensilsCrossed className="h-5 w-5" /> View Menu
               </a>
               <a href="#contact" className="inline-flex items-center justify-center gap-3 px-8 py-3 bg-shawarma border-2 border-shawarma text-white hover:bg-[#d95a1e] min-w-[160px] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 font-semibold rounded-lg">
