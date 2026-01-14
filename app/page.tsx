@@ -43,11 +43,8 @@ export default function Home() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 animate-gradient-hero" />
-          {/* Liquid gradient overlay */}
-          <div className="absolute inset-0 animate-gradient-subtle" />
-          {/* Subtle radial gradient for depth */}
-          <div className="absolute inset-0 bg-radial-gradient from-transparent via-transparent to-black/20" style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, transparent 0%, rgba(0,0,0,0.1) 100%)' }} />
+          {/* Black 70% opacity overlay */}
+          <div className="absolute inset-0 bg-black/70" />
         </div>
         
         {/* Content */}
