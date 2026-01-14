@@ -76,7 +76,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="p-2 bg-gray-900 rounded-lg">
+            <div className="p-2 bg-shawarma rounded-lg">
               <Coffee className="h-5 w-5 text-white" />
             </div>
             <span className="font-semibold text-gray-900">Today Shawarma</span>

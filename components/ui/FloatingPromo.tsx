@@ -103,8 +103,8 @@ export function FloatingPromo() {
             {currentOffer.type === "banner" && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-8 h-8 bg-amber-100 rounded-full">
-                    <Tag className="h-4 w-4 text-amber-600" />
+                  <span className="flex items-center justify-center w-8 h-8 bg-shawarma rounded-full">
+                    <Tag className="h-4 w-4 text-white" />
                   </span>
                   <span className="font-bold text-gray-900">{currentOffer.data.title}</span>
                 </div>
@@ -126,8 +126,8 @@ export function FloatingPromo() {
             {currentOffer.type === "promo" && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-full">
-                    <Percent className="h-4 w-4 text-green-600" />
+                  <span className="flex items-center justify-center w-8 h-8 bg-shawarma rounded-full">
+                    <Percent className="h-4 w-4 text-white" />
                   </span>
                   <span className="font-bold text-gray-900">{currentOffer.data.name}</span>
                 </div>

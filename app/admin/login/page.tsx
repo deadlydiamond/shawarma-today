@@ -67,7 +67,7 @@ export default function AdminLogin() {
         <CardContent className="p-8">
           {/* Logo */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-900 rounded-2xl mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-shawarma rounded-2xl mb-4">
               <Coffee className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">Admin Panel</h1>

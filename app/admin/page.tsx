@@ -180,7 +180,7 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gray-900 rounded-xl">
+              <div className="p-2 bg-shawarma rounded-xl">
                 <Coffee className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -250,8 +250,8 @@ export default function AdminDashboard() {
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-100 rounded-xl">
-                  <ChefHat className="h-6 w-6 text-blue-600" />
+                <div className="p-3 bg-shawarma rounded-xl">
+                  <ChefHat className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">In Kitchen</p>
@@ -266,8 +266,8 @@ export default function AdminDashboard() {
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <ShoppingBag className="h-6 w-6 text-green-600" />
+                <div className="p-3 bg-shawarma rounded-xl">
+                  <ShoppingBag className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Today&apos;s Orders</p>

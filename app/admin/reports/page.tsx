@@ -179,8 +179,8 @@ export default function ReportsPage() {
           <Card className="bg-white">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-green-100 rounded-xl">
-                  <DollarSign className="h-6 w-6 text-green-600" />
+                <div className="p-3 bg-shawarma rounded-xl">
+                  <DollarSign className="h-6 w-6 text-white" />
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Total Revenue</p>

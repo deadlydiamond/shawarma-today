@@ -201,8 +201,8 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
           <div className="animate-slide-up space-y-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 rounded-lg bg-white shadow-sm">
-                <Heart className="h-5 w-5 text-gray-900" strokeWidth={2} />
+              <div className="p-2 rounded-lg bg-shawarma shadow-sm">
+                <Heart className="h-5 w-5 text-white" strokeWidth={2} />
               </div>
               <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
                 About Us

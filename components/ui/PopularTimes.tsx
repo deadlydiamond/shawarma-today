@@ -141,8 +141,8 @@ export default function PopularTimes() {
     <Card className="p-10">
       <CardContent className="p-0">
         <div className="flex items-center justify-center gap-4 mb-8">
-          <div className="p-3 rounded-xl bg-gray-100">
-            <TrendingUp className="h-6 w-6 text-gray-900" strokeWidth={2} />
+          <div className="p-3 rounded-xl bg-shawarma">
+            <TrendingUp className="h-6 w-6 text-white" strokeWidth={2} />
           </div>
           <h3 className="text-xl font-semibold">Popular Times</h3>
         </div>
