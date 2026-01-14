@@ -529,7 +529,6 @@ export default function Home() {
                 <div className="text-center p-4 rounded-xl bg-white/60 backdrop-blur-sm border border-gray-100 hover-scale">
                   <div className="text-3xl font-bold text-shawarma flex items-center justify-center gap-1">
                     {googleStats.rating}
-                    <Star className="h-6 w-6 text-yellow-500 fill-yellow-500" />
                   </div>
                   <div className="text-sm text-gray-600">Google Rating</div>
                 </div>
@@ -557,11 +556,11 @@ export default function Home() {
               <div className="absolute bottom-6 left-6 right-6">
                 <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-xl">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-yellow-500 animate-badge-bounce">
+                    <div className="p-2 rounded-xl bg-shawarma animate-badge-bounce">
                       <Star className="h-5 w-5 text-white fill-white" />
                     </div>
                     <div>
-                      <div className="font-bold text-gray-900">5.0 Rating</div>
+                      <div className="font-bold text-gray-900">{googleStats.rating} Rating</div>
                       <div className="text-sm text-gray-600">Based on Google Reviews</div>
                     </div>
                   </div>
