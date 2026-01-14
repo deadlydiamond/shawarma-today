@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://leafandbeancafe.co.uk/sitemap.xml

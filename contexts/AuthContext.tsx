@@ -1,0 +1,184 @@
+"use client"
+
+import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from "react"
+import { supabase } from "@/lib/supabase"
+
+export interface Staff {
+  id: string
+  username: string
+  name: string
+  role: string
+  is_active: boolean
+}
+
+// Fallback admin credentials when Supabase isn't configured
+const FALLBACK_ADMIN = {
+  id: "local-admin",
+  username: "admin",
+  password: "leafbean2024",
+  name: "Admin",
+  role: "admin",
+  is_active: true,
+}
+
+interface AuthContextType {
+  staff: Staff | null
+  loading: boolean
+  error: string | null
+  login: (username: string, password: string) => Promise<boolean>
+  logout: () => void
+  isAuthenticated: boolean
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [staff, setStaff] = useState<Staff | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Check if user is already logged in on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const storedStaffId = localStorage.getItem("staff_id")
+        if (storedStaffId) {
+          // Check for local fallback admin
+          if (storedStaffId === FALLBACK_ADMIN.id) {
+            setStaff({
+              id: FALLBACK_ADMIN.id,
+              username: FALLBACK_ADMIN.username,
+              name: FALLBACK_ADMIN.name,
+              role: FALLBACK_ADMIN.role,
+              is_active: true,
+            })
+            setLoading(false)
+            return
+          }
+
+          // Try Supabase
+          try {
+            const { data, error } = await supabase
+              .from("staff")
+              .select("id, username, name, role, is_active")
+              .eq("id", storedStaffId)
+              .eq("is_active", true)
+              .single()
+
+            if (data && !error) {
+              setStaff(data)
+            } else {
+              localStorage.removeItem("staff_id")
+            }
+          } catch {
+            // Supabase not available, check local
+            localStorage.removeItem("staff_id")
+          }
+        }
+      } catch (err) {
+        console.error("Auth check error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkAuth()
+  }, [])
+
+  const login = useCallback(async (username: string, password: string): Promise<boolean> => {
+    setError(null)
+    setLoading(true)
+
+    try {
+      // First try Supabase authentication
+      try {
+        const { data, error: queryError } = await supabase
+          .from("staff")
+          .select("id, username, name, role, is_active, password_hash")
+          .eq("username", username.toLowerCase())
+          .eq("is_active", true)
+          .single()
+
+        if (!queryError && data && data.password_hash === password) {
+          // Update last login time
+          await supabase
+            .from("staff")
+            .update({ last_login: new Date().toISOString() })
+            .eq("id", data.id)
+
+          const staffData: Staff = {
+            id: data.id,
+            username: data.username,
+            name: data.name,
+            role: data.role,
+            is_active: data.is_active,
+          }
+
+          setStaff(staffData)
+          localStorage.setItem("staff_id", data.id)
+          setLoading(false)
+          return true
+        }
+      } catch {
+        // Supabase not available, continue to fallback
+        console.log("Supabase not available, using fallback authentication")
+      }
+
+      // Fallback to local admin credentials
+      if (
+        username.toLowerCase() === FALLBACK_ADMIN.username &&
+        password === FALLBACK_ADMIN.password
+      ) {
+        const staffData: Staff = {
+          id: FALLBACK_ADMIN.id,
+          username: FALLBACK_ADMIN.username,
+          name: FALLBACK_ADMIN.name,
+          role: FALLBACK_ADMIN.role,
+          is_active: true,
+        }
+
+        setStaff(staffData)
+        localStorage.setItem("staff_id", FALLBACK_ADMIN.id)
+        setLoading(false)
+        return true
+      }
+
+      setError("Invalid username or password")
+      setLoading(false)
+      return false
+    } catch (err) {
+      console.error("Login error:", err)
+      setError("An error occurred during login")
+      setLoading(false)
+      return false
+    }
+  }, [])
+
+  const logout = useCallback(() => {
+    setStaff(null)
+    localStorage.removeItem("staff_id")
+  }, [])
+
+  return (
+    <AuthContext.Provider
+      value={{
+        staff,
+        loading,
+        error,
+        login,
+        logout,
+        isAuthenticated: !!staff,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider")
+  }
+  return context
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Shawarma Today",
+  "tagline": "Authentic Middle Eastern flavours, made fresh daily.",
+  "address": {
+    "line1": "123 High Street",
+    "city": "Edinburgh",
+    "postcode": "EH1 1AA",
+    "country": "United Kingdom"
+  },
+  "phone": "+44 131 123 4567",
+  "socials": {
+    "facebook": "https://www.facebook.com/shawarmatoday/",
+    "instagram": "https://www.instagram.com/shawarmatoday/"
+  },
+  "hours": {
+    "note": "Hours may vary. Please call to confirm.",
+    "items": [
+      { "day": "Monday", "open": "11:00", "close": "22:00" },
+      { "day": "Tuesday", "open": "11:00", "close": "22:00" },
+      { "day": "Wednesday", "open": "11:00", "close": "22:00" },
+      { "day": "Thursday", "open": "11:00", "close": "22:00" },
+      { "day": "Friday", "open": "11:00", "close": "23:00" },
+      { "day": "Saturday", "open": "11:00", "close": "23:00" },
+      { "day": "Sunday", "open": "12:00", "close": "21:00" }
+    ]
+  }
+}
