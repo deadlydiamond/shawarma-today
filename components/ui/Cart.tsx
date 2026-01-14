@@ -138,7 +138,7 @@ export default function Cart() {
               className="w-full"
               onClick={() => setIsOpen(false)}
             >
-              <Link href="/checkout">🛒 Proceed to Checkout</Link>
+              <Link href="/checkout" className="flex items-center justify-center gap-3"><ShoppingBag className="h-5 w-5 text-white" /> Proceed to Checkout</Link>
             </Button>
             <Button
               variant="outline"
