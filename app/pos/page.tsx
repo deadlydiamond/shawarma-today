@@ -693,204 +693,183 @@ export default function POSPage() {
         </div>
       </div>
 
-      {/* Receipt Modal */}
+      {/* Receipt Modal - Modern Industry Design */}
       {showReceipt && lastReceipt && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden">
-            {/* Scrollable Receipt Content */}
-            <div ref={receiptRef} className="p-6 overflow-y-auto flex-1">
-              <div className="header text-center border-b-2 border-dashed border-gray-300 pb-4 mb-4">
-                <div className="logo text-2xl font-bold">TODAY SHAWARMA</div>
-                <p className="text-gray-500 text-sm">203 Dalry Road, Edinburgh</p>
-                <p className="text-gray-500 text-sm">Tel: 0131 XXX XXXX</p>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-3xl max-w-md w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-gray-700">
+            {/* Header with Close */}
+            <div className="relative p-6 pb-0">
+              <button
+                onClick={() => { setShowReceipt(false); setShowReceiptPaymentOptions(false) }}
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              
+              {/* Order Number - Hero Style */}
+              <div className="text-center mb-6">
+                <p className="text-gray-400 text-sm font-medium tracking-wider uppercase mb-2">Order Placed</p>
+                <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-shawarma to-orange-600 shadow-lg shadow-orange-500/30">
+                  <span className="text-white text-5xl font-black">{lastReceipt.orderCode}</span>
+                </div>
               </div>
 
-              {/* Large Order Code */}
-              <div className="text-center mb-4 p-4 bg-shawarma rounded-xl">
-                <p className="text-white/80 text-sm font-medium">ORDER NUMBER</p>
-                <p className="text-white text-5xl font-bold tracking-wider">{lastReceipt.orderCode}</p>
-              </div>
-
-              {/* Ready Time - Prominent */}
-              <div className="text-center mb-4 p-4 bg-green-500 rounded-xl">
-                <p className="text-white/80 text-sm font-medium">READY AT</p>
-                <p className="text-white text-3xl font-bold">
+              {/* Ready Time Card */}
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-4 text-center shadow-lg shadow-green-500/20 mb-4">
+                <div className="flex items-center justify-center gap-2 text-white/80 text-sm mb-1">
+                  <Clock className="h-4 w-4" />
+                  <span>Ready in ~{lastReceipt.prepTime} min</span>
+                </div>
+                <p className="text-white text-4xl font-black">
                   {lastReceipt.readyTime.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                 </p>
-                <p className="text-white/80 text-sm">~{lastReceipt.prepTime} minutes</p>
               </div>
 
-              <div className="text-center mb-4">
-                <p className="text-sm text-gray-500">
-                  Ordered: {lastReceipt.timestamp.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
-                </p>
-              </div>
-
-              <div className="mb-4 p-3 bg-gray-100 rounded-lg">
-                <p className="font-semibold">{lastReceipt.customer || "Walk-in Customer"}</p>
-                <p className="text-sm text-gray-600">
-                  {lastReceipt.tableNumber === "counter" ? "Counter" : 
-                   lastReceipt.tableNumber === "takeaway" ? "Takeaway" :
-                   `Table ${lastReceipt.tableNumber}`}
-                </p>
-              </div>
-
-              <div className="divider border-t border-dashed border-gray-300 my-4" />
-
-              <div className="space-y-2 mb-4">
-                {lastReceipt.items.map(item => (
-                  <div key={item.id} className="item flex justify-between text-sm">
-                    <span>{item.quantity}x {item.name}</span>
-                    <span>£{(item.price * item.quantity).toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="divider border-t border-dashed border-gray-300 my-4" />
-
-              <div className="flex justify-between font-bold text-lg mb-2">
-                <span>TOTAL</span>
-                <span>£{lastReceipt.total.toFixed(2)}</span>
-              </div>
-
-              {/* Payment Status on Receipt */}
-              <div className={`mt-4 p-3 rounded-xl text-center font-bold ${
-                lastReceipt.isPaid 
-                  ? "bg-green-100 text-green-700 border-2 border-green-300" 
-                  : "bg-red-100 text-red-700 border-2 border-red-300"
-              }`}>
-                {lastReceipt.isPaid ? "✅ PAYMENT COLLECTED" : "💰 PAYMENT PENDING"}
-              </div>
-
-              <div className="footer text-center mt-4 text-sm text-gray-500">
-                <p>Thank you for your order!</p>
-                <p>100% Halal • Fresh Daily</p>
+              {/* Customer & Location */}
+              <div className="flex gap-3 mb-4">
+                <div className="flex-1 bg-white/5 rounded-xl p-3 border border-white/10">
+                  <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Customer</p>
+                  <p className="text-white font-semibold truncate">{lastReceipt.customer || "Walk-in"}</p>
+                </div>
+                <div className="flex-1 bg-white/5 rounded-xl p-3 border border-white/10">
+                  <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">Location</p>
+                  <p className="text-white font-semibold">
+                    {lastReceipt.tableNumber === "counter" ? "Counter" : 
+                     lastReceipt.tableNumber === "takeaway" ? "Takeaway" :
+                     `Table ${lastReceipt.tableNumber}`}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Actions - Fixed at bottom */}
-            <div className="p-4 bg-gray-50 space-y-3 border-t border-gray-200 flex-shrink-0">
-              {/* Collect Payment section - only if not paid */}
+            {/* Scrollable Items */}
+            <div ref={receiptRef} className="flex-1 overflow-y-auto px-6 py-4 min-h-0">
+              <div className="space-y-2">
+                {lastReceipt.items.map(item => (
+                  <div key={item.id} className="flex items-center justify-between py-2 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-white font-bold text-sm">
+                        {item.quantity}
+                      </span>
+                      <span className="text-white">{item.name}</span>
+                    </div>
+                    <span className="text-gray-300 font-medium">£{(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Total & Payment Status */}
+            <div className="px-6 py-4 bg-black/30">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-gray-400 text-lg">Total</span>
+                <span className="text-white text-3xl font-black">£{lastReceipt.total.toFixed(2)}</span>
+              </div>
+              
+              {/* Payment Status Badge */}
+              <div className={`rounded-xl p-3 text-center font-bold ${
+                lastReceipt.isPaid 
+                  ? "bg-green-500/20 text-green-400 border border-green-500/30" 
+                  : "bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse"
+              }`}>
+                {lastReceipt.isPaid ? "✓ PAYMENT COLLECTED" : "PAYMENT PENDING"}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="p-4 bg-black/50 space-y-3">
+              {/* Payment Options */}
               {!lastReceipt.isPaid && !showReceiptPaymentOptions && (
                 <button
                   onClick={() => setShowReceiptPaymentOptions(true)}
-                  className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+                  className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-2xl font-bold text-lg flex items-center justify-center gap-3 transition-all shadow-lg shadow-green-500/30"
                 >
-                  <CreditCard className="h-6 w-6" />
-                  Collect Payment • £{lastReceipt.total.toFixed(2)}
+                  <Banknote className="h-6 w-6" />
+                  Collect Payment
                 </button>
               )}
 
-              {/* Payment Options - Cash or Card */}
               {!lastReceipt.isPaid && showReceiptPaymentOptions && (
-                <div className="bg-white rounded-xl border-2 border-green-200 p-4">
-                  <p className="text-center text-gray-600 mb-3 font-medium">Select Payment Method</p>
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <button
-                      onClick={async () => {
-                        const order = orders.find(o => 
-                          o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
-                        )
-                        if (order) {
-                          const newInstructions = order.specialInstructions?.replace("💰 UNPAID", "✅ PAID (Cash)") || "✅ PAID (Cash)"
-                          await updateOrderNotes(order.id, newInstructions)
-                        }
-                        setLastReceipt({ ...lastReceipt, isPaid: true })
-                        setShowReceiptPaymentOptions(false)
-                      }}
-                      className="p-4 bg-green-100 hover:bg-green-200 rounded-xl text-center transition-colors border-2 border-green-300"
-                    >
-                      <Banknote className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                      <span className="font-bold text-green-700">Cash</span>
-                    </button>
-                    <button
-                      onClick={async () => {
-                        const order = orders.find(o => 
-                          o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
-                        )
-                        if (order) {
-                          const newInstructions = order.specialInstructions?.replace("💰 UNPAID", "✅ PAID (Card)") || "✅ PAID (Card)"
-                          await updateOrderNotes(order.id, newInstructions)
-                        }
-                        setLastReceipt({ ...lastReceipt, isPaid: true })
-                        setShowReceiptPaymentOptions(false)
-                      }}
-                      className="p-4 bg-blue-100 hover:bg-blue-200 rounded-xl text-center transition-colors border-2 border-blue-300"
-                    >
-                      <CreditCard className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                      <span className="font-bold text-blue-700">Card</span>
-                    </button>
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => setShowReceiptPaymentOptions(false)}
-                    className="w-full py-2 text-gray-500 hover:text-gray-700 text-sm font-medium"
+                    onClick={async () => {
+                      const order = orders.find(o => o.specialInstructions?.includes(`#${lastReceipt.orderCode}`))
+                      if (order) {
+                        await updateOrderNotes(order.id, order.specialInstructions?.replace("💰 UNPAID", "✅ PAID (Cash)") || "✅ PAID (Cash)")
+                      }
+                      setLastReceipt({ ...lastReceipt, isPaid: true })
+                      setShowReceiptPaymentOptions(false)
+                    }}
+                    className="py-5 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-2xl font-bold flex flex-col items-center justify-center gap-2 transition-all shadow-lg"
                   >
-                    Back
+                    <Banknote className="h-8 w-8" />
+                    <span>CASH</span>
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const order = orders.find(o => o.specialInstructions?.includes(`#${lastReceipt.orderCode}`))
+                      if (order) {
+                        await updateOrderNotes(order.id, order.specialInstructions?.replace("💰 UNPAID", "✅ PAID (Card)") || "✅ PAID (Card)")
+                      }
+                      setLastReceipt({ ...lastReceipt, isPaid: true })
+                      setShowReceiptPaymentOptions(false)
+                    }}
+                    className="py-5 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-2xl font-bold flex flex-col items-center justify-center gap-2 transition-all shadow-lg"
+                  >
+                    <CreditCard className="h-8 w-8" />
+                    <span>CARD</span>
                   </button>
                 </div>
               )}
               
-              {/* Main action buttons */}
-              <div className="flex gap-3">
+              {/* Main Actions */}
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={handlePrintReceipt}
-                  className="flex-1 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
+                  className="py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors border border-white/10"
                 >
                   <Printer className="h-5 w-5" />
                   Print
                 </button>
                 <button
-                  onClick={() => {
-                    setShowReceipt(false)
-                    setShowReceiptPaymentOptions(false)
-                  }}
-                  className="flex-1 py-3 bg-shawarma hover:bg-shawarma-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2"
+                  onClick={() => { setShowReceipt(false); setShowReceiptPaymentOptions(false) }}
+                  className="py-3 bg-shawarma hover:bg-orange-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
                 >
                   <CheckCircle className="h-5 w-5" />
                   Done
                 </button>
               </div>
 
-              {/* Modify / Cancel buttons */}
-              <div className="flex gap-3 pt-2 border-t border-gray-200">
+              {/* Secondary Actions */}
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => {
-                    // Re-add items to cart for modification
                     setCart(lastReceipt.items)
                     setCustomerName(lastReceipt.customer)
                     setTableNumber(lastReceipt.tableNumber)
-                    // Cancel the existing order
-                    const order = orders.find(o => 
-                      o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
-                    )
-                    if (order) {
-                      updateOrderStatus(order.id, "cancelled")
-                    }
+                    const order = orders.find(o => o.specialInstructions?.includes(`#${lastReceipt.orderCode}`))
+                    if (order) updateOrderStatus(order.id, "cancelled")
                     setShowReceipt(false)
                     setShowReceiptPaymentOptions(false)
                   }}
-                  className="flex-1 py-2 border-2 border-amber-400 text-amber-600 hover:bg-amber-50 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+                  className="py-2.5 text-amber-400 hover:bg-amber-500/10 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors text-sm"
                 >
                   <RefreshCw className="h-4 w-4" />
-                  Modify Order
+                  Modify
                 </button>
                 <button
                   onClick={async () => {
-                    if (confirm("Are you sure you want to cancel this order?")) {
-                      const order = orders.find(o => 
-                        o.specialInstructions?.includes(`#${lastReceipt.orderCode}`)
-                      )
-                      if (order) {
-                        await updateOrderStatus(order.id, "cancelled")
-                      }
+                    if (confirm("Cancel this order?")) {
+                      const order = orders.find(o => o.specialInstructions?.includes(`#${lastReceipt.orderCode}`))
+                      if (order) await updateOrderStatus(order.id, "cancelled")
                       setShowReceipt(false)
                       setShowReceiptPaymentOptions(false)
                     }
                   }}
-                  className="flex-1 py-2 border-2 border-red-300 text-red-600 hover:bg-red-50 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors"
+                  className="py-2.5 text-red-400 hover:bg-red-500/10 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors text-sm"
                 >
                   <X className="h-4 w-4" />
-                  Cancel Order
+                  Cancel
                 </button>
               </div>
             </div>
@@ -898,149 +877,135 @@ export default function POSPage() {
         </div>
       )}
 
-      {/* Payment Lookup Modal */}
+      {/* Payment Lookup Modal - Modern Design */}
       {showPaymentLookup && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
-          <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-gray-700">
             {/* Header */}
-            <div className="p-4 bg-amber-500 flex items-center justify-between">
-              <div className="flex items-center gap-3 text-white">
-                <DollarSign className="h-6 w-6" />
-                <h2 className="text-xl font-bold">Payment Lookup</h2>
+            <div className="p-6 border-b border-white/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30">
+                    <Search className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Payment Lookup</h2>
+                    <p className="text-gray-400 text-sm">Search by order code</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setShowPaymentLookup(false); setPaymentSearchCode(""); setFoundOrder(null) }}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  setShowPaymentLookup(false)
-                  setPaymentSearchCode("")
-                  setFoundOrder(null)
-                }}
-                className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
 
             <div className="p-6">
-              {/* Search */}
+              {/* Search Input */}
               <div className="flex gap-2 mb-6">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
                     value={paymentSearchCode}
                     onChange={(e) => setPaymentSearchCode(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && searchOrderByCode()}
-                    placeholder="Enter 4-digit order code"
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-lg font-mono focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    placeholder="Enter order code"
+                    className="w-full px-4 py-4 bg-white/5 border border-white/10 rounded-xl text-2xl font-mono text-white text-center placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 tracking-widest"
                     maxLength={4}
                   />
                 </div>
                 <button
                   onClick={searchOrderByCode}
-                  className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold transition-colors"
+                  className="px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg"
                 >
-                  Search
+                  Find
                 </button>
               </div>
 
               {/* Result */}
               {foundOrder ? (
-                <div className="border border-gray-200 rounded-xl overflow-hidden">
-                  {/* Order Header */}
-                  <div className="p-4 bg-gray-50 flex items-center justify-between">
+                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+                  {/* Order Info */}
+                  <div className="p-4 flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-500">Order</p>
-                      <p className="text-xl font-bold text-gray-900">{foundOrder.customer.name}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-gray-900">£{foundOrder.total.toFixed(2)}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-gray-400 text-sm">Customer</p>
+                      <p className="text-white font-bold text-lg">{foundOrder.customer.name.split("#")[0].trim()}</p>
+                      <p className="text-gray-500 text-sm">
                         {foundOrder.tableNumber === "counter" ? "Counter" : 
                          foundOrder.tableNumber === "takeaway" ? "Takeaway" : 
                          `Table ${foundOrder.tableNumber}`}
                       </p>
                     </div>
+                    <p className="text-3xl font-black text-white">£{foundOrder.total.toFixed(2)}</p>
                   </div>
 
                   {/* Payment Status */}
-                  <div className="p-4">
+                  <div className="p-4 border-t border-white/10">
                     {foundOrder.specialInstructions?.includes("💰 UNPAID") ? (
-                      <div className="flex items-center justify-between p-4 bg-red-50 border-2 border-red-200 rounded-xl mb-4">
-                        <div className="flex items-center gap-3">
-                          <AlertCircle className="h-8 w-8 text-red-500" />
+                      <>
+                        <div className="flex items-center gap-3 p-4 bg-red-500/20 border border-red-500/30 rounded-xl mb-4">
+                          <div className="w-12 h-12 rounded-full bg-red-500/30 flex items-center justify-center">
+                            <AlertCircle className="h-6 w-6 text-red-400" />
+                          </div>
                           <div>
-                            <p className="font-bold text-red-700">PAYMENT NOT COLLECTED</p>
-                            <p className="text-sm text-red-600">Please collect payment before handover</p>
+                            <p className="font-bold text-red-400">UNPAID</p>
+                            <p className="text-red-400/70 text-sm">Collect payment before handover</p>
                           </div>
                         </div>
-                      </div>
+                        <button
+                          onClick={markAsPaid}
+                          className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-lg shadow-green-500/30"
+                        >
+                          <CheckCircle className="h-6 w-6" />
+                          Mark as Paid
+                        </button>
+                      </>
                     ) : (
-                      <div className="flex items-center justify-between p-4 bg-green-50 border-2 border-green-200 rounded-xl mb-4">
-                        <div className="flex items-center gap-3">
-                          <CheckCircle className="h-8 w-8 text-green-500" />
-                          <div>
-                            <p className="font-bold text-green-700">PAYMENT COLLECTED</p>
-                            <p className="text-sm text-green-600">Order is ready for handover</p>
-                          </div>
+                      <div className="flex items-center gap-3 p-4 bg-green-500/20 border border-green-500/30 rounded-xl">
+                        <div className="w-12 h-12 rounded-full bg-green-500/30 flex items-center justify-center">
+                          <CheckCircle className="h-6 w-6 text-green-400" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-green-400">PAID</p>
+                          <p className="text-green-400/70 text-sm">Ready for handover</p>
                         </div>
                       </div>
-                    )}
-
-                    {/* Items Preview */}
-                    <div className="mb-4">
-                      <p className="text-sm text-gray-500 mb-2">{foundOrder.items.length} items</p>
-                      <div className="text-sm text-gray-600">
-                        {foundOrder.items.slice(0, 3).map((item, i) => (
-                          <span key={i}>{item.quantity}x {item.name}{i < 2 && foundOrder.items.length > 1 ? ", " : ""}</span>
-                        ))}
-                        {foundOrder.items.length > 3 && <span> +{foundOrder.items.length - 3} more</span>}
-                      </div>
-                    </div>
-
-                    {/* Mark as Paid Button */}
-                    {foundOrder.specialInstructions?.includes("💰 UNPAID") && (
-                      <button
-                        onClick={markAsPaid}
-                        className="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-colors"
-                      >
-                        <CreditCard className="h-6 w-6" />
-                        Mark Payment Collected
-                      </button>
                     )}
                   </div>
                 </div>
               ) : paymentSearchCode && (
-                <div className="text-center py-8 text-gray-500">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>No order found with code &quot;{paymentSearchCode}&quot;</p>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="h-8 w-8 text-gray-600" />
+                  </div>
+                  <p className="text-white font-medium">No order found</p>
+                  <p className="text-gray-500 text-sm">Code &quot;{paymentSearchCode}&quot; not found</p>
                 </div>
               )}
 
               {/* Unpaid Orders List */}
               {unpaidOrders.length > 0 && !foundOrder && (
                 <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
                     Unpaid Orders ({unpaidOrders.length})
                   </h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {unpaidOrders.map(order => {
-                      // Extract order code from special instructions
                       const codeMatch = order.specialInstructions?.match(/#(\d{4})/)
                       const code = codeMatch ? codeMatch[1] : order.id.slice(-4)
                       return (
                         <button
                           key={order.id}
-                          onClick={() => {
-                            setPaymentSearchCode(code)
-                            setFoundOrder(order)
-                          }}
-                          className="w-full p-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl flex items-center justify-between transition-colors text-left"
+                          onClick={() => { setPaymentSearchCode(code); setFoundOrder(order) }}
+                          className="w-full p-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl flex items-center justify-between transition-colors text-left"
                         >
                           <div className="flex items-center gap-3">
-                            <span className="font-mono font-bold text-red-700">#{code}</span>
-                            <span className="text-gray-700">{order.customer.name.split("#")[0].trim()}</span>
+                            <span className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center font-mono font-bold text-red-400">{code}</span>
+                            <span className="text-white">{order.customer.name.split("#")[0].trim()}</span>
                           </div>
-                          <span className="font-bold text-gray-900">£{order.total.toFixed(2)}</span>
+                          <span className="font-bold text-white">£{order.total.toFixed(2)}</span>
                         </button>
                       )
                     })}
@@ -1052,61 +1017,75 @@ export default function POSPage() {
         </div>
       )}
 
-      {/* Held Orders Modal */}
+      {/* Held Orders Modal - Modern Design */}
       {showHeldOrders && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
-          <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden">
-            <div className="p-4 bg-amber-500 flex items-center justify-between">
-              <div className="flex items-center gap-3 text-white">
-                <Clock className="h-6 w-6" />
-                <h2 className="text-xl font-bold">Held Orders ({heldOrders.length})</h2>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-gray-700">
+            {/* Header */}
+            <div className="p-6 border-b border-white/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <Clock className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Held Orders</h2>
+                    <p className="text-gray-400 text-sm">{heldOrders.length} parked orders</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowHeldOrders(false)}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <button
-                onClick={() => setShowHeldOrders(false)}
-                className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
+
+            {/* Content */}
             <div className="p-4 max-h-[60vh] overflow-y-auto">
               {heldOrders.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <Clock className="h-16 w-16 mx-auto mb-4 opacity-30" />
-                  <p className="font-medium">No held orders</p>
-                  <p className="text-sm">Use HOLD to park orders for later</p>
+                <div className="text-center py-16">
+                  <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
+                    <Clock className="h-10 w-10 text-gray-600" />
+                  </div>
+                  <p className="text-white font-medium mb-1">No held orders</p>
+                  <p className="text-gray-500 text-sm">Tap HOLD to park an order for later</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {heldOrders.map(held => (
-                    <div key={held.id} className="border border-gray-200 rounded-xl p-4">
-                      <div className="flex items-center justify-between mb-2">
+                    <div key={held.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-colors">
+                      <div className="flex items-start justify-between mb-3">
                         <div>
-                          <p className="font-bold text-gray-900">{held.name || "No Name"}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-bold text-white text-lg">{held.name || "Walk-in"}</p>
+                          <p className="text-gray-400 text-sm flex items-center gap-2">
+                            <MapPin className="h-3 w-3" />
                             {held.table === "counter" ? "Counter" : held.table === "takeaway" ? "Takeaway" : `Table ${held.table}`}
-                            {" • "}
+                            <span className="text-gray-600">•</span>
+                            <Clock className="h-3 w-3" />
                             {held.time.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
                           </p>
                         </div>
-                        <p className="text-xl font-bold text-gray-900">
+                        <p className="text-2xl font-black text-green-400">
                           £{held.items.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2)}
                         </p>
                       </div>
-                      <div className="text-sm text-gray-600 mb-3">
-                        {held.items.map(i => `${i.quantity}x ${i.name}`).join(", ")}
+                      <div className="text-sm text-gray-400 mb-4 line-clamp-2">
+                        {held.items.map(i => `${i.quantity}× ${i.name}`).join(" • ")}
                       </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => recallOrder(held.id)}
-                          className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-colors"
+                          className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-500/20"
                         >
-                          Recall
+                          Recall Order
                         </button>
                         <button
                           onClick={() => deleteHeldOrder(held.id)}
-                          className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg font-semibold transition-colors"
+                          className="px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-semibold transition-colors"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-5 w-5" />
                         </button>
                       </div>
                     </div>
@@ -1118,53 +1097,80 @@ export default function POSPage() {
         </div>
       )}
 
-      {/* Discount Modal */}
+      {/* Discount Modal - Modern Design */}
       {showDiscount && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
-          <div className="bg-white rounded-2xl max-w-sm w-full overflow-hidden">
-            <div className="p-4 bg-purple-500 flex items-center justify-between">
-              <div className="flex items-center gap-3 text-white">
-                <DollarSign className="h-6 w-6" />
-                <h2 className="text-xl font-bold">Apply Discount</h2>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl border border-gray-700">
+            {/* Header */}
+            <div className="p-6 text-center border-b border-white/10">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/30">
+                <DollarSign className="h-8 w-8 text-white" />
               </div>
+              <h2 className="text-2xl font-bold text-white">Apply Discount</h2>
+              <p className="text-gray-400 mt-1">Select a percentage off</p>
               <button
                 onClick={() => setShowDiscount(false)}
-                className="p-2 text-white/80 hover:text-white rounded-lg hover:bg-white/20 transition-colors"
+                className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
+
+            {/* Discount Options */}
             <div className="p-6">
-              <p className="text-center text-gray-600 mb-4">Select discount percentage</p>
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-3 gap-3 mb-6">
                 {[5, 10, 15, 20, 25, 50].map(percent => (
                   <button
                     key={percent}
                     onClick={() => applyDiscount(percent)}
-                    className={`py-4 rounded-xl text-lg font-bold transition-colors ${
+                    className={`py-5 rounded-2xl text-xl font-black transition-all ${
                       discount === percent
-                        ? "bg-purple-500 text-white"
-                        : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                        ? "bg-gradient-to-br from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/30 scale-105"
+                        : "bg-white/5 hover:bg-white/10 text-white border border-white/10"
                     }`}
                   >
                     {percent}%
                   </button>
                 ))}
               </div>
-              <div className="border-t pt-4">
-                <p className="text-sm text-gray-500 text-center mb-2">Subtotal: £{subtotal.toFixed(2)}</p>
+
+              {/* Preview */}
+              <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-400">Subtotal</span>
+                  <span className="text-white font-medium">£{subtotal.toFixed(2)}</span>
+                </div>
                 {discount > 0 && (
-                  <p className="text-lg font-bold text-center text-green-600">
-                    After {discount}% off: £{(subtotal - subtotal * discount / 100).toFixed(2)}
-                  </p>
+                  <>
+                    <div className="flex justify-between items-center mb-2 text-green-400">
+                      <span>Discount ({discount}%)</span>
+                      <span>-£{(subtotal * discount / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                      <span className="text-white font-bold">New Total</span>
+                      <span className="text-2xl font-black text-green-400">£{(subtotal - subtotal * discount / 100).toFixed(2)}</span>
+                    </div>
+                  </>
                 )}
               </div>
-              <button
-                onClick={() => setShowDiscount(false)}
-                className="w-full mt-4 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold transition-colors"
-              >
-                Done
-              </button>
+
+              {/* Actions */}
+              <div className="flex gap-3 mt-6">
+                {discount > 0 && (
+                  <button
+                    onClick={() => setDiscount(0)}
+                    className="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-semibold transition-colors"
+                  >
+                    Clear
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowDiscount(false)}
+                  className={`${discount > 0 ? 'flex-1' : 'w-full'} py-3 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl font-bold transition-all shadow-lg`}
+                >
+                  Apply & Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
