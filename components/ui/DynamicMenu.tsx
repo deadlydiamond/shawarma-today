@@ -2,7 +2,7 @@
 
 import { useMenu } from "@/contexts/MenuContext"
 import { MenuItem, useCart } from "@/contexts/CartContext"
-import { Plus, Minus, Flame, Leaf, Sparkles, WheatOff, Check, ShoppingBag, Pizza, Sandwich, UtensilsCrossed, Beef, Salad, CupSoda, LayoutGrid } from "lucide-react"
+import { Plus, Minus, Flame, Check, ShoppingBag, Pizza, Sandwich, UtensilsCrossed, Beef, Salad, CupSoda, LayoutGrid } from "lucide-react"
 import { useMemo, useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
@@ -101,37 +101,27 @@ type ExtendedMenuItem = MenuItem & {
 function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isCompact?: boolean }) {
   const { addToCart, cartItems, updateQuantity } = useCart()
   const [imageLoaded, setImageLoaded] = useState(false)
-  const [selectedSize, setSelectedSize] = useState<"regular" | "large" | "kids">("regular")
   const [justAdded, setJustAdded] = useState(false)
   
-  const hasSizes = !!(item.priceLarge || item.priceKids)
-  const cartItem = cartItems.find((i) => i.id === item.id && i.selectedSize === selectedSize)
+  const cartItem = cartItems.find((i) => i.id === item.id)
   const quantity = cartItem?.quantity || 0
-  
-  const getDisplayPrice = () => {
-    if (selectedSize === "large" && item.priceLarge) return item.priceLarge
-    if (selectedSize === "kids" && item.priceKids) return item.priceKids
-    return item.price
-  }
   
   const handleAdd = () => {
     addToCart({
       id: item.id,
       name: item.name,
-      price: getDisplayPrice(),
-      priceLarge: item.priceLarge,
-      priceKids: item.priceKids,
+      price: item.price,
       image: item.image,
       category: item.category,
       description: item.description,
-    }, selectedSize)
+    })
     setJustAdded(true)
     setTimeout(() => setJustAdded(false), 1000)
   }
 
   const handleIncrement = () => {
     if (cartItem) {
-      updateQuantity(cartItem.id, quantity + 1, cartItem.selectedSize || "regular")
+      updateQuantity(cartItem.id, quantity + 1)
     } else {
       handleAdd()
     }
@@ -139,16 +129,9 @@ function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isC
 
   const handleDecrement = () => {
     if (cartItem && quantity > 0) {
-      updateQuantity(cartItem.id, quantity - 1, cartItem.selectedSize || "regular")
+      updateQuantity(cartItem.id, quantity - 1)
     }
   }
-
-  const tags = []
-  if (item.isNew) tags.push({ label: "NEW", icon: Sparkles, color: "bg-blue-500" })
-  if (item.isPopular) tags.push({ label: "POPULAR", icon: Flame, color: "bg-shawarma" })
-  if (item.isVegan) tags.push({ label: "Vegan", icon: Leaf, color: "bg-green-600" })
-  if (item.isVegetarian && !item.isVegan) tags.push({ label: "Veggie", icon: Leaf, color: "bg-green-500" })
-  if (item.isGlutenFree) tags.push({ label: "GF", icon: WheatOff, color: "bg-amber-600" })
 
   if (isCompact) {
     // Compact card for grid view
@@ -167,53 +150,16 @@ function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isC
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             onLoad={() => setImageLoaded(true)}
           />
-          {/* Tags */}
-          {tags.length > 0 && (
-            <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-              {tags.slice(0, 2).map((tag, i) => (
-                <span key={i} className={cn("px-2 py-0.5 text-white text-[10px] font-bold rounded-full flex items-center gap-1", tag.color)}>
-                  <tag.icon className="h-3 w-3" />
-                  {tag.label}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Content */}
         <div className="p-3">
           <h4 className="font-semibold text-gray-900 text-sm leading-tight mb-1 line-clamp-1">{item.name}</h4>
           <p className="text-xs text-gray-500 line-clamp-1 mb-2">{item.description}</p>
-          
-          {/* Size selector */}
-          {hasSizes && (
-            <div className="flex gap-1 mb-2">
-              <button
-                onClick={() => setSelectedSize("regular")}
-                className={cn(
-                  "flex-1 py-1 text-[10px] font-medium rounded-lg transition-colors",
-                  selectedSize === "regular" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                )}
-              >
-                Regular
-              </button>
-              {item.priceLarge && (
-                <button
-                  onClick={() => setSelectedSize("large")}
-                  className={cn(
-                    "flex-1 py-1 text-[10px] font-medium rounded-lg transition-colors",
-                    selectedSize === "large" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  )}
-                >
-                  Large
-                </button>
-              )}
-            </div>
-          )}
 
           {/* Price & Add */}
           <div className="flex items-center justify-between">
-            <span className="text-base font-bold text-gray-900">{getDisplayPrice()}</span>
+            <span className="text-base font-bold text-gray-900">{item.price}</span>
             
             {quantity > 0 ? (
               <div className="flex items-center gap-1 bg-gray-900 rounded-full">
@@ -277,17 +223,6 @@ function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isC
             sizes="(max-width: 640px) 100vw, 200px"
             onLoad={() => setImageLoaded(true)}
           />
-          {/* Tags */}
-          {tags.length > 0 && (
-            <div className="absolute top-3 left-3 flex flex-wrap gap-1">
-              {tags.map((tag, i) => (
-                <span key={i} className={cn("px-2.5 py-1 text-white text-xs font-bold rounded-full flex items-center gap-1", tag.color)}>
-                  <tag.icon className="h-3.5 w-3.5" />
-                  {tag.label}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Content */}
@@ -295,37 +230,11 @@ function MenuItemCard({ item, isCompact = false }: { item: ExtendedMenuItem; isC
           <div>
             <h4 className="font-bold text-gray-900 text-lg mb-1">{item.name}</h4>
             <p className="text-sm text-gray-500 mb-3">{item.description}</p>
-            
-            {/* Size selector */}
-            {hasSizes && (
-              <div className="flex gap-2 mb-3">
-                <button
-                  onClick={() => setSelectedSize("regular")}
-                  className={cn(
-                    "px-4 py-1.5 text-xs font-semibold rounded-full transition-colors",
-                    selectedSize === "regular" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  )}
-                >
-                  Regular
-                </button>
-                {item.priceLarge && (
-                  <button
-                    onClick={() => setSelectedSize("large")}
-                    className={cn(
-                      "px-4 py-1.5 text-xs font-semibold rounded-full transition-colors",
-                      selectedSize === "large" ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    )}
-                  >
-                    Large
-                  </button>
-                )}
-              </div>
-            )}
           </div>
 
           {/* Price & Add */}
           <div className="flex items-center justify-between mt-2">
-            <span className="text-xl font-bold text-gray-900">{getDisplayPrice()}</span>
+            <span className="text-xl font-bold text-gray-900">{item.price}</span>
             
             {quantity > 0 ? (
               <div className="flex items-center gap-2 bg-gray-900 rounded-full px-1">
