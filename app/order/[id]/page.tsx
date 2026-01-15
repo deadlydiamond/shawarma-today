@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useParams } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 import Navbar from "@/components/layout/Navbar"
@@ -86,8 +86,17 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const prevStatusRef = useRef<string | null>(null)
 
   useEffect(() => {
+    if (!supabase) {
+      setNotFound(true)
+      setLoading(false)
+      return
+    }
+
+    let realtimeWorking = false
+
     const fetchOrder = async () => {
       try {
         const { data, error } = await supabase
@@ -119,6 +128,11 @@ export default function OrderTrackingPage() {
           }
           setNotFound(true)
         } else {
+          // Check if status changed to ready and play sound
+          if (data.status === "ready" && prevStatusRef.current !== "ready") {
+            playReadySound()
+          }
+          prevStatusRef.current = data.status
           setOrder(data)
         }
       } catch (err) {
@@ -129,8 +143,25 @@ export default function OrderTrackingPage() {
       }
     }
 
+    const playReadySound = () => {
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        const oscillator = audioContext.createOscillator()
+        const gainNode = audioContext.createGain()
+        oscillator.connect(gainNode)
+        gainNode.connect(audioContext.destination)
+        oscillator.frequency.value = 880
+        oscillator.type = "sine"
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8)
+        oscillator.start(audioContext.currentTime)
+        oscillator.stop(audioContext.currentTime + 0.8)
+      } catch {}
+    }
+
     fetchOrder()
 
+    // Realtime subscription
     const channel = supabase
       .channel(`order-${orderId}`)
       .on(
@@ -142,29 +173,41 @@ export default function OrderTrackingPage() {
           filter: `id=eq.${orderId}`,
         },
         (payload) => {
-          setOrder(payload.new as Order)
+          console.log("Realtime update received:", payload)
+          const newOrder = payload.new as Order
           
-          if (payload.new.status === "ready") {
-            try {
-              const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-              const oscillator = audioContext.createOscillator()
-              const gainNode = audioContext.createGain()
-              oscillator.connect(gainNode)
-              gainNode.connect(audioContext.destination)
-              oscillator.frequency.value = 880
-              oscillator.type = "sine"
-              gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-              gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8)
-              oscillator.start(audioContext.currentTime)
-              oscillator.stop(audioContext.currentTime + 0.8)
-            } catch {}
+          // Check if status changed to ready
+          if (newOrder.status === "ready" && prevStatusRef.current !== "ready") {
+            playReadySound()
           }
+          prevStatusRef.current = newOrder.status
+          setOrder(newOrder)
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log("Realtime subscription status:", status)
+        if (status === "SUBSCRIBED") {
+          realtimeWorking = true
+        }
+      })
+
+    // Polling fallback - check every 3 seconds if realtime isn't working
+    const pollInterval = setInterval(() => {
+      if (!realtimeWorking) {
+        console.log("Polling for order updates...")
+        fetchOrder()
+      }
+    }, 3000)
+
+    // Also poll every 10 seconds as backup even if realtime is working
+    const backupPollInterval = setInterval(() => {
+      fetchOrder()
+    }, 10000)
 
     return () => {
       supabase.removeChannel(channel)
+      clearInterval(pollInterval)
+      clearInterval(backupPollInterval)
     }
   }, [orderId])
 
