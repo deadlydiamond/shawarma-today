@@ -150,6 +150,11 @@ CREATE POLICY "Allow all on staff" ON staff FOR ALL USING (true) WITH CHECK (tru
 -- ============================================================================
 -- REALTIME - Enable for orders and settings
 -- ============================================================================
+
+-- Set REPLICA IDENTITY FULL for realtime to work properly (includes all columns in updates)
+ALTER TABLE orders REPLICA IDENTITY FULL;
+ALTER TABLE settings REPLICA IDENTITY FULL;
+
 DO $$
 BEGIN
   BEGIN
