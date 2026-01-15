@@ -1,114 +1,163 @@
-# Leaf & Bean Café Website
+# Today Shawarma - Restaurant Management System
 
-A premium, timeless marketing website for Leaf & Bean Café, an independent neighbourhood café in Morningside, Edinburgh.
+A complete restaurant management system with customer ordering website, POS system, and admin dashboard.
 
-## Tech Stack
+## 🚀 Features
+
+### Customer Website
+- ✅ Beautiful landing page with hero, menu, reviews, contact sections
+- ✅ Dynamic menu from Supabase with category filtering
+- ✅ Shopping cart with localStorage persistence
+- ✅ Checkout flow (dine-in / takeaway)
+- ✅ Real-time order tracking
+- ✅ Google Reviews integration
+- ✅ Cookie consent popup
+- ✅ Mobile responsive design
+
+### POS System (`/pos`)
+- ✅ Walk-in order creation
+- ✅ Category filtering & search
+- ✅ Discount application
+- ✅ Cash calculator for change
+- ✅ Receipt modal (Cash/Card/Pay Later)
+- ✅ Active orders management
+- ✅ Payment lookup by order code
+- ✅ Lock screen functionality
+
+### Admin Dashboard (`/admin`)
+- ✅ Order management with real-time updates
+- ✅ Payment collection (Cash/Card)
+- ✅ Order status workflow
+- ✅ Daily statistics
+- ✅ Lock screen functionality
+
+### Admin Menu Management (`/admin/menu`)
+- ✅ Add/Edit/Delete menu items
+- ✅ Category management
+- ✅ Image upload (URL or Supabase Storage)
+- ✅ Sold out toggle
+- ✅ Popular/Featured tags
+
+### Admin Reports (`/admin/reports`)
+- ✅ Daily revenue reports
+- ✅ Order statistics
+- ✅ Popular items tracking
+- ✅ Hourly breakdown
+
+### Admin Settings (`/admin/settings`)
+- ✅ Restaurant info (name, address, phone)
+- ✅ Accept online orders toggle
+- ✅ Table count configuration
+- ✅ Tax rate settings
+
+## 🛠 Tech Stack
 
 - **Framework**: Next.js 14 (App Router, TypeScript)
+- **Database**: Supabase (PostgreSQL)
 - **Styling**: TailwindCSS
-- **UI Components**: shadcn/ui
-- **Icons**: lucide-react
-- **Fonts**: Cinzel (headings), Inter (body)
-- **Deployment**: Vercel
+- **Icons**: Lucide React
+- **State Management**: React Context
+- **Real-time**: Supabase Realtime
 
-## Project Structure
+## 📦 Installation
 
-```
-coffee/
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx         # Root layout with fonts and metadata
-│   ├── page.tsx           # Home page
-│   ├── menu/              # Menu page
-│   ├── visit/             # Visit/contact info page
-│   ├── about/             # About page
-│   ├── contact/           # Contact form page
-│   └── globals.css        # Global styles and Tailwind
-├── components/
-│   ├── layout/            # Header and Footer components
-│   └── ui/                # Reusable UI components (Button, Card)
-├── lib/
-│   └── utils.ts           # Utility functions (cn helper)
-├── src/
-│   └── content/
-│       └── content.json    # Content data (address, hours, etc.)
-├── assets/                # Images and media
-│   ├── gallery/           # Gallery images
-│   ├── images/            # General images
-│   └── logos/             # Logo files
-├── favicons/              # Favicon files
-└── data/                  # Additional data files
+1. Clone the repository:
+```bash
+git clone <your-repo-url>
+cd shawarma-today
 ```
 
-## Brand Guidelines
-
-### Colors
-- **Gold Primary**: `#D4AF37`
-- **Gold Secondary**: `#C9A227`
-- **Black Primary**: `#0B0B0C`
-- **Charcoal**: `#141414`
-- **Cream Background**: `#F5F1E8`
-- **Coffee Brown**: `#5A4634`
-
-### Typography
-- **Headings**: Cinzel (uppercase, 0.04em letter spacing)
-- **Body**: Inter (400 weight)
-- **Buttons**: Inter (600 weight, uppercase)
-
-### Design Principles
-- Minimal and calm
-- High contrast for readability
-- Strong hierarchy
-- Generous spacing
-- Timeless, not trendy
-- No visual clutter
-
-## Getting Started
-
-1. Install dependencies:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Run the development server:
+3. Copy environment variables:
+```bash
+cp .env.example .env.local
+```
+
+4. Add your credentials to `.env.local`:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+GOOGLE_PLACES_API_KEY=your-google-api-key
+GOOGLE_PLACE_ID=your-place-id
+```
+
+5. Set up Supabase database:
+   - Go to Supabase Dashboard → SQL Editor
+   - Run the contents of `supabase-schema.sql`
+
+6. Run the development server:
 ```bash
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+## 🚀 Deployment (Vercel)
 
-## Building for Production
-
+### Step 1: Push to GitHub
 ```bash
-npm run build
-npm start
+git add .
+git commit -m "Ready for deployment"
+git push origin main
 ```
 
-## Content Management
+### Step 2: Deploy to Vercel
+1. Go to [vercel.com](https://vercel.com)
+2. Click "New Project"
+3. Import your GitHub repository
+4. Add Environment Variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `GOOGLE_PLACES_API_KEY`
+   - `GOOGLE_PLACE_ID`
+5. Click "Deploy"
 
-Content is managed in `src/content/content.json`. Update this file to change:
-- Business name and tagline
-- Address and contact information
-- Opening hours
-- Social media links
+### Step 3: Configure Supabase
+1. Go to Supabase Dashboard → Settings → API
+2. Add your Vercel domain to "Site URL"
+3. Ensure RLS policies allow public access for orders
 
-## Assets
+## 📁 Project Structure
 
-- **Logos**: Place logo files in `/logos/` directory
-- **Gallery Images**: Place gallery images in `/assets/gallery/`
-- **Favicons**: Place favicon files in `/favicons/` directory
+```
+shawarma-today/
+├── app/
+│   ├── page.tsx              # Landing page
+│   ├── checkout/             # Customer checkout
+│   ├── orders/               # Customer order tracking
+│   ├── order/[id]/           # Single order view
+│   ├── pos/                  # POS system
+│   ├── admin/                # Admin dashboard
+│   │   ├── login/            # Admin login
+│   │   ├── menu/             # Menu management
+│   │   ├── reports/          # Daily reports
+│   │   └── settings/         # Restaurant settings
+│   └── api/
+│       └── reviews/          # Google Reviews API
+├── components/
+│   ├── admin/                # Admin components
+│   ├── layout/               # Header, Footer, Navbar
+│   └── ui/                   # Reusable UI components
+├── contexts/                 # React Context providers
+├── lib/                      # Utilities and Supabase client
+└── supabase-schema.sql       # Database schema
+```
 
-## SEO
+## 🔐 Default Login
 
-The site includes:
-- Proper meta tags and Open Graph data
-- Local business schema markup
-- Semantic HTML structure
-- Optimized images
+- **Username**: `admin`
+- **Password**: `admin123`
+- **PIN (Lock Screen)**: `1234`
 
-## Deployment
+## 📱 URLs
 
-The site is configured for deployment on Vercel. Simply connect your repository to Vercel for automatic deployments.
+- **Customer Website**: `/`
+- **POS System**: `/pos`
+- **Admin Dashboard**: `/admin`
+- **Admin Login**: `/admin/login`
 
-## License
+## 📄 License
 
-This is a client-commissioned project. All rights reserved.
+Private project. All rights reserved.

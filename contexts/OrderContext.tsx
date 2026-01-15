@@ -17,7 +17,8 @@ export interface Order {
   specialInstructions?: string
   subtotal: number
   total: number
-  status: "pending" | "preparing" | "ready" | "completed" | "cancelled"
+  status: "pending" | "paid" | "preparing" | "ready" | "completed" | "cancelled"
+  paymentMethod?: "cash" | "card" | null
   createdAt: string
   updatedAt: string
 }
@@ -25,9 +26,10 @@ export interface Order {
 interface OrderContextType {
   orders: Order[]
   loading: boolean
-  addOrder: (order: Omit<Order, "id" | "status" | "createdAt" | "updatedAt">) => Promise<string | null>
+  addOrder: (order: Omit<Order, "id" | "createdAt" | "updatedAt"> & { status?: Order["status"] }) => Promise<string | null>
   updateOrderStatus: (orderId: string, status: Order["status"]) => Promise<void>
   updateOrderNotes: (orderId: string, notes: string) => Promise<void>
+  updatePaymentMethod: (orderId: string, method: "cash" | "card") => Promise<void>
   getOrder: (orderId: string) => Order | undefined
   getPendingOrders: () => Order[]
   getTodayOrders: () => Order[]
@@ -51,6 +53,7 @@ const dbToOrder = (row: DbOrder): Order => ({
   subtotal: row.subtotal,
   total: row.total,
   status: row.status as Order["status"],
+  paymentMethod: row.payment_method || null,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 })
@@ -186,8 +189,9 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [fetchOrders])
 
-  const addOrder = async (orderData: Omit<Order, "id" | "status" | "createdAt" | "updatedAt">) => {
+  const addOrder = async (orderData: Omit<Order, "id" | "createdAt" | "updatedAt"> & { status?: Order["status"] }) => {
     const orderId = generateOrderId()
+    const orderStatus = orderData.status || "preparing" // Default to preparing for POS
     
     try {
       const { error } = await supabase.from("orders").insert({
@@ -200,7 +204,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         items: orderData.items,
         subtotal: orderData.subtotal,
         total: orderData.total,
-        status: "pending",
+        status: orderStatus,
       })
 
       if (error) {
@@ -209,7 +213,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         const newOrder: Order = {
           ...orderData,
           id: orderId,
-          status: "pending",
+          status: orderStatus,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }
@@ -267,6 +271,30 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
             : order
         )
       )
+    } catch (error) {
+      console.error("Error updating order notes:", error)
+    }
+  }
+
+  const updatePaymentMethod = async (orderId: string, method: "cash" | "card") => {
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .update({ payment_method: method })
+        .eq("id", orderId)
+
+      if (error) {
+        console.error("Error updating payment method:", error)
+      }
+      
+      // Update local state
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId
+            ? { ...order, paymentMethod: method, updatedAt: new Date().toISOString() }
+            : order
+        )
+      )
     } catch (err) {
       console.error("Error:", err)
     }
@@ -306,6 +334,7 @@ export const OrderProvider = ({ children }: { children: ReactNode }) => {
         addOrder,
         updateOrderStatus,
         updateOrderNotes,
+        updatePaymentMethod,
         getOrder,
         getPendingOrders,
         getTodayOrders,

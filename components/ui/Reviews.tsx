@@ -163,13 +163,17 @@ export default function Reviews() {
                   <img 
                     src={review.profile_photo_url} 
                     alt={review.author_name}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover bg-gray-100"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                    }}
                   />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-shawarma to-shawarma-600 flex items-center justify-center text-white font-semibold text-sm">
-                    {getInitials(review.author_name)}
-                  </div>
-                )}
+                ) : null}
+                <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-shawarma to-shawarma-600 flex items-center justify-center text-white font-semibold text-sm ${review.profile_photo_url ? 'hidden' : ''}`}>
+                  {getInitials(review.author_name)}
+                </div>
                 <div>
                   <p className="font-semibold text-gray-900 text-sm">{review.author_name}</p>
                   <div className="flex gap-0.5">
@@ -200,13 +204,17 @@ export default function Reviews() {
                     <img 
                       src={review.profile_photo_url} 
                       alt={review.author_name}
-                      className="w-10 h-10 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover bg-gray-100"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                      }}
                     />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-white font-semibold text-sm">
-                      {getInitials(review.author_name)}
-                    </div>
-                  )}
+                  ) : null}
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-white font-semibold text-sm ${review.profile_photo_url ? 'hidden' : ''}`}>
+                    {getInitials(review.author_name)}
+                  </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{review.author_name}</p>
                     <div className="flex gap-0.5">

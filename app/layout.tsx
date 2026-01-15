@@ -10,7 +10,7 @@ import { SettingsProvider } from "@/contexts/SettingsContext"
 import { MenuProvider } from "@/contexts/MenuContext"
 import Cart from "@/components/ui/Cart"
 import { FloatingCart } from "@/components/ui/FloatingCart"
-import { FloatingPromo } from "@/components/ui/FloatingPromo"
+import CustomerCookieConsent from "@/components/ui/CustomerCookieConsent"
 import contentData from "@/src/content/content.json"
 
 const inter = Inter({
@@ -107,7 +107,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
                   <Cart />
                   <FloatingCart />
-                  <FloatingPromo />
+                  <CustomerCookieConsent />
                 </CartProvider>
               </OrderProvider>
             </MenuProvider>

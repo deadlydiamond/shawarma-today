@@ -4,7 +4,7 @@
 -- Run this in Supabase SQL Editor: https://supabase.com/dashboard/project/YOUR_PROJECT/sql
 
 -- ============================================================================
--- 1. ORDERS TABLE (Main table for POS and Kitchen)
+-- 1. ORDERS TABLE (Main table for POS)
 -- ============================================================================
 DROP TABLE IF EXISTS orders CASCADE;
 CREATE TABLE orders (
@@ -21,7 +21,7 @@ CREATE TABLE orders (
   discount_amount DECIMAL(10,2) DEFAULT 0,
   total DECIMAL(10,2) NOT NULL DEFAULT 0,
   
-  -- Status: preparing (sent to kitchen), ready (done cooking), completed (picked up), cancelled
+  -- Status: preparing (in kitchen), ready (done cooking), completed (picked up), cancelled
   status TEXT NOT NULL DEFAULT 'preparing' CHECK (status IN ('pending', 'paid', 'preparing', 'ready', 'completed', 'cancelled')),
   
   -- Payment tracking (stored in special_instructions as "PAID" or "UNPAID")
@@ -72,34 +72,11 @@ CREATE TABLE menu_items (
 );
 
 -- ============================================================================
--- 4. BANNERS (Promotional, Announcements)
+-- 4. RESTAURANT SETTINGS
 -- ============================================================================
-DROP TABLE IF EXISTS banners CASCADE;
-CREATE TABLE banners (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  banner_type TEXT NOT NULL DEFAULT 'announcement',
-  title TEXT NOT NULL,
-  subtitle TEXT,
-  description TEXT,
-  image_url TEXT,
-  background_color TEXT,
-  text_color TEXT,
-  button_text TEXT,
-  button_link TEXT,
-  position TEXT DEFAULT 'top',
-  sort_order INTEGER DEFAULT 0,
-  start_date TIMESTAMPTZ DEFAULT NOW(),
-  end_date TIMESTAMPTZ,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ============================================================================
--- 5. RESTAURANT SETTINGS
--- ============================================================================
+DROP TABLE IF EXISTS settings CASCADE;
 DROP TABLE IF EXISTS cafe_settings CASCADE;
-CREATE TABLE cafe_settings (
+CREATE TABLE settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   key TEXT UNIQUE NOT NULL,
   value JSONB NOT NULL,
@@ -107,21 +84,18 @@ CREATE TABLE cafe_settings (
 );
 
 -- Insert default settings for Today Shawarma
-INSERT INTO cafe_settings (key, value) VALUES
-  ('business_hours', '{"monday": {"open": "11:00", "close": "23:00"}, "tuesday": {"open": "11:00", "close": "23:00"}, "wednesday": {"open": "11:00", "close": "23:00"}, "thursday": {"open": "11:00", "close": "23:00"}, "friday": {"open": "11:00", "close": "23:00"}, "saturday": {"open": "11:00", "close": "23:00"}, "sunday": {"open": "12:00", "close": "22:00"}}'),
+INSERT INTO settings (key, value) VALUES
   ('accepting_orders', 'true'),
-  ('estimated_wait_base', '10'),
-  ('estimated_wait_per_order', '5'),
   ('table_count', '10'),
   ('tax_rate', '0'),
   ('currency', '"£"'),
-  ('cafe_name', '"Today Shawarma"'),
-  ('cafe_address', '"203 Dalry Road, Edinburgh"'),
-  ('cafe_phone', '"+44 131 XXX XXXX"')
+  ('restaurant_name', '"Today Shawarma"'),
+  ('restaurant_address', '"203 Dalry Road, Edinburgh"'),
+  ('restaurant_phone', '"+44 131 XXX XXXX"')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 
 -- ============================================================================
--- 6. STAFF TABLE
+-- 5. STAFF TABLE (Simplified)
 -- ============================================================================
 DROP TABLE IF EXISTS staff CASCADE;
 CREATE TABLE staff (
@@ -129,18 +103,16 @@ CREATE TABLE staff (
   username TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   name TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('manager', 'cashier', 'kitchen')),
+  role TEXT DEFAULT 'admin',
   is_active BOOLEAN DEFAULT true,
   last_login TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Insert default staff
+-- Insert default admin user
 INSERT INTO staff (username, password_hash, name, role) VALUES
-  ('admin', 'admin123', 'Admin', 'manager'),
-  ('cashier', 'cashier123', 'Cashier', 'cashier'),
-  ('kitchen', 'kitchen123', 'Kitchen Staff', 'kitchen')
-ON CONFLICT (username) DO NOTHING;
+  ('admin', 'admin123', 'Admin', 'admin')
+ON CONFLICT (username) DO UPDATE SET password_hash = 'admin123';
 
 -- ============================================================================
 -- INDEXES
@@ -156,8 +128,7 @@ CREATE INDEX IF NOT EXISTS idx_menu_items_active ON menu_items(is_active);
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE menu_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE menu_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE banners ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cafe_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE staff ENABLE ROW LEVEL SECURITY;
 
 -- Policies (allowing all for simplicity - restrict in production)
@@ -170,30 +141,30 @@ CREATE POLICY "Allow all on menu_categories" ON menu_categories FOR ALL USING (t
 DROP POLICY IF EXISTS "Allow all on menu_items" ON menu_items;
 CREATE POLICY "Allow all on menu_items" ON menu_items FOR ALL USING (true) WITH CHECK (true);
 
-DROP POLICY IF EXISTS "Allow all on banners" ON banners;
-CREATE POLICY "Allow all on banners" ON banners FOR ALL USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow all on cafe_settings" ON cafe_settings;
-CREATE POLICY "Allow all on cafe_settings" ON cafe_settings FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow all on settings" ON settings;
+CREATE POLICY "Allow all on settings" ON settings FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow all on staff" ON staff;
 CREATE POLICY "Allow all on staff" ON staff FOR ALL USING (true) WITH CHECK (true);
 
 -- ============================================================================
--- REALTIME - Enable for orders (critical for kitchen display)
+-- REALTIME - Enable for orders and settings
 -- ============================================================================
--- First remove from publication if exists, then add
 DO $$
 BEGIN
-  -- Try to drop from publication first
   BEGIN
     ALTER PUBLICATION supabase_realtime DROP TABLE orders;
   EXCEPTION WHEN OTHERS THEN
     NULL;
   END;
-  
-  -- Add to publication
   ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+  
+  BEGIN
+    ALTER PUBLICATION supabase_realtime DROP TABLE settings;
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+  ALTER PUBLICATION supabase_realtime ADD TABLE settings;
 END $$;
 
 -- ============================================================================
@@ -215,9 +186,6 @@ CREATE TRIGGER update_menu_categories_updated_at BEFORE UPDATE ON menu_categorie
 
 DROP TRIGGER IF EXISTS update_menu_items_updated_at ON menu_items;
 CREATE TRIGGER update_menu_items_updated_at BEFORE UPDATE ON menu_items FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-DROP TRIGGER IF EXISTS update_banners_updated_at ON banners;
-CREATE TRIGGER update_banners_updated_at BEFORE UPDATE ON banners FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================================================
 -- SEED DATA - MENU CATEGORIES FOR TODAY SHAWARMA

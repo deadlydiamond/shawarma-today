@@ -4,9 +4,10 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useCart } from "@/contexts/CartContext"
 import { useOrders } from "@/contexts/OrderContext"
+import { useSettings } from "@/contexts/SettingsContext"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { ArrowLeft, Loader2, User, MapPin, MessageSquare, Clock, Minus, Plus, Trash2, ShoppingBag, CreditCard, Shield, ChefHat, Sparkles, ArrowRight, CheckCircle } from "lucide-react"
+import { ArrowLeft, Loader2, User, MapPin, MessageSquare, Clock, Minus, Plus, Trash2, ShoppingBag, CreditCard, Shield, ChefHat, Sparkles, ArrowRight, CheckCircle, XCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -25,12 +26,22 @@ export default function Checkout() {
   const router = useRouter()
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, clearCart } = useCart()
   const { addOrder, orders } = useOrders()
+  const { settings } = useSettings()
   const [sessionId, setSessionId] = useState("")
+  const [orderType, setOrderType] = useState<"dine-in" | "takeaway">("dine-in")
+  const [formData, setFormData] = useState({
+    name: "",
+    tableNumber: "",
+    pickupTime: "",
+    specialInstructions: "",
+  })
+  const [errors, setErrors] = useState<{ tableNumber?: string; pickupTime?: string }>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
   useEffect(() => {
     setSessionId(getSessionId())
   }, [])
-  
+
   const getEstimatedWaitTime = () => {
     const activeOrders = orders.filter(o => 
       o.status === "preparing"
@@ -43,15 +54,40 @@ export default function Checkout() {
     }
   }
 
-  const [orderType, setOrderType] = useState<"dine-in" | "takeaway">("dine-in")
-  const [formData, setFormData] = useState({
-    name: "",
-    tableNumber: "",
-    pickupTime: "",
-    specialInstructions: "",
-  })
-  const [errors, setErrors] = useState<{ name?: string; tableNumber?: string; pickupTime?: string }>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  // Show closed message if not accepting orders
+  if (!settings.acceptingOrders) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+        <Navbar />
+        <div className="pt-32 pb-20 px-6">
+          <div className="max-w-lg mx-auto text-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
+              <XCircle className="h-10 w-10 text-red-500" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">We're Currently Closed</h1>
+            <p className="text-gray-600 mb-8">
+              Sorry, we're not accepting online orders at the moment. Please check back later or call us for more information.
+            </p>
+            {settings.restaurantPhone && (
+              <a
+                href={`tel:${settings.restaurantPhone.replace(/\s/g, "")}`}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-shawarma text-white rounded-xl font-semibold hover:bg-shawarma/90 transition-colors"
+              >
+                Call Us: {settings.restaurantPhone}
+              </a>
+            )}
+            <Link
+              href="/"
+              className="block mt-4 text-shawarma hover:text-shawarma/80 font-medium"
+            >
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    )
+  }
 
   const formatPrice = (price: number) => `£${price.toFixed(2)}`
 
@@ -87,13 +123,7 @@ export default function Checkout() {
   }
 
   const validateForm = () => {
-    const newErrors: { name?: string; tableNumber?: string; pickupTime?: string } = {}
-    
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required"
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = "Name must be at least 2 characters"
-    }
+    const newErrors: { tableNumber?: string; pickupTime?: string } = {}
     
     if (orderType === "dine-in" && !formData.tableNumber.trim()) {
       newErrors.tableNumber = "Please select your table"
@@ -127,14 +157,14 @@ export default function Checkout() {
     const newOrderId = await addOrder({
       items: orderItems,
       customer: {
-        name: formData.name,
+        name: formData.name.trim() || "Guest",
         sessionId: sessionId,
       },
       tableNumber: orderType === "takeaway" ? "takeaway" : formData.tableNumber,
       pickupTime: orderType === "takeaway" ? formData.pickupTime : undefined,
       specialInstructions: formData.specialInstructions,
       subtotal: getTotalPrice(),
-      total: getTotalPrice(),
+      total: getTotalPrice() + (getTotalPrice() * (settings.taxRate || 0) / 100),
     })
 
     if (newOrderId) {
@@ -155,7 +185,7 @@ export default function Checkout() {
     })
   }
 
-  const isFormValid = formData.name.trim() && (orderType === "takeaway" ? formData.pickupTime : formData.tableNumber)
+  const isFormValid = orderType === "takeaway" ? formData.pickupTime : formData.tableNumber
 
   // Empty Cart State
   if (cartItems.length === 0) {
@@ -275,31 +305,23 @@ export default function Checkout() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-gray-900">Your Details</h2>
-                    <p className="text-sm text-gray-500">We&apos;ll call your name when ready</p>
+                    <p className="text-sm text-gray-500">Add your name so we can call you when ready</p>
                   </div>
                 </div>
                 
                 <form className="space-y-4">
-                  {/* Name */}
+                  {/* Name (Optional) */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Your Name *</label>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Your Name <span className="text-gray-400 font-normal">(optional)</span></label>
                     <input
                       type="text"
                       name="name"
                       value={formData.name}
-                      onChange={(e) => {
-                        handleChange(e)
-                        if (errors.name) setErrors({ ...errors, name: undefined })
-                      }}
-                      placeholder="e.g. John"
-                      className={`w-full px-4 py-3.5 bg-gray-50 border-2 rounded-xl focus:outline-none focus:bg-white transition-all text-lg ${
-                        errors.name 
-                          ? "border-red-300 focus:border-red-500" 
-                          : "border-gray-100 focus:border-shawarma"
-                      }`}
+                      onChange={handleChange}
+                      placeholder="e.g. John (or leave blank)"
+                      className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-shawarma transition-all text-lg"
                     />
-                    {errors.name && <p className="mt-1.5 text-sm text-red-500">{errors.name}</p>}
-                    <p className="mt-1.5 text-xs text-gray-400">This is how we&apos;ll call you when your order is ready</p>
+                    <p className="mt-1.5 text-xs text-gray-400">Leave blank to order as &quot;Guest&quot;</p>
                   </div>
 
                   {/* Table Number - Dine In Only */}
@@ -322,7 +344,7 @@ export default function Checkout() {
                         }`}
                       >
                         <option value="">Select your table</option>
-                        {[...Array(20)].map((_, i) => (
+                        {[...Array(settings.tableCount || 10)].map((_, i) => (
                           <option key={i + 1} value={`${i + 1}`}>Table {i + 1}</option>
                         ))}
                         <option value="counter">Counter Seating</option>
@@ -449,6 +471,12 @@ export default function Checkout() {
                       <span>Subtotal ({getTotalItems()} items)</span>
                       <span>{formatPrice(getTotalPrice())}</span>
                     </div>
+                    {settings.taxRate > 0 && (
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>VAT ({settings.taxRate}%)</span>
+                        <span>{formatPrice(getTotalPrice() * settings.taxRate / 100)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-sm text-gray-600">
                       <span>Service fee</span>
                       <span className="text-green-600 font-medium">Free</span>
@@ -459,7 +487,7 @@ export default function Checkout() {
 
                   <div className="flex justify-between items-center mb-5">
                     <span className="text-lg font-bold text-gray-900">Total</span>
-                    <span className="text-2xl font-bold text-gray-900">{formatPrice(getTotalPrice())}</span>
+                    <span className="text-2xl font-bold text-gray-900">{formatPrice(getTotalPrice() + (getTotalPrice() * (settings.taxRate || 0) / 100))}</span>
                   </div>
 
                   {/* Checkout Button */}

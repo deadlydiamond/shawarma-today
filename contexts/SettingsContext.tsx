@@ -3,114 +3,103 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from "react"
 import { supabase } from "@/lib/supabase"
 
-export interface CafeSettings {
-  businessHours: {
-    [key: string]: { open: string; close: string }
-  }
+export interface RestaurantSettings {
   acceptingOrders: boolean
-  estimatedWaitBase: number
-  estimatedWaitPerOrder: number
   tableCount: number
   taxRate: number
   currency: string
-  cafeName: string
-  cafeAddress: string
-  cafePhone: string
+  restaurantName: string
+  restaurantAddress: string
+  restaurantPhone: string
 }
 
 interface SettingsContextType {
-  settings: CafeSettings
+  settings: RestaurantSettings
   loading: boolean
   error: string | null
   updateSetting: (key: string, value: any) => Promise<void>
   refreshSettings: () => Promise<void>
 }
 
-const defaultSettings: CafeSettings = {
-  businessHours: {
-    monday: { open: "08:00", close: "18:00" },
-    tuesday: { open: "08:00", close: "18:00" },
-    wednesday: { open: "08:00", close: "18:00" },
-    thursday: { open: "08:00", close: "18:00" },
-    friday: { open: "08:00", close: "18:00" },
-    saturday: { open: "09:00", close: "17:00" },
-    sunday: { open: "10:00", close: "16:00" },
-  },
-  acceptingOrders: true,
-  estimatedWaitBase: 5,
-  estimatedWaitPerOrder: 3,
-  tableCount: 20,
+// Empty default - all settings must come from Supabase
+const defaultSettings: RestaurantSettings = {
+  acceptingOrders: false,
+  tableCount: 10,
   taxRate: 0,
   currency: "£",
-  cafeName: "Today Shawarma Café",
-  cafeAddress: "123 Morningside Road, Edinburgh",
-  cafePhone: "+44 7887 910900",
+  restaurantName: "",
+  restaurantAddress: "",
+  restaurantPhone: "",
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
-  const [settings, setSettings] = useState<CafeSettings>(defaultSettings)
+  const [settings, setSettings] = useState<RestaurantSettings>(defaultSettings)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const loadSettings = useCallback(async () => {
+    if (!supabase) {
+      console.error("Supabase not configured")
+      setError("Database not configured")
+      setLoading(false)
+      return
+    }
+
     try {
       setLoading(true)
       const { data, error: fetchError } = await supabase
-        .from("cafe_settings")
+        .from("settings")
         .select("key, value")
 
       if (fetchError) {
         console.error("Error loading settings:", fetchError)
         setError(fetchError.message)
+        setLoading(false)
         return
       }
 
-      if (data && data.length > 0) {
-        const loadedSettings: Partial<CafeSettings> = {}
-        
-        data.forEach((row: { key: string; value: any }) => {
-          switch (row.key) {
-            case "business_hours":
-              loadedSettings.businessHours = row.value
-              break
-            case "accepting_orders":
-              loadedSettings.acceptingOrders = row.value === true || row.value === "true"
-              break
-            case "estimated_wait_base":
-              loadedSettings.estimatedWaitBase = parseInt(row.value) || 5
-              break
-            case "estimated_wait_per_order":
-              loadedSettings.estimatedWaitPerOrder = parseInt(row.value) || 3
-              break
-            case "table_count":
-              loadedSettings.tableCount = parseInt(row.value) || 20
-              break
-            case "tax_rate":
-              loadedSettings.taxRate = parseFloat(row.value) || 0
-              break
-            case "currency":
-              loadedSettings.currency = row.value || "£"
-              break
-            case "cafe_name":
-              loadedSettings.cafeName = row.value || "Today Shawarma Café"
-              break
-            case "cafe_address":
-              loadedSettings.cafeAddress = row.value || ""
-              break
-            case "cafe_phone":
-              loadedSettings.cafePhone = row.value || ""
-              break
-          }
-        })
-
-        setSettings({ ...defaultSettings, ...loadedSettings })
+      if (!data || data.length === 0) {
+        console.error("No settings found in database - please run the schema SQL")
+        setError("No settings in database. Please run the schema SQL in Supabase.")
+        setLoading(false)
+        return
       }
+
+      const loadedSettings: Partial<RestaurantSettings> = {}
+      
+      data.forEach((row: { key: string; value: any }) => {
+        switch (row.key) {
+          case "accepting_orders":
+            loadedSettings.acceptingOrders = row.value === true || row.value === "true"
+            break
+          case "table_count":
+            loadedSettings.tableCount = parseInt(row.value) || 10
+            break
+          case "tax_rate":
+            loadedSettings.taxRate = parseFloat(row.value) || 0
+            break
+          case "currency":
+            loadedSettings.currency = row.value || "£"
+            break
+          case "restaurant_name":
+            loadedSettings.restaurantName = row.value || ""
+            break
+          case "restaurant_address":
+            loadedSettings.restaurantAddress = row.value || ""
+            break
+          case "restaurant_phone":
+            loadedSettings.restaurantPhone = row.value || ""
+            break
+        }
+      })
+
+      setSettings({ ...defaultSettings, ...loadedSettings })
       setError(null)
     } catch (err) {
       console.error("Error loading settings:", err)
-      setError("Failed to load settings")
+      setError("Failed to load settings from database")
     } finally {
       setLoading(false)
     }
@@ -118,28 +107,42 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     loadSettings()
+
+    // Subscribe to real-time settings changes
+    const channel = supabase
+      ?.channel("settings-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "settings" },
+        () => {
+          // Reload settings when any change occurs
+          loadSettings()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      channel?.unsubscribe()
+    }
   }, [loadSettings])
 
   const updateSetting = useCallback(async (key: string, value: any) => {
     try {
       // Map frontend keys to database keys
       const dbKeyMap: Record<string, string> = {
-        businessHours: "business_hours",
         acceptingOrders: "accepting_orders",
-        estimatedWaitBase: "estimated_wait_base",
-        estimatedWaitPerOrder: "estimated_wait_per_order",
         tableCount: "table_count",
         taxRate: "tax_rate",
         currency: "currency",
-        cafeName: "cafe_name",
-        cafeAddress: "cafe_address",
-        cafePhone: "cafe_phone",
+        restaurantName: "restaurant_name",
+        restaurantAddress: "restaurant_address",
+        restaurantPhone: "restaurant_phone",
       }
 
       const dbKey = dbKeyMap[key] || key
 
       const { error: upsertError } = await supabase
-        .from("cafe_settings")
+        .from("settings")
         .upsert(
           { key: dbKey, value: value, updated_at: new Date().toISOString() },
           { onConflict: "key" }

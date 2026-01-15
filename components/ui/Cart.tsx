@@ -1,7 +1,8 @@
 "use client"
 
-import { X, Plus, Minus, ShoppingBag, Trash2, Clock, ArrowRight, Sparkles } from "lucide-react"
+import { X, Plus, Minus, ShoppingBag, Trash2, Clock, ArrowRight, Sparkles, AlertCircle } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
+import { useSettings } from "@/contexts/SettingsContext"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
@@ -9,6 +10,7 @@ import { useState, useEffect } from "react"
 
 export default function Cart() {
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, isOpen, setIsOpen } = useCart()
+  const { settings } = useSettings()
   const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
@@ -197,6 +199,12 @@ export default function Cart() {
                 <span>Subtotal</span>
                 <span>{formatPrice(totalPrice)}</span>
               </div>
+              {settings.taxRate > 0 && (
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <span>VAT ({settings.taxRate}%)</span>
+                  <span>{formatPrice(totalPrice * settings.taxRate / 100)}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <span>Service fee</span>
                 <span className="text-green-600 font-medium">Free</span>
@@ -213,21 +221,41 @@ export default function Cart() {
             {/* Total */}
             <div className="flex items-center justify-between">
               <span className="text-lg font-bold text-gray-900">Total</span>
-              <span className="text-2xl font-bold text-gray-900">{formatPrice(totalPrice)}</span>
+              <span className="text-2xl font-bold text-gray-900">{formatPrice(totalPrice + (totalPrice * (settings.taxRate || 0) / 100))}</span>
             </div>
 
-            {/* Checkout Button */}
-            <Link 
-              href="/checkout" 
-              onClick={handleClose}
-              className="flex items-center justify-center gap-3 w-full py-4 px-6 bg-shawarma hover:bg-shawarma-600 text-white font-bold text-lg rounded-2xl transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
-            >
-              <span>Checkout</span>
-              <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1">
-                <span className="text-sm">{formatPrice(totalPrice)}</span>
-                <ArrowRight className="h-4 w-4" />
+            {/* Closed Warning */}
+            {!settings.acceptingOrders && (
+              <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+                <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-sm">We're currently closed</p>
+                  <p className="text-xs text-red-600">Online ordering is not available right now</p>
+                </div>
               </div>
-            </Link>
+            )}
+
+            {/* Checkout Button */}
+            {settings.acceptingOrders ? (
+              <Link 
+                href="/checkout" 
+                onClick={handleClose}
+                className="flex items-center justify-center gap-3 w-full py-4 px-6 bg-shawarma hover:bg-shawarma-600 text-white font-bold text-lg rounded-2xl transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98]"
+              >
+                <span>Checkout</span>
+                <div className="flex items-center gap-2 bg-white/20 rounded-full px-3 py-1">
+                  <span className="text-sm">{formatPrice(totalPrice)}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </div>
+              </Link>
+            ) : (
+              <button 
+                disabled
+                className="flex items-center justify-center gap-3 w-full py-4 px-6 bg-gray-300 text-gray-500 font-bold text-lg rounded-2xl cursor-not-allowed"
+              >
+                <span>Checkout Unavailable</span>
+              </button>
+            )}
             
             {/* Continue Shopping */}
             <button

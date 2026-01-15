@@ -20,73 +20,64 @@ const categoryConfig: { id: CategoryFilter; label: string; icon: React.ReactNode
   { id: "drinks", label: "Drinks", icon: <CupSoda className="h-5 w-5" /> },
 ]
 
-// Fallback menu items - TODAY SHAWARMA (IMAGE-VERIFIED + Google Reviews Popular)
-const fallbackMenuItems: Record<string, ExtendedMenuItem[]> = {
+// Unsplash fallback images by category - high quality food photos (hotlink-friendly)
+const categoryFallbackImages: Record<string, string[]> = {
   pizzas: [
-    { id: "pz1", name: "Margherita", description: "Cheese & tomato", price: "£4.99", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=75", category: "Pizzas" },
-    { id: "pz2", name: "Chicken Pizza", description: "Chicken, mushroom & sweetcorn", price: "£5.99", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=75", category: "Pizzas", isPopular: true },
-    { id: "pz3", name: "Lamb Pizza", description: "Lamb, green chilli & onions", price: "£6.99", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=75", category: "Pizzas" },
-    { id: "pz4", name: "Meat Feast", description: "Chicken, lamb & pepperoni", price: "£6.99", image: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=75", category: "Pizzas", isPopular: true },
-    { id: "pz5", name: "Veggie", description: "Mushrooms, onions, sweetcorn & green peppers", price: "£5.50", image: "https://images.unsplash.com/photo-1511689660979-10d2b1aada49?w=400&q=75", category: "Pizzas" },
-    { id: "pz6", name: "Mighty Meaty", description: "Chicken, lamb, donner, spicy beef", price: "£6.99", image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=400&q=75", category: "Pizzas" },
-    { id: "pz7", name: "Garlic Bread with Cheese", description: "10\" garlic bread", price: "£3.99", image: "https://images.unsplash.com/photo-1619531040576-f9416740661b?w=400&q=75", category: "Pizzas" },
-    { id: "pz8", name: "Extra Toppings", description: "Meat or veg", price: "£0.70", image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=75", category: "Pizzas" },
-    { id: "pz9", name: "Extra Cheese", description: "Add to any pizza", price: "£1.00", image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=75", category: "Pizzas" },
+    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=75",
+    "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=75",
+    "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=75",
+    "https://images.unsplash.com/photo-1588315029754-2dd089d39a1a?w=400&q=75",
+    "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=400&q=75",
   ],
   fatayer: [
-    { id: "ft1", name: "Chicken Fatayer", description: "10\" flatbread", price: "£4.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer", isPopular: true },
-    { id: "ft2", name: "Lamb Fatayer", description: "10\" flatbread", price: "£5.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
-    { id: "ft3", name: "Mix Fatayer", description: "10\" flatbread", price: "£5.50", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
-    { id: "ft4", name: "Veggie Fatayer", description: "10\" flatbread", price: "£4.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
-    { id: "ft5", name: "Cheese Fatayer", description: "10\" flatbread", price: "£3.99", image: "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75", category: "Fatayer" },
+    "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&q=75",
+    "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=400&q=75",
+    "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=75",
+    "https://images.unsplash.com/photo-1562967916-eb82221dfb92?w=400&q=75",
+    "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&q=75",
   ],
   wraps: [
-    { id: "wr1", name: "Lamb Shawarma Wrap", description: "Sells out daily!", price: "£4.99", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps", isPopular: true },
-    { id: "wr2", name: "Chicken Shawarma Wrap", description: "Sells out daily!", price: "£4.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps", isPopular: true },
-    { id: "wr3", name: "Falafel Wrap", description: "", price: "£4.99", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Wraps" },
-    { id: "wr4", name: "Lamb Shawarma Sandwich", description: "", price: "£4.99", image: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75", category: "Wraps" },
-    { id: "wr5", name: "Chicken Shawarma Sandwich", description: "", price: "£4.50", image: "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75", category: "Wraps" },
+    "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&q=75",
+    "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=75",
+    "https://images.unsplash.com/photo-1561651823-34feb02250e4?w=400&q=75",
+    "https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?w=400&q=75",
+    "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=400&q=75",
   ],
   meals: [
-    { id: "ml1", name: "Lamb Shawarma", description: "With chips & salad", price: "£7.99", image: "https://images.unsplash.com/photo-1547424850-2bef379d8159?w=400&q=75", category: "Meals", isPopular: true },
-    { id: "ml2", name: "Chicken Shawarma", description: "With chips & salad", price: "£6.99", image: "https://images.unsplash.com/photo-1547424850-2bef379d8159?w=400&q=75", category: "Meals", isPopular: true },
-    { id: "ml3", name: "Falafel (6 pcs)", description: "With naan & salad", price: "£5.99", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Meals" },
+    "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=75",
+    "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=75",
+    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=75",
+    "https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&q=75",
+    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=75",
   ],
   grill: [
-    { id: "gr1", name: "Mix Platter", description: "2 Chicken Tikka, 2 Lamb Tikka, 4 Kebabs, 5 Lamb Chops, 6 Chicken Wings, Rice & Salad", price: "£60.00", image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=75", category: "Grill", isPopular: true },
-    { id: "gr2", name: "Mix Kebab Full", description: "2 Kebabs, Chicken Tikka, Lamb Tikka, 2 Naan & Salad", price: "£17.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill", isPopular: true },
-    { id: "gr3", name: "Mix Kebab Half", description: "Lamb Kebab, Chicken Tikka, Lamb Tikka & Salad", price: "£14.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr4", name: "Lamb Chops (5)", description: "With salad & naan", price: "£13.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr5", name: "Lamb Chops (5)", description: "With rice & soup", price: "£16.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr6", name: "Lamb Kebab (2)", description: "With salad & naan", price: "£11.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr7", name: "Lamb Tikka (2)", description: "With salad & naan", price: "£13.00", image: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=400&q=75", category: "Grill" },
-    { id: "gr8", name: "Chicken Tikka (2)", description: "With salad & naan", price: "£10.00", image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&q=75", category: "Grill" },
-    { id: "gr9", name: "Chicken Wings (10)", description: "With salad & naan", price: "£9.00", image: "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=400&q=75", category: "Grill", isPopular: true },
-    { id: "gr10", name: "Dolma", description: "Saturday only", price: "£12.00", image: "https://images.unsplash.com/photo-1621532074858-a7e5a99a4e9e?w=400&q=75", category: "Grill" },
+    "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=75",
+    "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=75",
+    "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400&q=75",
+    "https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=400&q=75",
+    "https://images.unsplash.com/photo-1606728035253-49e8a23146de?w=400&q=75",
   ],
   sides: [
-    { id: "sd1", name: "Chips", description: "", price: "£2.50", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=75", category: "Sides" },
-    { id: "sd2", name: "Fresh Salad", description: "", price: "£2.50", image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&q=75", category: "Sides" },
-    { id: "sd3", name: "Falafel", description: "", price: "£3.99", image: "https://images.unsplash.com/photo-1593001874117-c99c800e3eb7?w=400&q=75", category: "Sides", isPopular: true },
-    { id: "sd4", name: "Hummus", description: "", price: "£3.00", image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&q=75", category: "Sides" },
-    { id: "sd5", name: "Tub of Sauce", description: "", price: "£0.50", image: "https://images.unsplash.com/photo-1577805947697-89e18249d767?w=400&q=75", category: "Sides" },
+    "https://images.unsplash.com/photo-1518013431117-eb1465fa5752?w=400&q=75",
+    "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=75",
+    "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=75",
+    "https://images.unsplash.com/photo-1534938665420-4193effeab64?w=400&q=75",
+    "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&q=75",
   ],
   drinks: [
-    { id: "dr1", name: "Can of Drink", description: "", price: "£1.00", image: "https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=400&q=75", category: "Drinks" },
-    { id: "dr2", name: "Bottle", description: "", price: "£1.50", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=400&q=75", category: "Drinks" },
-    { id: "dr3", name: "Ayran", description: "", price: "£1.00", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=75", category: "Drinks", isPopular: true },
+    "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=75",
+    "https://images.unsplash.com/photo-1497534446932-c925b458314e?w=400&q=75",
+    "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400&q=75",
+    "https://images.unsplash.com/photo-1560526860-1f0e56046c85?w=400&q=75",
+    "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=75",
   ],
 }
 
-const defaultCategories = [
-  { id: "1", slug: "pizzas", name: "Pizzas", sortOrder: 1, isActive: true },
-  { id: "2", slug: "fatayer", name: "Fatayer", sortOrder: 2, isActive: true },
-  { id: "3", slug: "wraps", name: "Wraps & Sandwiches", sortOrder: 3, isActive: true },
-  { id: "4", slug: "meals", name: "Meals", sortOrder: 4, isActive: true },
-  { id: "5", slug: "grill", name: "Grill & Platters", sortOrder: 5, isActive: true },
-  { id: "6", slug: "sides", name: "Sides", sortOrder: 6, isActive: true },
-  { id: "7", slug: "drinks", name: "Drinks", sortOrder: 7, isActive: true },
-]
+// Get fallback image based on category and item index
+const getFallbackImage = (categorySlug: string, itemIndex: number): string => {
+  const images = categoryFallbackImages[categorySlug] || categoryFallbackImages.meals
+  return images[itemIndex % images.length]
+}
 
 type ExtendedMenuItem = MenuItem & { 
   id: string
@@ -318,7 +309,7 @@ export function DynamicMenu({
   maxItemsPerCategory,
   showCategoryHeaders = true 
 }: DynamicMenuProps) {
-  const { categories, menuItems, loading } = useMenu()
+  const { categories, menuItems, loading, error } = useMenu()
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all")
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const tabsRef = useRef<HTMLDivElement>(null)
@@ -351,14 +342,14 @@ export function DynamicMenu({
       const categoryItems = menuItems
         .filter(item => item.categoryId === cat.id && item.isActive)
         .sort((a, b) => a.sortOrder - b.sortOrder)
-        .map(item => ({
+        .map((item, index) => ({
           id: item.id,
           name: item.name,
           description: item.description || "",
           price: `£${item.price.toFixed(2)}`,
           priceLarge: item.priceLarge ? `£${item.priceLarge.toFixed(2)}` : undefined,
           priceKids: item.priceKids ? `£${item.priceKids.toFixed(2)}` : undefined,
-          image: item.imageUrl || "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=75",
+          image: item.imageUrl || getFallbackImage(cat.slug, index),
           category: cat.name,
           isVegan: item.isVegan,
           isVegetarian: item.isVegetarian,
@@ -372,9 +363,10 @@ export function DynamicMenu({
     return itemsByCategory
   }, [categories, menuItems, maxItemsPerCategory])
 
-  const hasSupabaseData = transformedItems && Object.values(transformedItems).some(items => items.length > 0)
-  const displayItems = hasSupabaseData ? transformedItems : fallbackMenuItems
-  const displayCategories = categories.length > 0 ? categories : defaultCategories
+  // All data must come from Supabase - no fallbacks
+  const hasData = transformedItems && Object.values(transformedItems).some(items => items.length > 0)
+  const displayItems = transformedItems
+  const displayCategories = categories
 
   const filteredCategories = showCategories 
     ? displayCategories.filter(cat => showCategories.includes(cat.slug))
@@ -382,6 +374,7 @@ export function DynamicMenu({
 
   // Get all items for "all" category view
   const allItems = useMemo(() => {
+    if (!displayItems) return []
     return Object.values(displayItems).flat()
   }, [displayItems])
 
@@ -393,6 +386,31 @@ export function DynamicMenu({
   // Change category filter (no scroll)
   const selectCategory = (categorySlug: string) => {
     setActiveCategory(categorySlug as CategoryFilter)
+  }
+
+  // Show error if no data loaded from Supabase
+  if (!loading && error) {
+    return (
+      <div className="py-12 text-center">
+        <div className="max-w-md mx-auto p-6 bg-red-50 rounded-2xl border border-red-200">
+          <h3 className="text-lg font-bold text-red-800 mb-2">Database Not Connected</h3>
+          <p className="text-red-600 text-sm mb-4">{error}</p>
+          <p className="text-red-500 text-xs">Please run the SQL schema in Supabase SQL Editor.</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show message if no menu items
+  if (!loading && !hasData) {
+    return (
+      <div className="py-12 text-center">
+        <div className="max-w-md mx-auto p-6 bg-amber-50 rounded-2xl border border-amber-200">
+          <h3 className="text-lg font-bold text-amber-800 mb-2">No Menu Items</h3>
+          <p className="text-amber-600 text-sm">Please run the SQL schema in Supabase to populate the menu.</p>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
@@ -447,7 +465,7 @@ export function DynamicMenu({
             const isActive = activeCategory === cat.id
             const itemCount = cat.id === "all" 
               ? allItems.length 
-              : (displayItems[cat.id] || []).length
+              : (displayItems?.[cat.id] || []).length
             
             if (cat.id !== "all" && itemCount === 0) return null
             
@@ -522,7 +540,7 @@ export function DynamicMenu({
         {filteredCategories
           .filter(category => activeCategory === "all" || category.slug === activeCategory)
           .map((category) => {
-            const items = displayItems[category.slug] || []
+            const items = displayItems?.[category.slug] || []
             if (items.length === 0) return null
 
             const categoryConf = categoryConfig.find(c => c.id === category.slug)
@@ -570,7 +588,7 @@ export function DynamicMenu({
       </div>
 
       {/* Empty State */}
-      {filteredCategories.filter(cat => activeCategory === "all" || cat.slug === activeCategory).every(cat => (displayItems[cat.slug] || []).length === 0) && (
+      {filteredCategories.filter(cat => activeCategory === "all" || cat.slug === activeCategory).every(cat => (displayItems?.[cat.slug] || []).length === 0) && (
         <div className="text-center py-16">
           <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShoppingBag className="h-10 w-10 text-gray-400" />

@@ -20,6 +20,7 @@ export interface DbOrder {
   subtotal: number
   total: number
   status: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled'
+  payment_method?: 'cash' | 'card' | null
   created_at: string
   updated_at: string
 }

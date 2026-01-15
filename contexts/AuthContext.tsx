@@ -11,16 +11,6 @@ export interface Staff {
   is_active: boolean
 }
 
-// Fallback admin credentials when Supabase isn't configured
-const FALLBACK_ADMIN = {
-  id: "local-admin",
-  username: "admin",
-  password: "leafbean2024",
-  name: "Admin",
-  role: "admin",
-  is_active: true,
-}
-
 interface AuthContextType {
   staff: Staff | null
   loading: boolean
@@ -40,43 +30,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Check if user is already logged in on mount
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) {
+        console.error("Supabase not configured")
+        setError("Database not configured. Please check environment variables.")
+        setLoading(false)
+        return
+      }
+
       try {
         const storedStaffId = localStorage.getItem("staff_id")
         if (storedStaffId) {
-          // Check for local fallback admin
-          if (storedStaffId === FALLBACK_ADMIN.id) {
-            setStaff({
-              id: FALLBACK_ADMIN.id,
-              username: FALLBACK_ADMIN.username,
-              name: FALLBACK_ADMIN.name,
-              role: FALLBACK_ADMIN.role,
-              is_active: true,
-            })
-            setLoading(false)
-            return
-          }
+          const { data, error: queryError } = await supabase
+            .from("staff")
+            .select("id, username, name, role, is_active")
+            .eq("id", storedStaffId)
+            .eq("is_active", true)
+            .single()
 
-          // Try Supabase
-          try {
-            const { data, error } = await supabase
-              .from("staff")
-              .select("id, username, name, role, is_active")
-              .eq("id", storedStaffId)
-              .eq("is_active", true)
-              .single()
-
-            if (data && !error) {
-              setStaff(data)
-            } else {
-              localStorage.removeItem("staff_id")
-            }
-          } catch {
-            // Supabase not available, check local
+          if (data && !queryError) {
+            setStaff(data)
+          } else {
             localStorage.removeItem("staff_id")
           }
         }
       } catch (err) {
         console.error("Auth check error:", err)
+        localStorage.removeItem("staff_id")
       } finally {
         setLoading(false)
       }
@@ -86,59 +65,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   const login = useCallback(async (username: string, password: string): Promise<boolean> => {
+    if (!supabase) {
+      setError("Database not configured. Please check environment variables.")
+      return false
+    }
+
     setError(null)
     setLoading(true)
 
     try {
-      // First try Supabase authentication
-      try {
-        const { data, error: queryError } = await supabase
-          .from("staff")
-          .select("id, username, name, role, is_active, password_hash")
-          .eq("username", username.toLowerCase())
-          .eq("is_active", true)
-          .single()
+      const { data, error: queryError } = await supabase
+        .from("staff")
+        .select("id, username, name, role, is_active, password_hash")
+        .eq("username", username.toLowerCase())
+        .eq("is_active", true)
+        .single()
 
-        if (!queryError && data && data.password_hash === password) {
-          // Update last login time
-          await supabase
-            .from("staff")
-            .update({ last_login: new Date().toISOString() })
-            .eq("id", data.id)
-
-          const staffData: Staff = {
-            id: data.id,
-            username: data.username,
-            name: data.name,
-            role: data.role,
-            is_active: data.is_active,
-          }
-
-          setStaff(staffData)
-          localStorage.setItem("staff_id", data.id)
-          setLoading(false)
-          return true
-        }
-      } catch {
-        // Supabase not available, continue to fallback
-        console.log("Supabase not available, using fallback authentication")
+      if (queryError) {
+        console.error("Login query error:", queryError)
+        setError("Invalid username or password")
+        setLoading(false)
+        return false
       }
 
-      // Fallback to local admin credentials
-      if (
-        username.toLowerCase() === FALLBACK_ADMIN.username &&
-        password === FALLBACK_ADMIN.password
-      ) {
+      if (data && data.password_hash === password) {
+        // Update last login time
+        await supabase
+          .from("staff")
+          .update({ last_login: new Date().toISOString() })
+          .eq("id", data.id)
+
         const staffData: Staff = {
-          id: FALLBACK_ADMIN.id,
-          username: FALLBACK_ADMIN.username,
-          name: FALLBACK_ADMIN.name,
-          role: FALLBACK_ADMIN.role,
-          is_active: true,
+          id: data.id,
+          username: data.username,
+          name: data.name,
+          role: data.role,
+          is_active: data.is_active,
         }
 
         setStaff(staffData)
-        localStorage.setItem("staff_id", FALLBACK_ADMIN.id)
+        localStorage.setItem("staff_id", data.id)
         setLoading(false)
         return true
       }

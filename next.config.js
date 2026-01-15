@@ -21,6 +21,18 @@ const nextConfig = {
         hostname: '*.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
+      {
+        // Google Profile Photos (for reviews)
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
+      {
+        // Pixabay images (fallback menu images)
+        protocol: 'https',
+        hostname: 'cdn.pixabay.com',
+        pathname: '/**',
+      },
     ],
     // Optimize image formats
     formats: ['image/avif', 'image/webp'],

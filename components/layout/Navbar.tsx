@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Menu, X, ShoppingBag, ClipboardList } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/contexts/CartContext"
+import { useSettings } from "@/contexts/SettingsContext"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -18,6 +19,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { setIsOpen, getTotalItems } = useCart()
+  const { settings } = useSettings()
   const pathname = usePathname()
   
   // Pages with light backgrounds that need dark navbar
@@ -66,7 +68,7 @@ export default function Navbar() {
                 ? "text-shawarma" 
                 : "text-shawarma drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
             )}>
-              TODAY SHAWARMA
+              {settings.restaurantName || "TODAY SHAWARMA"}
             </span>
           </a>
 

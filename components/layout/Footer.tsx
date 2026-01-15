@@ -1,10 +1,11 @@
 "use client"
 
 import { MapPin, Phone, Clock, Heart } from "lucide-react"
-import contentData from "@/src/content/content.json"
 import Link from "next/link"
+import { useSettings } from "@/contexts/SettingsContext"
 
 export default function Footer() {
+  const { settings } = useSettings()
   const currentYear = new Date().getFullYear()
   
   return (
@@ -15,13 +16,13 @@ export default function Footer() {
           
           {/* Brand */}
           <div className="lg:col-span-1">
-            <h3 className="text-xl font-bold mb-4">Today Shawarma</h3>
+            <h3 className="text-xl font-bold mb-4">{settings.restaurantName || "Today Shawarma"}</h3>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              {contentData.tagline}
+              Authentic Middle Eastern flavours made fresh daily with traditional recipes.
             </p>
             <div className="flex items-center gap-2 text-shawarma">
               <Heart className="h-4 w-4 fill-current" />
-              <span className="text-sm font-medium">Made with love in Edinburgh</span>
+              <span className="text-sm font-medium">Made with love</span>
             </div>
           </div>
 
@@ -56,46 +57,41 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-5">Contact</h3>
             <div className="space-y-4">
-              <a 
-                href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contentData.address.line1 + ', ' + contentData.address.city)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-3 text-gray-300 hover:text-white transition-colors group"
-              >
-                <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-shawarma transition-colors">
-                  <MapPin className="h-4 w-4" />
-                </div>
-                <div className="text-sm">
-                  <p>{contentData.address.line1}</p>
-                  <p className="text-gray-500">{contentData.address.city} {contentData.address.postcode}</p>
-                </div>
-              </a>
-              <a 
-                href={`tel:${contentData.phone.replace(/\s/g, "")}`}
-                className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors group"
-              >
-                <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-shawarma transition-colors">
-                  <Phone className="h-4 w-4" />
-                </div>
-                <span className="text-sm">{contentData.phone}</span>
-              </a>
+              {settings.restaurantAddress && (
+                <a 
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(settings.restaurantAddress)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-3 text-gray-300 hover:text-white transition-colors group"
+                >
+                  <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-shawarma transition-colors">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                  <div className="text-sm">
+                    <p>{settings.restaurantAddress}</p>
+                  </div>
+                </a>
+              )}
+              {settings.restaurantPhone && (
+                <a 
+                  href={`tel:${settings.restaurantPhone.replace(/\s/g, "")}`}
+                  className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors group"
+                >
+                  <div className="p-2 bg-gray-800 rounded-lg group-hover:bg-shawarma transition-colors">
+                    <Phone className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm">{settings.restaurantPhone}</span>
+                </a>
+              )}
             </div>
           </div>
 
-          {/* Hours */}
+          {/* Status */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-5">Opening Hours</h3>
-            <div className="space-y-2">
-              {contentData.hours.items.slice(0, 3).map((item) => (
-                <div key={item.day} className="flex justify-between text-sm">
-                  <span className="text-gray-400">{item.day}</span>
-                  <span className="text-gray-300">{item.open} - {item.close}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 flex items-center gap-2 text-shawarma text-sm">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-400 mb-5">Status</h3>
+            <div className={`flex items-center gap-2 text-sm ${settings.acceptingOrders ? "text-green-400" : "text-red-400"}`}>
               <Clock className="h-4 w-4" />
-              <span className="font-medium">Open now</span>
+              <span className="font-medium">{settings.acceptingOrders ? "Open for orders" : "Currently closed"}</span>
             </div>
           </div>
         </div>
@@ -106,10 +102,10 @@ export default function Footer() {
         <div className="mx-auto max-w-7xl px-6 py-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-xs text-gray-500">
-              © {currentYear} Today Shawarma. All rights reserved.
+              © {currentYear} {settings.restaurantName || "Today Shawarma"}. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-xs text-gray-500">
-              <span>Edinburgh, UK</span>
+              <span>UK</span>
               <span className="w-1 h-1 bg-gray-600 rounded-full" />
               <span>Fresh • Fast • Halal</span>
             </div>

@@ -8,17 +8,16 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Section } from "@/components/ui/Section"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { Beef, UtensilsCrossed, Salad, Heart, MapPin, Phone, Clock, Star, Percent, Tag, ArrowRight, Users, Award, Flame } from "lucide-react"
+import { Beef, UtensilsCrossed, Salad, Heart, MapPin, Phone, Clock, Star, ArrowRight, Users, Award, Flame } from "lucide-react"
 import Reviews from "@/components/ui/Reviews"
 import contentData from "@/src/content/content.json"
 import PopularTimes from "@/components/ui/PopularTimes"
 import { DynamicMenu } from "@/components/ui/DynamicMenu"
-import { useMenu } from "@/contexts/MenuContext"
 import { AnimatedSection, AnimatedCounter } from "@/components/ui/AnimatedSection"
+import { useSettings } from "@/contexts/SettingsContext"
 
 export default function Home() {
-  const { promotions, banners, getTodaySpecials } = useMenu()
-  
+  const { settings } = useSettings()
   // Google reviews data for About Us stats
   const [googleStats, setGoogleStats] = useState({ rating: 4.8, totalReviews: 100 })
   
@@ -35,17 +34,6 @@ export default function Home() {
         // Keep default values on error
       })
   }, [])
-  
-  // Get today's specials
-  const todaySpecials = getTodaySpecials()
-  
-  // Show all active promotions (admin controls what's active)
-  const activePromotions = promotions.filter(p => p.isActive)
-  // Show all active banners
-  const activeBanners = banners.filter(b => b.isActive)
-  const topBanners = activeBanners.filter(b => b.position === "top")
-  const heroBanners = activeBanners.filter(b => b.position === "hero")
-  const menuBanners = activeBanners.filter(b => b.position === "menu")
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
@@ -84,8 +72,17 @@ export default function Home() {
         {/* Content */}
         <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8 text-center">
           <div className="space-y-8">
-            {/* Trust Badge */}
-            <div className="animate-slide-up flex justify-center" style={{ animationDelay: '0.2s' }}>
+            {/* Trust Badges */}
+            <div className="animate-slide-up flex flex-wrap justify-center gap-3" style={{ animationDelay: '0.2s' }}>
+              {/* Halal Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500/20 to-green-500/20 backdrop-blur-md rounded-full border border-emerald-400/40 text-white text-sm shadow-lg shadow-emerald-500/20">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold text-xs shadow-inner">
+                  ☪
+                </div>
+                <span className="font-bold text-emerald-300">100% HALAL</span>
+              </div>
+              
+              {/* Customer Love Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white/90 text-sm">
                 <div className="flex -space-x-2">
                   <div className="w-6 h-6 rounded-full bg-shawarma flex items-center justify-center text-xs">⭐</div>
@@ -128,8 +125,8 @@ export default function Home() {
                 <span className="text-sm font-medium">Fresh Daily</span>
               </div>
               <div className="flex items-center gap-2 text-white/80">
-                <Award className="h-5 w-5 text-yellow-500" />
-                <span className="text-sm font-medium">100% Halal</span>
+                <Clock className="h-5 w-5 text-blue-400" />
+                <span className="text-sm font-medium">Fast Service</span>
               </div>
               <div className="flex items-center gap-2 text-white/80">
                 <Users className="h-5 w-5 text-green-400" />
@@ -150,33 +147,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Hero Position Banners */}
-      {heroBanners.length > 0 && (
-        <section className="py-6 px-6">
-          <div className="max-w-7xl mx-auto">
-            {heroBanners.map((banner) => (
-              <div 
-                key={banner.id}
-                className="rounded-2xl p-8 md:p-12 text-center shadow-2xl overflow-hidden"
-                style={{ backgroundColor: banner.backgroundColor, color: banner.textColor }}
-              >
-                <h2 className="text-3xl md:text-4xl font-bold mb-2">{banner.title}</h2>
-                {banner.subtitle && <p className="text-xl opacity-90 mb-2">{banner.subtitle}</p>}
-                {banner.description && <p className="opacity-80 max-w-2xl mx-auto">{banner.description}</p>}
-                {banner.buttonText && banner.buttonLink && (
-                  <Link 
-                    href={banner.buttonLink}
-                    className="inline-block mt-6 px-8 py-3 rounded-full font-semibold text-lg transition-all hover:scale-105 shadow-lg"
-                    style={{ backgroundColor: banner.textColor, color: banner.backgroundColor }}
-                  >
-                    {banner.buttonText}
-                  </Link>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Features Section - Trendy Bento Grid */}
       <Section className="relative py-16 md:py-24 overflow-hidden">
@@ -408,91 +378,6 @@ export default function Home() {
             </p>
           </AnimatedSection>
 
-        {/* Active Promotions Banner */}
-        {activePromotions.length > 0 && (
-          <div className="mb-12">
-            <div className="bg-gradient-to-r from-shawarma to-shawarma-600 rounded-2xl p-6 md:p-8 text-white shadow-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-white/20 rounded-full">
-                  <Percent className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-bold">Special Offers</h3>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {activePromotions.map((promo) => (
-                  <div key={promo.id} className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                    <h4 className="font-semibold text-lg">{promo.name}</h4>
-                    <p className="text-white/90 text-2xl font-bold mt-1">
-                      {promo.promoType === "percentage" ? `${promo.discountValue}% OFF` : `£${promo.discountValue?.toFixed(2)} OFF`}
-                    </p>
-                    {promo.description && <p className="text-white/80 text-sm mt-2">{promo.description}</p>}
-                    {promo.promoCode && (
-                      <div className="mt-3 inline-block px-3 py-1 bg-white/20 rounded-lg text-sm font-mono">
-                        Code: {promo.promoCode}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Menu Section Banners */}
-        {menuBanners.map((banner) => (
-          <div 
-            key={banner.id}
-            className="mb-8 rounded-2xl p-6 text-center shadow-lg"
-            style={{ backgroundColor: banner.backgroundColor, color: banner.textColor }}
-          >
-            <h3 className="text-xl font-bold">{banner.title}</h3>
-            {banner.subtitle && <p className="opacity-90 mt-1">{banner.subtitle}</p>}
-            {banner.description && <p className="opacity-80 text-sm mt-2">{banner.description}</p>}
-            {banner.buttonText && banner.buttonLink && (
-              <Link 
-                href={banner.buttonLink}
-                className="inline-block mt-4 px-6 py-2 rounded-full font-medium transition-opacity hover:opacity-80"
-                style={{ backgroundColor: banner.textColor, color: banner.backgroundColor }}
-              >
-                {banner.buttonText}
-              </Link>
-            )}
-          </div>
-        ))}
-
-        {/* Today's Specials - Horizontal scroll */}
-        {todaySpecials.length > 0 && (
-          <div className="mb-8 -mx-6 px-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-              <h3 className="text-lg font-bold text-gray-900">Today&apos;s Specials</h3>
-            </div>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-              {todaySpecials.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="flex-shrink-0 w-[200px] bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-3 snap-start"
-                >
-                  {item.imageUrl && (
-                    <div className="w-full h-24 rounded-lg overflow-hidden mb-2 bg-gray-100">
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.name}
-                        width={200}
-                        height={96}
-                        className="w-full h-full object-cover"
-                        loading="eager"
-                      />
-                    </div>
-                  )}
-                  <h4 className="font-semibold text-gray-900 text-sm truncate">{item.name}</h4>
-                  <p className="text-lg font-bold text-yellow-600">£{item.price.toFixed(2)}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Dynamic Menu from Supabase */}
         <div className="min-h-[600px]">
           <DynamicMenu />
@@ -619,11 +504,10 @@ export default function Home() {
                       <MapPin className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900">Today Shawarma</h4>
-                      <p className="text-sm text-gray-600">{contentData.address.line1}</p>
-                      <p className="text-sm text-gray-600">{contentData.address.city} {contentData.address.postcode}</p>
+                      <h4 className="font-bold text-gray-900">{settings.restaurantName || "Today Shawarma"}</h4>
+                      <p className="text-sm text-gray-600">{settings.restaurantAddress || contentData.address.line1}</p>
                       <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contentData.address.line1 + ', ' + contentData.address.city + ' ' + contentData.address.postcode)}`}
+                        href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(settings.restaurantAddress || contentData.address.line1)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 text-shawarma hover:text-shawarma-600 font-medium text-sm mt-2 transition-colors"
@@ -639,31 +523,28 @@ export default function Home() {
             {/* Right Column - Info Cards */}
             <div className="flex flex-col gap-6">
               
-              {/* Opening Hours Card */}
+              {/* Order Status Card */}
               <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 flex-1">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="p-2.5 rounded-xl bg-shawarma">
+                  <div className={`p-2.5 rounded-xl ${settings.acceptingOrders ? "bg-green-500" : "bg-red-500"}`}>
                     <Clock className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">Opening Hours</h3>
+                  <h3 className="text-lg font-bold text-gray-900">Order Status</h3>
                 </div>
-                <div className="space-y-2.5">
-                  {contentData.hours.items.map((item) => {
-                    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' })
-                    const isToday = item.day.toLowerCase().includes(today.toLowerCase().slice(0, 3))
-                    return (
-                      <div 
-                        key={item.day} 
-                        className={`flex justify-between items-center py-1.5 px-3 rounded-lg transition-colors ${isToday ? 'bg-shawarma/10 text-shawarma font-semibold' : 'text-gray-600'}`}
-                      >
-                        <span className="text-sm">{item.day}</span>
-                        <span className="text-sm font-medium">{item.open} - {item.close}</span>
-                      </div>
-                    )
-                  })}
+                <div className="text-center py-4">
+                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
+                    settings.acceptingOrders 
+                      ? "bg-green-100 text-green-700" 
+                      : "bg-red-100 text-red-700"
+                  }`}>
+                    <span className={`w-2 h-2 rounded-full ${settings.acceptingOrders ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
+                    {settings.acceptingOrders ? "Open for Orders" : "Currently Closed"}
+                  </div>
                 </div>
                 <p className="text-xs text-gray-500 mt-4 text-center">
-                  {contentData.hours.note}
+                  {settings.acceptingOrders 
+                    ? "We're ready to take your order!" 
+                    : "Please check back later"}
                 </p>
               </div>
 
@@ -672,7 +553,7 @@ export default function Home() {
                 <h3 className="text-lg font-bold mb-4">Get in Touch</h3>
                 <div className="space-y-4">
                   <a
-                    href={`tel:${contentData.phone.replace(/\s/g, "")}`}
+                    href={`tel:${(settings.restaurantPhone || contentData.phone).replace(/\s/g, "")}`}
                     className="flex items-center gap-3 p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors group"
                   >
                     <div className="p-2 rounded-lg bg-white">
@@ -680,12 +561,12 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-xs text-white/70">Call to order</p>
-                      <p className="font-semibold">{contentData.phone}</p>
+                      <p className="font-semibold">{settings.restaurantPhone || contentData.phone}</p>
                     </div>
                   </a>
                   
                   <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(contentData.address.line1 + ', ' + contentData.address.city + ' ' + contentData.address.postcode)}`}
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(settings.restaurantAddress || contentData.address.line1)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white text-shawarma hover:bg-white/90 rounded-xl font-semibold transition-colors"

@@ -248,7 +248,7 @@ export default function AdminLogin() {
                 <div className="p-1.5 rounded-lg bg-shawarma/10">
                   <Shield className="h-4 w-4 text-shawarma" />
                 </div>
-                <span className="text-sm font-medium text-gray-700">Demo Access</span>
+                <span className="text-sm font-medium text-gray-700">Login Credentials</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Username:</span>
@@ -256,7 +256,7 @@ export default function AdminLogin() {
               </div>
               <div className="flex items-center justify-between text-sm mt-1">
                 <span className="text-gray-500">Password:</span>
-                <code className="px-2 py-1 bg-gray-100 rounded-lg font-mono text-gray-700">leafbean2024</code>
+                <code className="px-2 py-1 bg-gray-100 rounded-lg font-mono text-gray-700">admin123</code>
               </div>
             </div>
 
